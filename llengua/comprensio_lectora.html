@@ -697,9 +697,9 @@ function renderHome(){
   });
 
   const statsHtml=clStatsVisible?`<div class="stats-row">
-    <div class="stat"><div class="stat-num">${doneCount}</div><div class="stat-lbl">Contes</div></div>
-    <div class="stat"><div class="stat-num">${xp}</div><div class="stat-lbl">XP Total</div></div>
-    <div class="stat"><div class="stat-num">${earned.length}</div><div class="stat-lbl">Assoliments</div></div>
+    <div class="stat"><div class="stat-num">${doneCount}</div><div class="stat-lbl">📖 Contes</div></div>
+    <div class="stat"><div class="stat-num">${xp}</div><div class="stat-lbl">⭐ XP Total</div></div>
+    <div class="stat"><div class="stat-num">${earned.length}</div><div class="stat-lbl">🏅 Assoliments</div></div>
   </div><button class="reset-lnk" onclick="if(confirm('Esborrar tot el progrés?'))resetAll()">Reiniciar progrés</button>`:'';
 
   const achsHtml=clAchsVisible?`<div class="ach-grid">${achRows}</div>`:'';
@@ -708,8 +708,8 @@ function renderHome(){
     <div class="hdr"><h1>Comprensió Lectora</h1></div>
     ${xpBar(xp)}
     <div class="gam-tabs">
-      <button class="gam-tab${clStatsVisible?' on':''}" onclick="toggleClStats()">Estadístiques</button>
-      <button class="gam-tab${clAchsVisible?' on':''}" onclick="toggleClAchs()">Assoliments</button>
+      <button class="gam-tab${clStatsVisible?' on':''}" onclick="toggleClStats()">📊 Estadístiques</button>
+      <button class="gam-tab${clAchsVisible?' on':''}" onclick="toggleClAchs()">🏅 Assoliments</button>
     </div>
     ${statsHtml}
     ${achsHtml}
