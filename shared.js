@@ -1,4 +1,6 @@
 // shared.js — Motor de gamificació i utilitats comunes a tots els exercicis
+(function(){const t=localStorage.getItem('ex_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+window.addEventListener('message',function(e){if(e.data&&e.data.exTheme)document.documentElement.setAttribute('data-theme',e.data.exTheme);});
 const GAM = 'ex_gam_v1';
 let GAM_LVS = [
   {n:'Principiant',x:0},{n:'Aprenent',x:75},{n:'Estudiant',x:200},
