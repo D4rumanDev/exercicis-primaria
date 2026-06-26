@@ -70,8 +70,10 @@
 .wrd-frac-line{width:52px;height:3px;background:var(--t);border-radius:2px}
 .wrd-frac-d{font-size:2.2rem;font-weight:900;line-height:1;color:var(--t)}
 /* Grid section */
-.grid-vis-wrap{display:flex;justify-content:center;margin:12px 0}
-.grid-cell{cursor:pointer;transition:fill .15s}
+.grid-vis-wrap{display:flex;justify-content:center;margin:12px 0;padding:2px}
+.grid-vis-wrap svg{overflow:visible}
+.grid-cell{cursor:pointer;transition:fill .15s,stroke .15s}
+.grid-cell[data-a="1"]{stroke:#2563eb;stroke-width:2.5}
 </style>
 </head>
 <body>
@@ -247,13 +249,21 @@ function circleSVG(n,d,th,size=175,inter=false){
 }
 
 function barSVG(n,d,th,W=260,H=72,inter=false){
-  const cw=Math.floor(W/d),tw=cw*d;let rects='';
+  const cw=Math.floor(W/d),tw=cw*d,rx=6;
+  const cid='bc'+Math.random().toString(36).slice(2,7);
+  let cells='';
   for(let i=0;i<d;i++){
     const fill=i<n?th.fill:th.empty;
     const ic=inter?`onclick="cellClick(this)" data-a="${i<n?1:0}" style="cursor:pointer"`:'';
-    rects+=`<rect ${ic} data-i="${i}" x="${i*cw}" y="2" width="${cw}" height="${H-4}" fill="${fill}" stroke="${th.stroke}" stroke-width="2" rx="5"/>`;
+    cells+=`<rect ${ic} data-i="${i}" x="${i*cw}" y="0" width="${cw}" height="${H}" fill="${fill}"/>`;
   }
-  return`<svg width="${tw}" height="${H}" class="${inter?'isv':''}">${rects}</svg>`;
+  let divs='';
+  for(let i=1;i<d;i++) divs+=`<line x1="${i*cw}" y1="0" x2="${i*cw}" y2="${H}" stroke="${th.stroke}" stroke-width="1.5"/>`;
+  return`<svg width="${tw}" height="${H}" class="${inter?'isv':''}">`
+    +`<defs><clipPath id="${cid}"><rect width="${tw}" height="${H}" rx="${rx}"/></clipPath></defs>`
+    +`<g clip-path="url(#${cid})">${cells}${divs}</g>`
+    +`<rect x="1" y="1" width="${tw-2}" height="${H-2}" rx="${rx-1}" fill="none" stroke="${th.stroke}" stroke-width="2"/>`
+    +`</svg>`;
 }
 
 function dominoSVG(n,d,th,W=90,H=26*Math.min(d,8)+20){
@@ -555,10 +565,10 @@ function gridSVG(d){
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
       const i=r*cols+c,x=c*(G_CW+G_GAP),y=r*(G_CH+G_GAP);
-      s+=`<rect class="grid-cell" onclick="gridCellClick(this)" data-a="0" data-i="${i}" x="${x}" y="${y}" width="${G_CW}" height="${G_CH}" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>`;
+      s+=`<rect class="grid-cell" onclick="gridCellClick(this)" data-a="0" data-i="${i}" x="${x}" y="${y}" width="${G_CW}" height="${G_CH}" rx="5" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>`;
     }
   }
-  return`<svg viewBox="0 0 ${W} ${H}" style="max-width:100%;width:${W}px;height:${H}px">${s}</svg>`;
+  return`<svg viewBox="-2 -2 ${W+4} ${H+4}" style="max-width:100%;width:${W}px;height:${H}px">${s}</svg>`;
 }
 function nextFracGrid(){
   const {n,d}=randFrac();
