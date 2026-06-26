@@ -96,3 +96,15 @@ h2{font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .dbtn:hover:not(.active){border-color:var(--a);color:var(--a)}
 .dbtn.active{background:var(--a);color:#fff;border-color:var(--a)}
 .dvline{width:100%;height:3px;background:var(--a);border-radius:1px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--m)}
+*{scrollbar-width:thin;scrollbar-color:var(--b) transparent}
+::selection{background:#dbeafe;color:var(--t)}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+.btn:active:not(:disabled){transform:scale(.97)}
+.aopt:active:not(:disabled){transform:scale(.96)}
+.dbtn:active:not(:disabled){transform:scale(.97)}
+.popt:active:not(:disabled){transform:scale(.96)}
