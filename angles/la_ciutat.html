@@ -157,6 +157,12 @@ const PLACES = [
   {name:'train station', icon:'🚂', cls:'cb-school'},
   {name:'supermarket',   icon:'🛒', cls:'cb-bank'},
   {name:'toy shop',      icon:'🧸', cls:'cb-cafe'},
+  {name:'sports centre', icon:'🏊', cls:'cb-school'},
+  {name:'post office',   icon:'📮', cls:'cb-museum'},
+  {name:'fire station',  icon:'🚒', cls:'cb-hospital'},
+  {name:'restaurant',    icon:'🍽️', cls:'cb-cafe'},
+  {name:'pharmacy',      icon:'💊', cls:'cb-hospital'},
+  {name:'bakery',        icon:'🥖', cls:'cb-cafe'},
 ];
 
 /* Fixed 3×3 map grid used for sections 2, 3, 4, 6 */
@@ -303,6 +309,15 @@ const S3_POOL = [
   {q:"Are there any schools in the town?",   yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
   {q:"Are there any cafés in the town?",     yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
   {q:"Are there any libraries in the town?", yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
+  {q:"Is there a bank in the town?",         yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
+  {q:"Is there a sports centre in the town?",yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
+  {q:"Is there a post office in the town?",  yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
+  {q:"Is there a fire station in the town?", yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
+  {q:"Is there a restaurant in the town?",   yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
+  {q:"Is there a library in the town?",      yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
+  {q:"Are there any banks in the town?",     yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
+  {q:"Are there any museums in the town?",   yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
+  {q:"Are there any zoos in the town?",      yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
 ];
 let s3Current = [];
 function s3Init() {
@@ -374,6 +389,12 @@ const S5_POOL = [
   {words:["There","are","a","lot","of","places","in","the","town."],correct:"There are a lot of places in the town."},
   {words:["The","cinema","is","next","to","the","school."],         correct:"The cinema is next to the school."},
   {words:["There","isn't","a","zoo","opposite","the","park."],      correct:"There isn't a zoo opposite the park."},
+  {words:["Is","there","a","library","in","the","town?"],             correct:"Is there a library in the town?"},
+  {words:["The","zoo","is","opposite","the","cinema."],               correct:"The zoo is opposite the cinema."},
+  {words:["There","isn't","a","sports","centre","in","the","town."],  correct:"There isn't a sports centre in the town."},
+  {words:["The","museum","is","between","the","café","and","the","library."], correct:"The museum is between the café and the library."},
+  {words:["Is","there","a","post","office","near","here?"],           correct:"Is there a post office near here?"},
+  {words:["There","are","two","parks","in","the","town."],            correct:"There are two parks in the town."},
 ];
 let s5State = [];
 function s5Init() {

@@ -149,6 +149,12 @@ const JOBS = [
   {name:'fashion designer', pronoun:'she', icon:'👗', desc:'She designs and creates beautiful clothes for people to wear.'},
   {name:'taxi driver',      pronoun:'he',  icon:'🚕', desc:'He drives people around the city in his car.'},
   {name:'teacher',          pronoun:'she', icon:'📚', desc:'She teaches children and helps them learn new things at school.'},
+  {name:'chef',             pronoun:'he',  icon:'👨‍🍳', desc:'He prepares and cooks delicious food in a restaurant kitchen.'},
+  {name:'pilot',            pronoun:'he',  icon:'✈️',  desc:'He flies aeroplanes and takes passengers to different countries.'},
+  {name:'engineer',         pronoun:'he',  icon:'🔧',  desc:'He designs and builds machines and bridges.'},
+  {name:'dentist',          pronoun:'she', icon:'🦷',  desc:'She takes care of teeth and helps people have a healthy smile.'},
+  {name:'journalist',       pronoun:'she', icon:'📰',  desc:'She writes articles and reports the news for newspapers and TV.'},
+  {name:'librarian',        pronoun:'she', icon:'📖',  desc:'She helps people find and borrow books in a library.'},
 ];
 
 const TF_POOL = [
@@ -178,6 +184,22 @@ const TF_POOL = [
   {stmt:"A police officer drives a fire engine.",  ans:false},
   {stmt:"A firefighter is brave.",                 ans:true},
   {stmt:"A shop assistant sells things in a shop.",ans:true},
+  {stmt:"A chef cooks food in a restaurant.",         ans:true},
+  {stmt:"A chef flies aeroplanes.",                    ans:false},
+  {stmt:"A chef wears a uniform.",                     ans:true},
+  {stmt:"A pilot flies aeroplanes.",                   ans:true},
+  {stmt:"A pilot works in a school.",                  ans:false},
+  {stmt:"A pilot wears a uniform.",                    ans:true},
+  {stmt:"An engineer builds bridges and machines.",    ans:true},
+  {stmt:"An engineer wears a uniform.",                ans:false},
+  {stmt:"A dentist looks after people's teeth.",       ans:true},
+  {stmt:"A dentist works in a hospital.",              ans:false},
+  {stmt:"A dentist wears a uniform.",                  ans:true},
+  {stmt:"A journalist writes articles and news.",      ans:true},
+  {stmt:"A journalist wears a uniform.",               ans:false},
+  {stmt:"A librarian works in a library.",             ans:true},
+  {stmt:"A librarian wears a uniform.",                ans:false},
+  {stmt:"A librarian helps people borrow books.",      ans:true},
 ];
 
 const WEAR_POOL = [
@@ -192,6 +214,12 @@ const WEAR_POOL = [
   {job:'fashion designer', wears:false},
   {job:'teacher',          wears:false},
   {job:'shop assistant',   wears:false},
+  {job:'chef',             wears:true},
+  {job:'pilot',            wears:true},
+  {job:'engineer',         wears:false},
+  {job:'dentist',          wears:true},
+  {job:'journalist',       wears:false},
+  {job:'librarian',        wears:false},
 ];
 
 const DOES_POOL = [
@@ -218,6 +246,18 @@ const DOES_POOL = [
   {q:"Does a fashion designer work in a school?", pronoun:'she', ans:false},
   {q:"Does a teacher help students?",             pronoun:'she', ans:true},
   {q:"Does a police officer work in the streets?",pronoun:'she', ans:true},
+  {q:"Does a chef cook food in a restaurant?",    pronoun:'he',  ans:true},
+  {q:"Does a chef fly aeroplanes?",               pronoun:'he',  ans:false},
+  {q:"Does a pilot wear a uniform?",              pronoun:'he',  ans:true},
+  {q:"Does a pilot work in a school?",            pronoun:'he',  ans:false},
+  {q:"Does an engineer build bridges?",           pronoun:'he',  ans:true},
+  {q:"Does an engineer wear a uniform?",          pronoun:'he',  ans:false},
+  {q:"Does a dentist look after teeth?",          pronoun:'she', ans:true},
+  {q:"Does a dentist work in a hospital?",        pronoun:'she', ans:false},
+  {q:"Does a journalist write articles?",         pronoun:'she', ans:true},
+  {q:"Does a journalist wear a uniform?",         pronoun:'she', ans:false},
+  {q:"Does a librarian work in a library?",       pronoun:'she', ans:true},
+  {q:"Does a librarian help people find books?",  pronoun:'she', ans:true},
 ];
 
 const S5_POOL = [
@@ -239,6 +279,11 @@ const S5_POOL = [
   {words:["Does","a","shop","assistant","work","in","a","shop?"],correct:"Does a shop assistant work in a shop?"},
   {words:["She","doesn't","work","in","a","hospital."],        correct:"She doesn't work in a hospital."},
   {words:["A","taxi","driver","doesn't","wear","a","uniform."],correct:"A taxi driver doesn't wear a uniform."},
+  {words:["A","chef","wears","a","uniform."],                  correct:"A chef wears a uniform."},
+  {words:["Does","a","pilot","fly","aeroplanes?"],              correct:"Does a pilot fly aeroplanes?"},
+  {words:["A","dentist","takes","care","of","people's","teeth."], correct:"A dentist takes care of people's teeth."},
+  {words:["She","works","in","a","library."],                   correct:"She works in a library."},
+  {words:["A","journalist","doesn't","wear","a","uniform."],    correct:"A journalist doesn't wear a uniform."},
 ];
 
 const GUESS_POOL = [
@@ -275,6 +320,18 @@ const GUESS_POOL = [
   {icon:'🛍️', ans:'shop assistant',
    clues:["She works in a shop.","She doesn't wear a uniform.","She helps customers find and buy things."],
    opts:['shop assistant','fashion designer','pop star','teacher']},
+  {icon:'👨‍🍳', ans:'chef',
+   clues:["He works in a restaurant kitchen.","He wears a uniform.","He prepares and cooks delicious food."],
+   opts:['chef','farmer','doctor','shop assistant']},
+  {icon:'✈️', ans:'pilot',
+   clues:["He flies aeroplanes.","He wears a uniform.","He takes passengers to different countries."],
+   opts:['pilot','taxi driver','firefighter','engineer']},
+  {icon:'🦷', ans:'dentist',
+   clues:["She takes care of your teeth.","She wears a uniform.","She works in a clinic and gives you a healthy smile."],
+   opts:['dentist','nurse','doctor','vet']},
+  {icon:'📰', ans:'journalist',
+   clues:["She writes articles and reports news.","She doesn't wear a uniform.","She interviews people and works for newspapers or TV."],
+   opts:['journalist','teacher','fashion designer','librarian']},
 ];
 
 /* ══ SECTION 1 ══ */

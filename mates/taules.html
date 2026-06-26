@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taules de Multiplicar</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.fact-big{text-align:center;font-family:'Courier New',monospace;font-size:3rem;font-weight:900;color:var(--t);margin:16px 0 10px;line-height:1.1}
+.fact-big .hi{color:var(--a)}
+.ans-big{display:block;margin:0 auto 4px;width:110px;height:68px;text-align:center;font-size:2.4rem;font-weight:900;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:12px;color:var(--a);background:var(--bg);outline:none;-moz-appearance:textfield;transition:border-color .15s,background .15s}
+.ans-big::-webkit-inner-spin-button,.ans-big::-webkit-outer-spin-button{-webkit-appearance:none}
+.ans-big:focus{border-color:var(--a);background:#eff6ff}
+.ans-big.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ans-big.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.tbl-grid{display:flex;flex-direction:column;gap:4px;margin:10px auto;max-width:240px}
+.tbl-cell{background:var(--bg);border:1.5px solid var(--b);border-radius:8px;padding:9px 20px;text-align:center;font-size:1rem;font-weight:600;font-family:'Courier New',monospace;color:var(--t);line-height:1.4}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr">
+  <div>
+    <h1>Taules de Multiplicar</h1>
+    <div class="muted">×2 fins ×9 · MCQ · Escriu · Factor desconegut</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<!-- ── 1: MCQ ── -->
+<div class="card">
+  <h2><span class="num">1</span> Tria la resposta</h2>
+  <p class="card-sub">Selecciona la taula o practica-les totes.</p>
+  <div class="diff-row" id="s1-fil">
+    <button class="dbtn active" data-t="all" onclick="s1Tbl('all')">Totes</button>
+    <button class="dbtn" data-t="2"   onclick="s1Tbl(2)">×2</button>
+    <button class="dbtn" data-t="3"   onclick="s1Tbl(3)">×3</button>
+    <button class="dbtn" data-t="4"   onclick="s1Tbl(4)">×4</button>
+    <button class="dbtn" data-t="5"   onclick="s1Tbl(5)">×5</button>
+    <button class="dbtn" data-t="6"   onclick="s1Tbl(6)">×6</button>
+    <button class="dbtn" data-t="7"   onclick="s1Tbl(7)">×7</button>
+    <button class="dbtn" data-t="8"   onclick="s1Tbl(8)">×8</button>
+    <button class="dbtn" data-t="9"   onclick="s1Tbl(9)">×9</button>
+  </div>
+  <div class="fact-big" id="s1-fact"></div>
+  <div class="opts-row" id="s1-opts"></div>
+  <div class="fb" id="s1-fb"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s1-nx" onclick="s1Next()" style="display:none">Següent →</button>
+  </div>
+</div>
+
+<!-- ── 2: Type ── -->
+<div class="card">
+  <h2><span class="num">2</span> Escriu la resposta</h2>
+  <p class="card-sub">Calcula i escriu el resultat. Prem Enter per comprovar.</p>
+  <div class="diff-row" id="s2-fil">
+    <button class="dbtn active" data-t="all" onclick="s2Tbl('all')">Totes</button>
+    <button class="dbtn" data-t="2"   onclick="s2Tbl(2)">×2</button>
+    <button class="dbtn" data-t="3"   onclick="s2Tbl(3)">×3</button>
+    <button class="dbtn" data-t="4"   onclick="s2Tbl(4)">×4</button>
+    <button class="dbtn" data-t="5"   onclick="s2Tbl(5)">×5</button>
+    <button class="dbtn" data-t="6"   onclick="s2Tbl(6)">×6</button>
+    <button class="dbtn" data-t="7"   onclick="s2Tbl(7)">×7</button>
+    <button class="dbtn" data-t="8"   onclick="s2Tbl(8)">×8</button>
+    <button class="dbtn" data-t="9"   onclick="s2Tbl(9)">×9</button>
+  </div>
+  <div class="fact-big" id="s2-fact"></div>
+  <input class="ans-big" id="s2-inp" type="number" min="0" inputmode="numeric" autocomplete="off">
+  <div class="fb" id="s2-fb" style="text-align:center;margin-top:8px"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-dark btn-sm" onclick="s2Check()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="s2-nx" onclick="s2Next()" style="display:none">Següent →</button>
+  </div>
+</div>
+
+<!-- ── 3: Missing factor ── -->
+<div class="card">
+  <h2><span class="num">3</span> Factor desconegut</h2>
+  <p class="card-sub">Quin número falta per completar la multiplicació?</p>
+  <div class="fact-big" id="s3-fact"></div>
+  <div class="opts-row" id="s3-opts"></div>
+  <div class="fb" id="s3-fb"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s3-nx" onclick="s3Next()" style="display:none">Següent →</button>
+  </div>
+</div>
+
+<!-- ── 4: Table reference ── -->
+<div class="card">
+  <h2><span class="num">4</span> Consulta la taula</h2>
+  <p class="card-sub">Selecciona una taula per repassar tots els resultats.</p>
+  <div class="diff-row">
+    <button class="dbtn active" data-r="2" onclick="s4Show(2)">×2</button>
+    <button class="dbtn" data-r="3" onclick="s4Show(3)">×3</button>
+    <button class="dbtn" data-r="4" onclick="s4Show(4)">×4</button>
+    <button class="dbtn" data-r="5" onclick="s4Show(5)">×5</button>
+    <button class="dbtn" data-r="6" onclick="s4Show(6)">×6</button>
+    <button class="dbtn" data-r="7" onclick="s4Show(7)">×7</button>
+    <button class="dbtn" data-r="8" onclick="s4Show(8)">×8</button>
+    <button class="dbtn" data-r="9" onclick="s4Show(9)">×9</button>
+  </div>
+  <div class="tbl-grid" id="s4-grid"></div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_taules_v1';
+GAM_ACHS = [...GAM_ACHS,
+  {id:'tau_first', s:'✖️', n:'Primer Encert',   d:'Primera resposta correcta a les taules'},
+  {id:'tau_ok10',  s:'⭐', n:'10 Respostes',     d:'10 encerts a les taules de multiplicar'},
+  {id:'tau_ok50',  s:'🎯', n:'50 Respostes',     d:'50 encerts a les taules de multiplicar'},
+  {id:'tau_all',   s:'🏆', n:'Totes les taules', d:'Almenys 1 encert a cada taula del ×2 al ×9'},
+];
+
+const KEY_T = 'ex_taules_v1';
+function loadT(){try{return JSON.parse(localStorage.getItem(KEY_T)||'{}');}catch{return{};}}
+function saveT(d){localStorage.setItem(KEY_T,JSON.stringify(d));}
+
+function taulesOk(xp, t) {
+  const d = loadT();
+  d.ok = (d.ok||0) + 1;
+  d['t'+t] = (d['t'+t]||0) + 1;
+  saveT(d);
+  gCorrect(xp, tryA => {
+    tryA('tau_first', d.ok >= 1);
+    tryA('tau_ok10',  d.ok >= 10);
+    tryA('tau_ok50',  d.ok >= 50);
+    tryA('tau_all',   [2,3,4,5,6,7,8,9].every(n => (d['t'+n]||0) >= 1));
+  });
+}
+
+function genFact(tbl) {
+  const t = tbl === 'all' ? (2 + Math.floor(Math.random() * 8)) : +tbl;
+  const a = 1 + Math.floor(Math.random() * 10);
+  return { a, t, res: a * t };
+}
+
+function distractors(correct, n) {
+  const s = new Set([correct]);
+  while (s.size < n) {
+    const t = 2 + Math.floor(Math.random() * 8);
+    const a = 1 + Math.floor(Math.random() * 10);
+    const v = a * t;
+    if (v !== correct) s.add(v);
+  }
+  return sh([...s]);
+}
+
+/* ── Section 1 ── */
+let s1T = 'all', s1F = null;
+function s1Tbl(t) {
+  s1T = t;
+  document.querySelectorAll('#s1-fil .dbtn').forEach(b => b.classList.toggle('active', b.dataset.t === String(t)));
+  s1Next();
+}
+function s1Next() {
+  s1F = genFact(s1T);
+  document.getElementById('s1-fact').innerHTML =
+    `<span class="hi">${s1F.a}</span> × <span class="hi">${s1F.t}</span> = <span class="hi">?</span>`;
+  document.getElementById('s1-fb').className = 'fb';
+  document.getElementById('s1-nx').style.display = 'none';
+  const od = document.getElementById('s1-opts'); od.innerHTML = '';
+  distractors(s1F.res, 4).forEach(o => {
+    const b = document.createElement('button'); b.className = 'aopt'; b.textContent = o;
+    b.onclick = () => {
+      od.querySelectorAll('.aopt').forEach(x => x.disabled = true);
+      const ok = o === s1F.res; b.classList.add(ok ? 'ok' : 'ko');
+      if (!ok) od.querySelectorAll('.aopt').forEach(x => { if (+x.textContent === s1F.res) x.classList.add('show'); });
+      const fb = document.getElementById('s1-fb');
+      fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+      fb.textContent = ok ? pick(OK) : `${s1F.a} × ${s1F.t} = ${s1F.res}`;
+      ok ? taulesOk(2, s1F.t) : gWrong();
+      document.getElementById('s1-nx').style.display = 'inline-block';
+    };
+    od.appendChild(b);
+  });
+}
+
+/* ── Section 2 ── */
+let s2T = 'all', s2F = null, s2Done = false;
+function s2Tbl(t) {
+  s2T = t;
+  document.querySelectorAll('#s2-fil .dbtn').forEach(b => b.classList.toggle('active', b.dataset.t === String(t)));
+  s2Next();
+}
+function s2Next() {
+  s2F = genFact(s2T); s2Done = false;
+  document.getElementById('s2-fact').innerHTML =
+    `<span class="hi">${s2F.a}</span> × <span class="hi">${s2F.t}</span> = <span class="hi">?</span>`;
+  const inp = document.getElementById('s2-inp');
+  inp.value = ''; inp.className = 'ans-big';
+  document.getElementById('s2-fb').className = 'fb';
+  document.getElementById('s2-nx').style.display = 'none';
+  setTimeout(() => inp.focus({ preventScroll: true }), 30);
+}
+function s2Check() {
+  if (s2Done) return;
+  const inp = document.getElementById('s2-inp');
+  const val = parseInt(inp.value);
+  if (isNaN(val) || inp.value === '') return;
+  const ok = val === s2F.res;
+  inp.className = 'ans-big ' + (ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s2-fb');
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(OK) : `${s2F.a} × ${s2F.t} = ${s2F.res}`;
+  s2Done = true;
+  ok ? taulesOk(3, s2F.t) : gWrong();
+  document.getElementById('s2-nx').style.display = 'inline-block';
+}
+
+/* ── Section 3 ── */
+let s3F = null;
+function s3Next() {
+  const t = 2 + Math.floor(Math.random() * 8);
+  const a = 1 + Math.floor(Math.random() * 10);
+  const res = a * t;
+  const hideA = Math.random() < 0.5;
+  const correct = hideA ? a : t;
+  s3F = { a, t, res, hideA, correct };
+  const fa = hideA ? '?' : a, ft = hideA ? t : '?';
+  document.getElementById('s3-fact').innerHTML =
+    `<span class="hi">${fa}</span> × <span class="hi">${ft}</span> = <span class="hi">${res}</span>`;
+  document.getElementById('s3-fb').className = 'fb';
+  document.getElementById('s3-nx').style.display = 'none';
+  const opts = new Set([correct]);
+  while (opts.size < 4) { const v = 1 + Math.floor(Math.random() * 10); if (v !== correct) opts.add(v); }
+  const od = document.getElementById('s3-opts'); od.innerHTML = '';
+  sh([...opts]).forEach(o => {
+    const b = document.createElement('button'); b.className = 'aopt'; b.textContent = o;
+    b.onclick = () => {
+      od.querySelectorAll('.aopt').forEach(x => x.disabled = true);
+      const ok = o === correct; b.classList.add(ok ? 'ok' : 'ko');
+      if (!ok) od.querySelectorAll('.aopt').forEach(x => { if (+x.textContent === correct) x.classList.add('show'); });
+      const fb = document.getElementById('s3-fb');
+      fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+      fb.textContent = ok ? pick(OK) : `${s3F.a} × ${s3F.t} = ${res}`;
+      ok ? taulesOk(3, t) : gWrong();
+      document.getElementById('s3-nx').style.display = 'inline-block';
+    };
+    od.appendChild(b);
+  });
+}
+
+/* ── Section 4 ── */
+function s4Show(t) {
+  document.querySelectorAll('[data-r]').forEach(b => b.classList.toggle('active', +b.dataset.r === t));
+  document.getElementById('s4-grid').innerHTML =
+    [...Array(10)].map((_, i) => {
+      const a = i + 1, r = a * t;
+      return `<div class="tbl-cell">${a} × ${t} = <strong>${r}</strong></div>`;
+    }).join('');
+}
+
+document.getElementById('s2-inp').addEventListener('keydown', e => {
+  if (e.key === 'Enter') s2Check();
+});
+
+window.addEventListener('load', () => {
+  s1Next(); s2Next(); s3Next(); s4Show(2);
+  gRender();
+});
+</script>
+</body>
+</html>
