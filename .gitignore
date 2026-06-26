@@ -1,2 +1,6 @@
 # PDFs de referència — no cal publicar-los
 Documentacio/
+
+# Scripts i fitxers interns
+publish.ps1
+*.lnk
