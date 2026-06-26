@@ -15,6 +15,10 @@
 .ans-big.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
 .tbl-grid{display:flex;flex-direction:column;gap:4px;margin:10px auto;max-width:240px}
 .tbl-cell{background:var(--bg);border:1.5px solid var(--b);border-radius:8px;padding:9px 20px;text-align:center;font-size:1rem;font-weight:600;font-family:'Courier New',monospace;color:var(--t);line-height:1.4}
+/* ── Visual groups ── */
+.groups-wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0 4px}
+.grp-box{border-radius:10px;padding:8px;display:flex;flex-wrap:wrap;border-width:2px;border-style:solid}
+.grp-dot{border-radius:50%;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -22,14 +26,27 @@
 <div class="hdr">
   <div>
     <h1>Taules de Multiplicar</h1>
-    <div class="muted">×2 fins ×9 · MCQ · Escriu · Factor desconegut</div>
+    <div class="muted">×2 fins ×9 · Grups visuals · MCQ · Escriu · Factor desconegut</div>
   </div>
 </div>
 <div id="gam-bar"></div>
 
-<!-- ── 1: MCQ ── -->
+<!-- ── 1: Visual groups ── -->
 <div class="card">
-  <h2><span class="num">1</span> Tria la resposta</h2>
+  <h2><span class="num">1</span> Grups Visuals</h2>
+  <p class="card-sub">Compta els punts de tots els grups i tria el total correcte.</p>
+  <div class="groups-wrap" id="s0-groups"></div>
+  <div class="fact-big" id="s0-fact"></div>
+  <div class="opts-row" id="s0-opts"></div>
+  <div class="fb" id="s0-fb"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s0-nx" onclick="s0Next()" style="display:none">Següent →</button>
+  </div>
+</div>
+
+<!-- ── 2: MCQ ── -->
+<div class="card">
+  <h2><span class="num">2</span> Tria la resposta</h2>
   <p class="card-sub">Selecciona la taula o practica-les totes.</p>
   <div class="diff-row" id="s1-fil">
     <button class="dbtn active" data-t="all" onclick="s1Tbl('all')">Totes</button>
@@ -52,7 +69,7 @@
 
 <!-- ── 2: Type ── -->
 <div class="card">
-  <h2><span class="num">2</span> Escriu la resposta</h2>
+  <h2><span class="num">3</span> Escriu la resposta</h2>
   <p class="card-sub">Calcula i escriu el resultat. Prem Enter per comprovar.</p>
   <div class="diff-row" id="s2-fil">
     <button class="dbtn active" data-t="all" onclick="s2Tbl('all')">Totes</button>
@@ -76,7 +93,7 @@
 
 <!-- ── 3: Missing factor ── -->
 <div class="card">
-  <h2><span class="num">3</span> Factor desconegut</h2>
+  <h2><span class="num">4</span> Factor desconegut</h2>
   <p class="card-sub">Quin número falta per completar la multiplicació?</p>
   <div class="fact-big" id="s3-fact"></div>
   <div class="opts-row" id="s3-opts"></div>
@@ -88,7 +105,7 @@
 
 <!-- ── 4: Table reference ── -->
 <div class="card">
-  <h2><span class="num">4</span> Consulta la taula</h2>
+  <h2><span class="num">5</span> Consulta la taula</h2>
   <p class="card-sub">Selecciona una taula per repassar tots els resultats.</p>
   <div class="diff-row">
     <button class="dbtn active" data-r="2" onclick="s4Show(2)">×2</button>
@@ -147,6 +164,70 @@ function distractors(correct, n) {
     if (v !== correct) s.add(v);
   }
   return sh([...s]);
+}
+
+/* ── Section 0: Grups Visuals ── */
+const GRP_COLORS = [
+  {bg:'#dbeafe',dot:'#3b82f6',bd:'#93c5fd'},{bg:'#dcfce7',dot:'#22c55e',bd:'#86efac'},
+  {bg:'#fef9c3',dot:'#ca8a04',bd:'#fde047'},{bg:'#fce7f3',dot:'#ec4899',bd:'#f9a8d4'},
+  {bg:'#ede9fe',dot:'#8b5cf6',bd:'#c4b5fd'},{bg:'#ffedd5',dot:'#f97316',bd:'#fdba74'},
+  {bg:'#ccfbf1',dot:'#14b8a6',bd:'#5eead4'},
+];
+function dotLayout(d) {
+  if (d <= 3) return {cols:d, sz:20, gap:4};
+  if (d === 4) return {cols:2, sz:20, gap:4};
+  return {cols:3, sz:18, gap:3};
+}
+function buildMulGroups(numGroups, dotsPerGroup) {
+  const c = GRP_COLORS[Math.floor(Math.random() * GRP_COLORS.length)];
+  const {cols, sz, gap} = dotLayout(dotsPerGroup);
+  const w = cols * sz + (cols - 1) * gap + 20;
+  let h = '';
+  for (let g = 0; g < numGroups; g++) {
+    h += `<div class="grp-box" style="background:${c.bg};border-color:${c.bd};gap:${gap}px;width:${w}px">`;
+    for (let d = 0; d < dotsPerGroup; d++)
+      h += `<div class="grp-dot" style="width:${sz}px;height:${sz}px;background:${c.dot}"></div>`;
+    h += '</div>';
+  }
+  return h;
+}
+let s0Grups, s0PerGrup;
+function s0Next() {
+  s0Grups   = 2 + Math.floor(Math.random() * 4);  // 2–5 grups
+  s0PerGrup = 2 + Math.floor(Math.random() * 8);  // 2–9 per grup
+  const prod = s0Grups * s0PerGrup;
+  document.getElementById('s0-groups').innerHTML = buildMulGroups(s0Grups, s0PerGrup);
+  document.getElementById('s0-fact').innerHTML =
+    `<span class="hi">${s0Grups}</span> × <span class="hi">${s0PerGrup}</span> = <span class="hi">?</span>`;
+  document.getElementById('s0-fb').className = 'fb';
+  document.getElementById('s0-nx').style.display = 'none';
+  const wrong = new Set();
+  [[-1,0],[1,0],[0,-1],[0,1]].forEach(([da,dt]) => {
+    const v = (s0Grups + da) * (s0PerGrup + dt);
+    if (v > 0 && v !== prod) wrong.add(v);
+  });
+  while (wrong.size < 3) {
+    const v = (2 + Math.floor(Math.random() * 4)) * (2 + Math.floor(Math.random() * 8));
+    if (v !== prod) wrong.add(v);
+  }
+  const opts = sh([prod, ...[...wrong].slice(0, 3)]);
+  const od = document.getElementById('s0-opts'); od.innerHTML = '';
+  opts.forEach(o => {
+    const b = document.createElement('button'); b.className = 'aopt'; b.textContent = o;
+    b.onclick = () => {
+      od.querySelectorAll('.aopt').forEach(x => x.disabled = true);
+      const ok = o === prod; b.classList.add(ok ? 'ok' : 'ko');
+      if (!ok) od.querySelectorAll('.aopt').forEach(x => { if (+x.textContent === prod) x.classList.add('show'); });
+      const fb = document.getElementById('s0-fb');
+      fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+      fb.textContent = ok
+        ? `${s0Grups} grups de ${s0PerGrup} → total ${prod}`
+        : `${s0Grups} × ${s0PerGrup} = ${prod}`;
+      ok ? taulesOk(2, s0PerGrup) : gWrong();
+      document.getElementById('s0-nx').style.display = 'inline-block';
+    };
+    od.appendChild(b);
+  });
 }
 
 /* ── Section 1 ── */
@@ -259,7 +340,7 @@ document.getElementById('s2-inp').addEventListener('keydown', e => {
 });
 
 window.addEventListener('load', () => {
-  s1Next(); s2Next(); s3Next(); s4Show(2);
+  s0Next(); s1Next(); s2Next(); s3Next(); s4Show(2);
   gRender();
 });
 </script>
