@@ -85,14 +85,50 @@ h2{font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .placed-chip:hover{background:var(--bg-hi2)}
 @media(prefers-color-scheme:dark){
   :root{--bg:#0f172a;--s:#1e293b;--b:#334155;--t:#f1f5f9;--m:#94a3b8;--a:#60a5fa;--ok:#4ade80;--ok2:#052e16;--er:#f87171;--er2:#450a0a;--ko:#f87171;--bg-hi:#0f2d4a;--bg-hi2:#1e3a5f;--bd-hi:#1d4ed8;--bd-hi2:#2563eb;--bg-lo:#1a2537}
-  .aopt,.popt{background:var(--s)}
+  /* html prefix = higher specificity (0,1,1) to beat local exercise styles (0,1,0) */
+  html .aopt,html .popt,
+  html .copt,html .fopt,html .cmp-btn,html .sopt,
+  html .word-chip,html .sentence-area,html .wb-chip,
+  html .chain-u,html .frac-item,html .unit-badge,html .ldg-bd{background:var(--s)}
+  html .cw-cell input{background:var(--s);color:var(--t)}
+  html .blank-td,html .conv-tbl .diag{background:var(--bg)}
+  html .done-banner,html .tt-ok{background:var(--ok2);color:var(--ok)}
+  html .err-sent{background:var(--er2)}
+  html .brw-btn{background:var(--er2)}
+  html .btn-danger:hover{background:var(--er2)}
+  html .copt.ok,html .copt.show,html .fi.ok,html .ans-inp.ok,
+  html .cx-inp.ok,html .ldg-inp.ok,html .ldg-bd.ok,html .cmp-btn.ok,
+  html .cmp-btn.show,html .sopt.ok,html .sopt.show,html .fopt.ok,
+  html .fopt.show,html .geo-inp.ok,html .tbl-inp.ok,html .ob.ok,
+  html .env-ob.ok,html .ti.ok,html .ci.ok,html .ji.ok,html .pi.ok,
+  html .voc-input.ok,html .fw-inp.ok,html .cmp-inp.ok{background:var(--ok2)}
+  html .copt.ko,html .fi.ko,html .ans-inp.ko,
+  html .cx-inp.ko,html .ldg-inp.ko,html .ldg-bd.ko,html .cmp-btn.ko,
+  html .sopt.ko,html .fopt.ko,html .geo-inp.ko,html .tbl-inp.ko,
+  html .ob.ko,html .env-ob.ko,html .ti.ko,html .ci.ko,html .ji.ko,
+  html .pi.ko,html .voc-input.ko,html .fw-inp.ko,html .cmp-inp.ko{background:var(--er2)}
+  html #feedback.ok,html #feedback1.ok,html #feedback2.ok,html #feedback3.ok{background:var(--ok2)}
+  html #feedback.ko,html #feedback1.ko,html #feedback2.ko,html #feedback3.ko{background:var(--er2)}
   .gam-toast{background:#475569}
   .ach-row.earned{background:#1c1202;border-color:#d97706}
   .ach-row.earned .ach-sym{background:#2d1f02;border-color:#d97706;color:#fbbf24}
   .ach-earn{color:#fbbf24}
 }
 html[data-theme="dark"]{--bg:#0f172a;--s:#1e293b;--b:#334155;--t:#f1f5f9;--m:#94a3b8;--a:#60a5fa;--ok:#4ade80;--ok2:#052e16;--er:#f87171;--er2:#450a0a;--ko:#f87171;--bg-hi:#0f2d4a;--bg-hi2:#1e3a5f;--bd-hi:#1d4ed8;--bd-hi2:#2563eb;--bg-lo:#1a2537;color-scheme:dark}
-html[data-theme="dark"] .aopt,html[data-theme="dark"] .popt{background:var(--s)}
+html[data-theme="dark"] .aopt,html[data-theme="dark"] .popt,
+html[data-theme="dark"] .copt,html[data-theme="dark"] .fopt,html[data-theme="dark"] .cmp-btn,html[data-theme="dark"] .sopt,
+html[data-theme="dark"] .word-chip,html[data-theme="dark"] .sentence-area,html[data-theme="dark"] .wb-chip,
+html[data-theme="dark"] .chain-u,html[data-theme="dark"] .frac-item,html[data-theme="dark"] .unit-badge,html[data-theme="dark"] .ldg-bd{background:var(--s)}
+html[data-theme="dark"] .cw-cell input{background:var(--s);color:var(--t)}
+html[data-theme="dark"] .blank-td,html[data-theme="dark"] .conv-tbl .diag{background:var(--bg)}
+html[data-theme="dark"] .done-banner,html[data-theme="dark"] .tt-ok{background:var(--ok2);color:var(--ok)}
+html[data-theme="dark"] .err-sent{background:var(--er2)}
+html[data-theme="dark"] .brw-btn{background:var(--er2)}
+html[data-theme="dark"] .btn-danger:hover{background:var(--er2)}
+html[data-theme="dark"] .copt.ok,html[data-theme="dark"] .copt.show,html[data-theme="dark"] .fi.ok,html[data-theme="dark"] .ans-inp.ok,html[data-theme="dark"] .cx-inp.ok,html[data-theme="dark"] .ldg-inp.ok,html[data-theme="dark"] .ldg-bd.ok,html[data-theme="dark"] .cmp-btn.ok,html[data-theme="dark"] .cmp-btn.show,html[data-theme="dark"] .sopt.ok,html[data-theme="dark"] .sopt.show,html[data-theme="dark"] .fopt.ok,html[data-theme="dark"] .fopt.show,html[data-theme="dark"] .geo-inp.ok,html[data-theme="dark"] .tbl-inp.ok,html[data-theme="dark"] .ob.ok,html[data-theme="dark"] .env-ob.ok,html[data-theme="dark"] .ti.ok,html[data-theme="dark"] .ci.ok,html[data-theme="dark"] .ji.ok,html[data-theme="dark"] .pi.ok,html[data-theme="dark"] .voc-input.ok,html[data-theme="dark"] .fw-inp.ok,html[data-theme="dark"] .cmp-inp.ok{background:var(--ok2)}
+html[data-theme="dark"] .copt.ko,html[data-theme="dark"] .fi.ko,html[data-theme="dark"] .ans-inp.ko,html[data-theme="dark"] .cx-inp.ko,html[data-theme="dark"] .ldg-inp.ko,html[data-theme="dark"] .ldg-bd.ko,html[data-theme="dark"] .cmp-btn.ko,html[data-theme="dark"] .sopt.ko,html[data-theme="dark"] .fopt.ko,html[data-theme="dark"] .geo-inp.ko,html[data-theme="dark"] .tbl-inp.ko,html[data-theme="dark"] .ob.ko,html[data-theme="dark"] .env-ob.ko,html[data-theme="dark"] .ti.ko,html[data-theme="dark"] .ci.ko,html[data-theme="dark"] .ji.ko,html[data-theme="dark"] .pi.ko,html[data-theme="dark"] .voc-input.ko,html[data-theme="dark"] .fw-inp.ko,html[data-theme="dark"] .cmp-inp.ko{background:var(--er2)}
+html[data-theme="dark"] #feedback.ok,html[data-theme="dark"] #feedback1.ok,html[data-theme="dark"] #feedback2.ok,html[data-theme="dark"] #feedback3.ok{background:var(--ok2)}
+html[data-theme="dark"] #feedback.ko,html[data-theme="dark"] #feedback1.ko,html[data-theme="dark"] #feedback2.ko,html[data-theme="dark"] #feedback3.ko{background:var(--er2)}
 html[data-theme="dark"] .gam-toast{background:#475569}
 html[data-theme="dark"] .ach-row.earned{background:#1c1202;border-color:#d97706}
 html[data-theme="dark"] .ach-row.earned .ach-sym{background:#2d1f02;border-color:#d97706;color:#fbbf24}
