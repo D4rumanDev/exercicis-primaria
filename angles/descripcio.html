@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="../shared.css">
 <style>
 .av-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
-.av-card{padding:10px 6px;border-radius:10px;border:2px solid var(--b);background:#f8faff;text-align:center}
+.av-card{padding:10px 6px;border-radius:10px;border:2px solid var(--b);background:var(--bg-lo);text-align:center}
 .av-emoji{font-size:2rem;line-height:1;margin-bottom:3px}
 .av-name{font-size:.8rem;font-weight:800;color:var(--t);margin-bottom:2px}
 .av-trait{font-size:.7rem;color:var(--m);line-height:1.4}
 .av-feat{font-size:.68rem;color:var(--a);margin-top:2px}
 
 .av-single{display:flex;flex-direction:column;align-items:center;gap:5px;
-  padding:14px;background:#f8faff;border-radius:12px;border:2px solid var(--b);margin:10px 0}
+  padding:14px;background:var(--bg-lo);border-radius:12px;border:2px solid var(--b);margin:10px 0}
 .av-single .av-emoji{font-size:3rem}
 .av-single .av-name{font-size:1rem;font-weight:800;color:var(--t)}
 .av-single .av-trait{font-size:.85rem;color:var(--m)}
@@ -29,15 +29,11 @@
 .q-sent{font-size:.93rem;font-weight:500;margin-bottom:8px;line-height:1.5}
 .blank{color:var(--a);font-weight:800}
 
-.desc-box{background:#f8faff;border-radius:8px;padding:10px 14px;margin-bottom:12px;
+.desc-box{background:var(--bg-lo);border-radius:8px;padding:10px 14px;margin-bottom:12px;
   font-size:.93rem;font-weight:500;line-height:1.7;border-left:3px solid var(--a)}
 
 .word-chip{padding:5px 10px;background:#fff;border:2px solid var(--a);border-radius:8px;
   font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;user-select:none}
-.word-chip:hover{background:#eff6ff}
-.placed-chip{padding:5px 10px;background:#eff6ff;border:2px solid var(--a);border-radius:8px;
-  font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;user-select:none}
-.placed-chip:hover{background:#dbeafe}
 
 .done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;
   border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
@@ -416,7 +412,7 @@ function s4Init() {
   document.getElementById('s4-list').innerHTML = s4State.map((_, i) => `
     <div style="padding:12px 0;border-bottom:1px solid var(--b)">
       <div class="label" style="margin-bottom:5px">Words:</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#f8faff;border-radius:8px;border:1.5px dashed var(--b);min-height:40px;margin:4px 0" id="s4b${i}"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:var(--bg-lo);border-radius:8px;border:1.5px dashed var(--b);min-height:40px;margin:4px 0" id="s4b${i}"></div>
       <div class="label" style="margin:5px 0 4px">Your sentence:</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-radius:8px;border:2px solid var(--b);min-height:40px;margin:4px 0" id="s4s${i}"></div>
       <div class="btn-row" style="margin-top:8px;justify-content:flex-start">

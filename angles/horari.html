@@ -16,15 +16,13 @@
 .copt.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
 .copt:disabled{pointer-events:none}
 
-/* ── Info / narrative box ── */
-.info-box{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:.88rem;line-height:1.7;color:var(--t)}
 .info-box strong{color:var(--a)}
 
 /* ── Timetable ── */
 .tt-table{width:100%;border-collapse:collapse;font-size:.83rem;margin:6px 0}
 .tt-table th{background:var(--a);color:#fff;padding:6px 8px;text-align:center;font-size:.78rem;font-weight:700}
 .tt-table td{border:1px solid var(--b);padding:6px 8px;text-align:center;font-weight:500}
-.tt-table .tc{background:#f8faff;color:var(--m);font-size:.75rem;font-weight:700;white-space:nowrap}
+.tt-table .tc{background:var(--bg-lo);color:var(--m);font-size:.75rem;font-weight:700;white-space:nowrap}
 .tt-ok{background:#f0fdf4;color:var(--ok);font-weight:700}
 .tt-q{color:#94a3b8;font-style:italic}
 
@@ -46,12 +44,8 @@
 /* ── Word reorder ── */
 .reorder-block{padding:12px 0;border-bottom:1px solid var(--b)}
 .reorder-block:last-child{border-bottom:none;padding-bottom:0}
-.word-bank{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#f8faff;border-radius:8px;border:1.5px dashed var(--b);min-height:40px;margin:4px 0}
 .sentence-area{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-radius:8px;border:2px solid var(--b);min-height:40px;margin:4px 0}
 .word-chip{padding:5px 10px;background:#fff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;transition:all .15s;user-select:none}
-.word-chip:hover{background:#eff6ff}
-.placed-chip{padding:5px 10px;background:#eff6ff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;transition:all .15s;user-select:none}
-.placed-chip:hover{background:#dbeafe}
 
 /* ── All-done banner ── */
 .done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
@@ -484,7 +478,7 @@ function s5Init() {
   S5.times.forEach((t, ti) => {
     grid += `<tr><td class="tc">${t}</td>`;
     S5.days.forEach((_, di) => {
-      if (S5.grid[ti][di] === null) grid += `<td style="background:#f8faff;color:var(--m)">—</td>`;
+      if (S5.grid[ti][di] === null) grid += `<td style="background:var(--bg-lo);color:var(--m)">—</td>`;
       else grid += `<td id="s5c_${ti}_${di}" class="tt-q">?</td>`;
     });
     grid += '</tr>';
