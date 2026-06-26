@@ -36,17 +36,17 @@ function gRender(){
   const extraH=typeof gStatsExtra==='function'?gStatsExtra(g):'';
   const el=document.getElementById('gam-bar');if(!el)return;
   el.innerHTML=
-    '<div class="xp-block"><div class="xp-top"><span class="level-name">'+lv.n+'</span><span class="xp-nums">'+xpStr+'</span></div>'
+    '<div class="xp-block"><div class="xp-top"><span class="level-name">'+lv.n+(g.streak>1?'<span class="xp-streak"> 🔥'+g.streak+'</span>':'')+'</span><span class="xp-nums">'+xpStr+'</span></div>'
     +'<div class="xp-track"><div class="xp-fill" style="width:'+pct+'%"></div></div></div>'
     +'<div class="gam-tabs">'
-    +'<button class="gam-tab'+(gStatsVisible?' on':'')+'" onclick="gToggleStats()">Estadístiques</button>'
-    +'<button class="gam-tab'+(gAchsVisible?' on':'')+'" onclick="gToggleAchs()">Assoliments</button>'
+    +'<button class="gam-tab'+(gStatsVisible?' on':'')+'" onclick="gToggleStats()">📊 Estadístiques</button>'
+    +'<button class="gam-tab'+(gAchsVisible?' on':'')+'" onclick="gToggleAchs()">🏅 Assoliments</button>'
     +'</div>'
     +(gStatsVisible?'<div class="stats-row">'
-      +'<div class="stat"><div class="stat-num">'+g.ok+'</div><div class="stat-lbl">Encerts</div></div>'
-      +'<div class="stat"><div class="stat-num">'+g.ko+'</div><div class="stat-lbl">Errors</div></div>'
-      +'<div class="stat"><div class="stat-num">'+g.streak+'</div><div class="stat-lbl">Ratxa</div></div>'
-      +'<div class="stat"><div class="stat-num">'+g.achs.length+'</div><div class="stat-lbl">Assoliments</div></div>'
+      +'<div class="stat"><div class="stat-num">'+g.ok+'</div><div class="stat-lbl">✅ Encerts</div></div>'
+      +'<div class="stat"><div class="stat-num">'+g.ko+'</div><div class="stat-lbl">❌ Errors</div></div>'
+      +'<div class="stat"><div class="stat-num">'+g.streak+'</div><div class="stat-lbl">🔥 Ratxa</div></div>'
+      +'<div class="stat"><div class="stat-num">'+g.achs.length+'</div><div class="stat-lbl">🏅 Assolim.</div></div>'
     +'</div>'+extraH+'<button class="reset-lnk" onclick="gReset()">Reiniciar progrés</button>':'')
     +(gAchsVisible?'<div class="ach-grid">'+achH+'</div>':'');
 }

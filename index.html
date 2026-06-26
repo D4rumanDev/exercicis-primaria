@@ -5,48 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Exercicis — 4t</title>
 <style>
-:root{--bg:#f0f4ff;--s:#fff;--b:#e2e8f0;--t:#1e293b;--m:#64748b;--a:#1d4ed8;--r:12px}
+:root{
+  --bg:#f0f4ff;--s:#fff;--b:#e2e8f0;--t:#1e293b;--m:#64748b;--a:#1d4ed8;--r:12px;
+  --mates:#1d4ed8;--llengua:#059669;--angles:#7c3aed;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
 .layout{display:flex;height:100vh}
 
 /* ── Sidebar ── */
-.sidebar{width:232px;flex-shrink:0;background:var(--s);border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s}
-.sidebar-hdr{padding:14px 16px 12px;border-bottom:1px solid var(--b);flex-shrink:0}
-.sidebar-title{font-size:1rem;font-weight:800;color:var(--t);letter-spacing:-.02em}
-.sidebar-sub{font-size:.72rem;color:var(--m);margin-top:2px}
+.sidebar{width:240px;flex-shrink:0;background:var(--s);border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s}
+.sidebar-hdr{padding:14px 16px 12px;border-bottom:1px solid var(--b);flex-shrink:0;display:flex;align-items:center;gap:10px}
+.sidebar-logo{font-size:1.4rem;line-height:1}
+.sidebar-txt{}
+.sidebar-title{font-size:.95rem;font-weight:800;color:var(--t);letter-spacing:-.02em;line-height:1.2}
+.sidebar-sub{font-size:.7rem;color:var(--m);margin-top:1px}
 
 /* ── Nav scroll area ── */
 .nav-scroll{flex:1;overflow-y:auto;min-height:0}
-.nav-group{padding:4px 0}
+.nav-group{padding:2px 0}
 .nav-sep{height:1px;background:var(--b);margin:2px 0}
 
 /* ── Collapsible group header ── */
-.nav-lbl{display:flex;align-items:center;justify-content:space-between;font-size:.67rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.08em;padding:8px 14px 5px 16px;cursor:pointer;user-select:none;transition:color .1s}
-.nav-lbl:hover{color:var(--a)}
-.nav-chevron{display:inline-block;font-style:normal;font-size:.6rem;opacity:.55;transition:transform .18s;line-height:1}
+.nav-lbl{display:flex;align-items:center;justify-content:space-between;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:10px 14px 6px 14px;cursor:pointer;user-select:none;transition:opacity .1s;gap:4px}
+.nav-lbl:hover{opacity:.75}
+.nav-lbl-mates{color:var(--mates)}
+.nav-lbl-llengua{color:var(--llengua)}
+.nav-lbl-angles{color:var(--angles)}
+.nav-chevron{display:inline-block;font-style:normal;font-size:.58rem;opacity:.5;transition:transform .18s;line-height:1;margin-left:auto;flex-shrink:0}
 .nav-group.collapsed .nav-chevron{transform:rotate(-90deg)}
 .nav-items{overflow:hidden}
 .nav-group.collapsed .nav-items{display:none}
 
-.nav-item{display:flex;align-items:center;width:100%;text-align:left;padding:6px 14px 6px 22px;border:none;background:none;font-family:inherit;font-size:.83rem;font-weight:500;color:var(--t);cursor:pointer;transition:background .1s,color .1s;line-height:1.35}
+.nav-item{display:flex;align-items:center;gap:7px;width:100%;text-align:left;padding:7px 14px 7px 14px;border:none;background:none;font-family:inherit;font-size:.82rem;font-weight:500;color:var(--t);cursor:pointer;transition:background .1s,color .1s;line-height:1.3}
 .nav-item:hover{background:var(--bg);color:var(--a)}
-.nav-item.active{background:#dbeafe;color:var(--a);font-weight:700;border-left:3px solid var(--a);padding-left:19px}
-.nav-badge{margin-left:auto;font-size:.62rem;font-weight:700;color:var(--a);background:#dbeafe;border-radius:100px;padding:1px 6px;min-width:20px;text-align:center;line-height:1.6;flex-shrink:0}
+.nav-item.active{background:#dbeafe;color:var(--a);font-weight:700;border-left:3px solid var(--a);padding-left:11px}
+.nav-icon{font-size:.95rem;min-width:18px;text-align:center;flex-shrink:0;line-height:1}
+.nav-badge{margin-left:auto;font-size:.6rem;font-weight:700;color:var(--a);background:#dbeafe;border-radius:100px;padding:1px 6px;min-width:20px;text-align:center;line-height:1.7;flex-shrink:0}
 
-/* ── Progress panel — fixed at bottom of sidebar ── */
-.gam-panel{padding:10px 16px 14px;border-top:1px solid var(--b);flex-shrink:0;background:var(--s)}
-.gam-panel-title{font-size:.67rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-.gam-lv{font-size:.8rem;font-weight:700;color:var(--a);margin-bottom:5px}
-.gam-xp-track{height:4px;background:var(--b);border-radius:3px;overflow:hidden;margin-bottom:8px}
+/* ── Progress panel — fixed at bottom ── */
+.gam-panel{padding:12px 14px 14px;border-top:1px solid var(--b);flex-shrink:0;background:var(--s)}
+.gam-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.gam-panel-title{font-size:.63rem;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.08em}
+.gam-lv{font-size:.82rem;font-weight:700;color:var(--a)}
+.gam-xp-track{height:5px;background:var(--b);border-radius:3px;overflow:hidden;margin:5px 0 8px}
 .gam-xp-fill{height:100%;background:var(--a);border-radius:3px;transition:width .5s}
-.gam-stats{display:flex;gap:0;text-align:center}
-.gam-stat{flex:1;font-size:.68rem;color:var(--m);line-height:1.2}
-.gam-stat-n{display:block;font-size:.95rem;font-weight:800;color:var(--t)}
+.gam-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;text-align:center}
+.gam-stat{font-size:.6rem;color:var(--m);line-height:1.3;padding:2px 0}
+.gam-stat-n{display:block;font-size:.88rem;font-weight:800;color:var(--t)}
 
 /* ── Main ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{height:38px;background:var(--bg);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0}
+.topbar{height:40px;background:var(--bg);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0}
 .tog{display:none;padding:4px 9px;border:1px solid var(--b);border-radius:8px;background:none;cursor:pointer;font-size:1rem;color:var(--m);line-height:1}
 .topbar-title{font-size:.83rem;font-weight:600;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 iframe{flex:1;border:none;width:100%;background:var(--bg)}
@@ -67,74 +77,80 @@ iframe{flex:1;border:none;width:100%;background:var(--bg)}
 
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-hdr">
-    <div class="sidebar-title">Exercicis — 4t</div>
-    <div class="sidebar-sub">Exercicis escolars</div>
+    <span class="sidebar-logo">🎒</span>
+    <div class="sidebar-txt">
+      <div class="sidebar-title">Exercicis — 4t</div>
+      <div class="sidebar-sub">Matemàtiques · Llengua · Anglès</div>
+    </div>
   </div>
 
   <div class="nav-scroll">
 
     <div class="nav-group" data-topic="mates">
-      <div class="nav-lbl" onclick="toggleGroup(this)">
-        <span>Matemàtiques</span><span class="nav-chevron">▾</span>
+      <div class="nav-lbl nav-lbl-mates" onclick="toggleGroup(this)">
+        <span>🧮 Matemàtiques</span><span class="nav-chevron">▾</span>
       </div>
       <div class="nav-items">
-        <button class="nav-item active" data-ekey="suma_portant_v1" onclick="goTo(this,'mates/suma_portant.html','Suma amb portant')">Suma amb portant</button>
-        <button class="nav-item" data-ekey="resta_portant_v1" onclick="goTo(this,'mates/resta_portant.html','Resta amb portant')">Resta amb portant</button>
-        <button class="nav-item" data-ekey="ex_mult_v1" onclick="goTo(this,'mates/multiplicacio.html','Multiplicació')">Multiplicació</button>
-        <button class="nav-item" data-ekey="ex_taules_v1" onclick="goTo(this,'mates/taules.html','Taules de Multiplicar')">Taules de Multiplicar</button>
-        <button class="nav-item" data-ekey="ex_div_v1" onclick="goTo(this,'mates/divisio.html','Divisió')">Divisió</button>
-        <button class="nav-item" data-ekey="ex_prob_v1" onclick="goTo(this,'mates/problemes.html','Problemes')">Problemes</button>
-        <button class="nav-item" data-ekey="ex_vp_v1" onclick="goTo(this,'mates/valor_posicional.html','Valor posicional')">Valor posicional</button>
-        <button class="nav-item" data-ekey="ex_frac_v1" onclick="goTo(this,'mates/fraccions.html','Fraccions')">Fraccions</button>
-        <button class="nav-item" data-ekey="ex_din_v1" onclick="goTo(this,'mates/diners.html','Diners')">Diners</button>
-        <button class="nav-item" data-ekey="ex_hores_v1" onclick="goTo(this,'mates/hores.html','Hores i Temps')">Hores i Temps</button>
-        <button class="nav-item" data-ekey="ex_long_v1" onclick="goTo(this,'mates/mesures_longitud.html','Mesures de Longitud')">Mesures de Longitud</button>
-        <button class="nav-item" data-ekey="mesures_cap_v1" onclick="goTo(this,'mates/mesures_capacitat.html','Mesures de Capacitat')">Mesures de Capacitat</button>
-        <button class="nav-item" data-ekey="ex_geo_v1" onclick="goTo(this,'mates/geometria.html','Geometria')">Geometria</button>
-        <button class="nav-item" data-ekey="ex_est_v1" onclick="goTo(this,'mates/estadistica.html','Estadística i Sèries')">Estadística i Sèries</button>
+        <button class="nav-item active" data-ekey="suma_portant_v1" onclick="goTo(this,'mates/suma_portant.html','Suma amb portant')"><span class="nav-icon">➕</span>Suma amb portant</button>
+        <button class="nav-item" data-ekey="resta_portant_v1" onclick="goTo(this,'mates/resta_portant.html','Resta amb portant')"><span class="nav-icon">➖</span>Resta amb portant</button>
+        <button class="nav-item" data-ekey="ex_mult_v1" onclick="goTo(this,'mates/multiplicacio.html','Multiplicació')"><span class="nav-icon">✖️</span>Multiplicació</button>
+        <button class="nav-item" data-ekey="ex_taules_v1" onclick="goTo(this,'mates/taules.html','Taules de Multiplicar')"><span class="nav-icon">📋</span>Taules de Multiplicar</button>
+        <button class="nav-item" data-ekey="ex_div_v1" onclick="goTo(this,'mates/divisio.html','Divisió')"><span class="nav-icon">➗</span>Divisió</button>
+        <button class="nav-item" data-ekey="ex_prob_v1" onclick="goTo(this,'mates/problemes.html','Problemes')"><span class="nav-icon">🧮</span>Problemes</button>
+        <button class="nav-item" data-ekey="ex_vp_v1" onclick="goTo(this,'mates/valor_posicional.html','Valor posicional')"><span class="nav-icon">🔢</span>Valor posicional</button>
+        <button class="nav-item" data-ekey="ex_frac_v1" onclick="goTo(this,'mates/fraccions.html','Fraccions')"><span class="nav-icon">🍕</span>Fraccions</button>
+        <button class="nav-item" data-ekey="ex_din_v1" onclick="goTo(this,'mates/diners.html','Diners')"><span class="nav-icon">💶</span>Diners</button>
+        <button class="nav-item" data-ekey="ex_hores_v1" onclick="goTo(this,'mates/hores.html','Hores i Temps')"><span class="nav-icon">⏰</span>Hores i Temps</button>
+        <button class="nav-item" data-ekey="ex_long_v1" onclick="goTo(this,'mates/mesures_longitud.html','Mesures de Longitud')"><span class="nav-icon">📏</span>Mesures de Longitud</button>
+        <button class="nav-item" data-ekey="mesures_cap_v1" onclick="goTo(this,'mates/mesures_capacitat.html','Mesures de Capacitat')"><span class="nav-icon">💧</span>Mesures de Capacitat</button>
+        <button class="nav-item" data-ekey="ex_geo_v1" onclick="goTo(this,'mates/geometria.html','Geometria')"><span class="nav-icon">📐</span>Geometria</button>
+        <button class="nav-item" data-ekey="ex_est_v1" onclick="goTo(this,'mates/estadistica.html','Estadística i Sèries')"><span class="nav-icon">📈</span>Estadística i Sèries</button>
       </div>
     </div>
 
     <div class="nav-sep" data-topic="mates"></div>
 
     <div class="nav-group" data-topic="llengua">
-      <div class="nav-lbl" onclick="toggleGroup(this)">
-        <span>Llengua</span><span class="nav-chevron">▾</span>
+      <div class="nav-lbl nav-lbl-llengua" onclick="toggleGroup(this)">
+        <span>📚 Llengua</span><span class="nav-chevron">▾</span>
       </div>
       <div class="nav-items">
-        <button class="nav-item" data-ekey="ex_cl_v1" onclick="goTo(this,'llengua/comprensio_lectora.html','Comprensió Lectora')">Comprensió Lectora</button>
-        <button class="nav-item" data-ekey="ex_cat_morf_v1" onclick="goTo(this,'llengua/morfologia.html','Morfologia i Ortografia')">Morfologia i Ortografia</button>
-        <button class="nav-item" data-ekey="ex_cat_cword_v1" onclick="goTo(this,'llengua/mots_encreuats.html','Mots Encreuats')">Mots Encreuats</button>
-        <button class="nav-item" data-ekey="ex_cart_v1" onclick="goTo(this,'llengua/cartells.html','Cartells amb Faltes')">Cartells amb Faltes</button>
-        <button class="nav-item" data-ekey="ex_cat_wsearch_v1" onclick="goTo(this,'llengua/sopa_lletres.html','Sopa de Lletres')">Sopa de Lletres</button>
+        <button class="nav-item" data-ekey="ex_cl_v1" onclick="goTo(this,'llengua/comprensio_lectora.html','Comprensió Lectora')"><span class="nav-icon">📖</span>Comprensió Lectora</button>
+        <button class="nav-item" data-ekey="ex_cat_morf_v1" onclick="goTo(this,'llengua/morfologia.html','Morfologia i Ortografia')"><span class="nav-icon">✏️</span>Morfologia i Ortografia</button>
+        <button class="nav-item" data-ekey="ex_cat_cword_v1" onclick="goTo(this,'llengua/mots_encreuats.html','Mots Encreuats')"><span class="nav-icon">🔤</span>Mots Encreuats</button>
+        <button class="nav-item" data-ekey="ex_cart_v1" onclick="goTo(this,'llengua/cartells.html','Cartells amb Faltes')"><span class="nav-icon">🔍</span>Cartells amb Faltes</button>
+        <button class="nav-item" data-ekey="ex_cat_wsearch_v1" onclick="goTo(this,'llengua/sopa_lletres.html','Sopa de Lletres')"><span class="nav-icon">🔠</span>Sopa de Lletres</button>
       </div>
     </div>
 
     <div class="nav-sep" data-topic="llengua"></div>
 
     <div class="nav-group" data-topic="angles">
-      <div class="nav-lbl" onclick="toggleGroup(this)">
-        <span>Anglès</span><span class="nav-chevron">▾</span>
+      <div class="nav-lbl nav-lbl-angles" onclick="toggleGroup(this)">
+        <span>🌍 Anglès</span><span class="nav-chevron">▾</span>
       </div>
       <div class="nav-items">
-        <button class="nav-item" data-ekey="ex_ang_hor_v1" onclick="goTo(this,'angles/horari.html','Timetable &amp; Time')">Timetable &amp; Time</button>
-        <button class="nav-item" data-ekey="ex_ang_prof_v1" onclick="goTo(this,'angles/professions.html','Jobs &amp; Professions')">Jobs &amp; Professions</button>
-        <button class="nav-item" data-ekey="ex_ang_act_v1" onclick="goTo(this,'angles/activitats.html','Hobbies &amp; Likes')">Hobbies &amp; Likes</button>
-        <button class="nav-item" data-ekey="ex_ang_city_v1" onclick="goTo(this,'angles/la_ciutat.html','Town &amp; Places')">Town &amp; Places</button>
-        <button class="nav-item" data-ekey="ex_ang_desc_v1" onclick="goTo(this,'angles/descripcio.html','Physical Description')">Physical Description</button>
+        <button class="nav-item" data-ekey="ex_ang_hor_v1" onclick="goTo(this,'angles/horari.html','Timetable &amp; Time')"><span class="nav-icon">🕐</span>Timetable &amp; Time</button>
+        <button class="nav-item" data-ekey="ex_ang_prof_v1" onclick="goTo(this,'angles/professions.html','Jobs &amp; Professions')"><span class="nav-icon">👔</span>Jobs &amp; Professions</button>
+        <button class="nav-item" data-ekey="ex_ang_act_v1" onclick="goTo(this,'angles/activitats.html','Hobbies &amp; Likes')"><span class="nav-icon">🎨</span>Hobbies &amp; Likes</button>
+        <button class="nav-item" data-ekey="ex_ang_city_v1" onclick="goTo(this,'angles/la_ciutat.html','Town &amp; Places')"><span class="nav-icon">🏙️</span>Town &amp; Places</button>
+        <button class="nav-item" data-ekey="ex_ang_desc_v1" onclick="goTo(this,'angles/descripcio.html','Physical Description')"><span class="nav-icon">👤</span>Physical Description</button>
       </div>
     </div>
 
   </div><!-- end .nav-scroll -->
 
   <div id="gam-panel" class="gam-panel">
-    <div class="gam-panel-title">Progrés</div>
-    <div class="gam-lv" id="gam-lv-name">—</div>
+    <div class="gam-panel-hdr">
+      <span class="gam-panel-title">Progrés</span>
+      <span class="gam-lv" id="gam-lv-name">—</span>
+    </div>
     <div class="gam-xp-track"><div class="gam-xp-fill" id="gam-xp-fill" style="width:0%"></div></div>
     <div class="gam-stats">
-      <div class="gam-stat"><span class="gam-stat-n" id="gam-xp">0</span>XP</div>
-      <div class="gam-stat"><span class="gam-stat-n" id="gam-ok">0</span>Encerts</div>
-      <div class="gam-stat"><span class="gam-stat-n" id="gam-achs">0</span>Assoliments</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-xp">0</span>⭐ XP</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-ok">0</span>✅ Encerts</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-streak">0</span>🔥 Ratxa</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-achs">0</span>🏅 Assolim.</div>
     </div>
   </div>
 </nav>
@@ -165,6 +181,7 @@ function updateGamPanel(){
   document.getElementById('gam-xp-fill').style.width=pct+'%';
   document.getElementById('gam-xp').textContent=g.xp;
   document.getElementById('gam-ok').textContent=g.ok||0;
+  document.getElementById('gam-streak').textContent=g.streak||0;
   document.getElementById('gam-achs').textContent=(g.achs||[]).length;
 }
 
@@ -181,24 +198,20 @@ restoreLastPage();
 
 /* ── Collapsible groups ── */
 function toggleGroup(lbl) {
-  const g = lbl.closest('.nav-group');
+  const g=lbl.closest('.nav-group');
   g.classList.toggle('collapsed');
   saveGroupState();
 }
-function saveGroupState() {
-  const state = {};
-  document.querySelectorAll('.nav-group[data-topic]').forEach(g => {
-    state[g.dataset.topic] = g.classList.contains('collapsed');
-  });
-  localStorage.setItem(NAV_STATE_KEY, JSON.stringify(state));
+function saveGroupState(){
+  const state={};
+  document.querySelectorAll('.nav-group[data-topic]').forEach(g=>{state[g.dataset.topic]=g.classList.contains('collapsed');});
+  localStorage.setItem(NAV_STATE_KEY,JSON.stringify(state));
 }
-function loadGroupState() {
-  try {
-    const state = JSON.parse(localStorage.getItem(NAV_STATE_KEY) || '{}');
-    document.querySelectorAll('.nav-group[data-topic]').forEach(g => {
-      if (state[g.dataset.topic]) g.classList.add('collapsed');
-    });
-  } catch {}
+function loadGroupState(){
+  try{
+    const state=JSON.parse(localStorage.getItem(NAV_STATE_KEY)||'{}');
+    document.querySelectorAll('.nav-group[data-topic]').forEach(g=>{if(state[g.dataset.topic])g.classList.add('collapsed');});
+  }catch{}
 }
 
 function applyTopicFilter(){
@@ -206,9 +219,7 @@ function applyTopicFilter(){
   const raw=params.get('topics');
   if(!raw)return;
   const allowed=raw.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);
-  document.querySelectorAll('[data-topic]').forEach(el=>{
-    el.style.display=allowed.includes(el.dataset.topic)?'':'none';
-  });
+  document.querySelectorAll('[data-topic]').forEach(el=>{el.style.display=allowed.includes(el.dataset.topic)?'':'none';});
   const first=document.querySelector('.nav-group:not([style*="none"]) .nav-item');
   if(first){
     const src=first.getAttribute('onclick').match(/'([^']+\.html)'/);
@@ -228,17 +239,14 @@ function updateProgress(){
     }else if(badge){badge.remove();}
   });
 }
-function goTo(btn, src, title) {
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+function goTo(btn,src,title){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const g = btn.closest('.nav-group');
-  if (g && g.classList.contains('collapsed')) {
-    g.classList.remove('collapsed');
-    saveGroupState();
-  }
-  document.getElementById('frame').src = src;
-  document.getElementById('topbar-title').textContent = title;
-  localStorage.setItem(LAST_KEY, JSON.stringify({src, title}));
+  const g=btn.closest('.nav-group');
+  if(g&&g.classList.contains('collapsed')){g.classList.remove('collapsed');saveGroupState();}
+  document.getElementById('frame').src=src;
+  document.getElementById('topbar-title').textContent=title;
+  localStorage.setItem(LAST_KEY,JSON.stringify({src,title}));
   closeSidebar();
 }
 function restoreLastPage(){
@@ -253,14 +261,8 @@ function restoreLastPage(){
     if(btn)goTo(btn,s.src,s.title);
   }catch{}
 }
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('overlay').classList.add('show');
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('show');
-}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
 </script>
 </body>
 </html>
