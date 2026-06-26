@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suma Portant-ne</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.card{padding:18px}
+/* ── Column layout ── */
+.op-center{display:flex;justify-content:center;margin:10px 0 4px}
+.op-outer{display:flex;align-items:flex-start;font-family:'Courier New',monospace}
+/* sign column */
+.sign-col{display:flex;flex-direction:column;width:30px;align-items:flex-end;padding-right:3px}
+.sign-col .sr{display:flex;align-items:center;justify-content:flex-end}
+.sign-col .sr.cry{height:34px}   /* carry row */
+.sign-col .sr.ad1{height:60px}   /* addend 1 */
+.sign-col .sr.ad2{height:60px;font-size:2.2rem;font-weight:700;color:#1d4ed8} /* + sign */
+.sign-col .sr.dv{height:11px}
+.sign-col .sr.ans{height:66px}
+.sign-col .sr.lbl{height:22px}
+/* digit columns */
+.digit-cols{display:flex}
+.dcol{display:flex;flex-direction:column;align-items:center;width:58px}
+.dcol .sr{display:flex;align-items:center;justify-content:center}
+.dcol .sr.cry{height:34px}
+.dcol .sr.ad1{height:60px;font-size:2.2rem;font-weight:700}
+.dcol .sr.ad2{height:60px;font-size:2.2rem;font-weight:700}
+.dcol .sr.dv{height:11px;width:100%}
+.dcol .sr.ans{height:66px}
+.dcol .sr.lbl{height:22px;font-family:'Segoe UI',sans-serif;font-size:.7rem;font-weight:800;color:#94a3b8;letter-spacing:.6px}
+/* carry toggle button */
+.cry-btn{width:26px;height:26px;border:2px dashed #93c5fd;border-radius:6px;background:#eff6ff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:transparent;transition:all .15s;user-select:none;line-height:1}
+.cry-btn:hover{border-color:#3b82f6;background:#dbeafe}
+.cry-btn.on{border-style:solid;border-color:var(--a);background:#dbeafe;color:var(--a)}
+/* answer input */
+.ans-inp{width:52px;height:58px;text-align:center;font-size:2rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:10px;color:var(--a);background:var(--bg);outline:none;padding:0;transition:border-color .15s,background .15s;-moz-appearance:textfield}
+.ans-inp::-webkit-inner-spin-button,.ans-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.ans-inp:focus{border-color:var(--a);background:#eff6ff}
+.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+/* overflow column (leftmost, only shown when sum has more digits than addends) */
+.dcol.overflow .sr.ad1,.dcol.overflow .sr.ad2{font-size:1.2rem;color:#94a3b8}
+#feedback{text-align:center;font-size:1rem;font-weight:600;padding:10px 14px;border-radius:10px;margin:10px 0;display:none}
+#feedback.ok{background:#f0fdf4;color:var(--ok)}
+#feedback.ko{background:#fef2f2;color:var(--ko)}
+.btn-primary{background:var(--a);color:#fff}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr"><h1>Suma Portant-ne</h1></div>
+<div id="gam-bar"></div>
+
+<div class="card">
+  <div class="diff-row">
+    <button class="dbtn" data-d="2" onclick="setMode(2)">2 xifres</button>
+    <button class="dbtn" data-d="3" onclick="setMode(3)">3 xifres</button>
+    <button class="dbtn" data-d="4" onclick="setMode(4)">4 xifres</button>
+    <button class="dbtn" data-d="5" onclick="setMode(5)">5 xifres</button>
+    <button class="dbtn active" data-d="0" onclick="setMode(0)">Auto</button>
+  </div>
+
+  <div class="op-center">
+    <div id="opWrap" class="op-outer"></div>
+  </div>
+
+  <div id="feedback"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="checkBtn" onclick="checkAnswer()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="nextBtn" onclick="nextExercise()">Següent →</button>
+  </div>
+</div>
+
+<script src="../shared.js"></script>
+<script>
+GAM_ACHS=[
+  {id:'first',s:'🌟',n:'Primer Encert',d:'Primera resposta correcta'},
+  {id:'s3',s:'🔥',n:'Ratxa x3',d:'3 encerts seguits'},
+  {id:'s5',s:'⚡',n:'Ratxa x5',d:'5 encerts seguits'},
+  {id:'s10',s:'⚡',n:'Ratxa x10',d:'10 encerts seguits'},
+  {id:'ok50',s:'🥉',n:'50 Encerts',d:'50 respostes correctes'},
+  {id:'ok200',s:'🥈',n:'200 Encerts',d:'200 respostes correctes'},
+  {id:'ok500',s:'🏆',n:'500 Encerts',d:'500 respostes correctes'}
+];
+const EXER_KEY='suma_portant_v1';
+function gResetExtra(){location.reload();}
+function gStatsExtra(){
+  const s=loadStats();
+  const digitH=[2,3,4,5].map(function(d){
+    const st=s['d'+d]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
+    return '<div class="stat-cell">'
+      +'<div class="stat-label">'+d+' XIF.</div>'
+      +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+      +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+      +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
+      +'</div>';
+  }).join('');
+  return '<div class="stats-grid">'+digitH+'</div>';
+}
+
+// ── Exercise state ────────────────────────────────────────────────────────────
+const KEY=EXER_KEY;
+let cA,cB,cResult,cDigits,cResultLen,answered=false,counted=false,mode=0;
+
+function defStats(){return{d2:{c:0,e:0},d3:{c:0,e:0},d4:{c:0,e:0},d5:{c:0,e:0},streak:0,total:0}}
+function loadStats(){try{return Object.assign(defStats(),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch{return defStats()}}
+function saveStats(s){localStorage.setItem(KEY,JSON.stringify(s))}
+
+// ── Adaptive difficulty ───────────────────────────────────────────────────────
+function selectDifficulty(){
+  if(mode!==0)return mode;
+  const s=loadStats(),diffs=[2,3,4,5];
+  const w=diffs.map(d=>{const st=s['d'+d]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5});
+  const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
+  for(let i=0;i<diffs.length;i++){r-=w[i];if(r<=0)return diffs[i];}
+  return 5;
+}
+
+// ── Exercise generation ───────────────────────────────────────────────────────
+function needsCarry(a,b){
+  // Returns true if at least one column produces a carry
+  let carry=0;
+  const as=String(a),bs=String(b);
+  const n=Math.max(as.length,bs.length);
+  const ap=as.padStart(n,'0'),bp=bs.padStart(n,'0');
+  for(let i=n-1;i>=0;i--){
+    const s=parseInt(ap[i])+parseInt(bp[i])+carry;
+    carry=s>=10?1:0;
+    if(s>=10)return true;
+  }
+  return false;
+}
+function generate(digits){
+  const mn=Math.pow(10,digits-1),mx=Math.pow(10,digits)-1;
+  let a,b,tries=0;
+  do{
+    a=mn+Math.floor(Math.random()*(mx-mn+1));
+    b=mn+Math.floor(Math.random()*(mx-mn+1));
+    tries++;if(tries>200)break;
+  }while(!needsCarry(a,b));
+  return{a,b,result:a+b};
+}
+
+// ── Build column layout ───────────────────────────────────────────────────────
+// The result may have one more digit than the addends (e.g. 99+12=111).
+// We display result-length columns; addend rows show blank for the overflow col.
+function buildOp(a,b){
+  const resStr=String(a+b);
+  const rLen=resStr.length;   // number of answer columns
+  const as=String(a).padStart(rLen,'0');
+  const bs=String(b).padStart(rLen,'0');
+  const lblAll=['C.M','D.M','UM','C','D','U'];
+  const labels=lblAll.slice(lblAll.length-rLen);
+
+  let html=`<div class="sign-col">
+    <div class="sr cry"></div>
+    <div class="sr ad1"></div>
+    <div class="sr ad2">+</div>
+    <div class="sr dv"></div>
+    <div class="sr ans"></div>
+    <div class="sr lbl"></div>
+  </div><div class="digit-cols">`;
+
+  for(let i=0;i<rLen;i++){
+    const isOverflow=(i===0 && as[0]==='0');
+    html+=`<div class="dcol${isOverflow?' overflow':''}">`;
+
+    // Carry button at column i = carry received FROM the right neighbor (column i+1).
+    // Not on the rightmost column (generates carry but its button goes to the left neighbor).
+    if(i < rLen-1){
+      html+=`<div class="sr cry"><div class="cry-btn" id="cry-${i}" onclick="toggleCarry(${i})" data-on="0">1</div></div>`;
+    }else{
+      html+=`<div class="sr cry"></div>`;
+    }
+
+    // Addend 1
+    html+=`<div class="sr ad1">${isOverflow?'':as[i]}</div>`;
+    // Addend 2
+    html+=`<div class="sr ad2">${isOverflow?'':bs[i]}</div>`;
+    // Divider
+    html+=`<div class="sr dv"><div class="dvline"></div></div>`;
+    // Answer input
+    html+=`<div class="sr ans"><input class="ans-inp" id="ans-${i}" maxlength="1" inputmode="numeric"></div>`;
+    // Label
+    html+=`<div class="sr lbl">${labels[i]}</div>`;
+
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+
+  document.getElementById('opWrap').innerHTML=html;
+  cResultLen=rLen;
+  for(let i=0;i<rLen;i++) wireAns(i,rLen);
+}
+
+// ── Toggle carry for column i (marks that THIS column sends carry to col i-1) ──
+function toggleCarry(i){
+  const btn=document.getElementById('cry-'+i);
+  const on=btn.dataset.on==='1';
+  btn.dataset.on=on?'0':'1';
+  btn.classList.toggle('on',!on);
+}
+
+// ── Wire answer input navigation ──────────────────────────────────────────────
+function wireAns(i,n){
+  const inp=document.getElementById('ans-'+i);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){checkAnswer();return;}
+    if(e.key==='ArrowLeft'||(e.key==='Backspace'&&inp.value==='')){
+      if(i>0){e.preventDefault();document.getElementById('ans-'+(i-1)).focus();}
+      return;
+    }
+    if(e.key==='ArrowRight'){
+      if(i<n-1){e.preventDefault();document.getElementById('ans-'+(i+1)).focus();}
+      return;
+    }
+    if(e.key.length===1&&!/\d/.test(e.key))e.preventDefault();
+  });
+  inp.addEventListener('input',()=>{
+    if(inp.value.length>1)inp.value=inp.value.slice(-1);
+    if(!/^\d?$/.test(inp.value)){inp.value='';return;}
+    if(inp.value.length===1&&i<n-1) document.getElementById('ans-'+(i+1)).focus();
+  });
+}
+
+// ── Check answer ──────────────────────────────────────────────────────────────
+function checkAnswer(){
+  if(answered)return;
+  const n=cResultLen;
+  let ansStr='';
+  for(let i=0;i<n;i++) ansStr+=document.getElementById('ans-'+i).value;
+  const fb=document.getElementById('feedback');
+  if(ansStr.length<n||ansStr.includes(' ')){
+    fb.textContent='Omple tots els dígits!';fb.className='ko';fb.style.display='block';return;
+  }
+  const val=parseInt(ansStr),key='d'+cDigits;
+  const resStr=String(cResult).padStart(n,'0');
+  for(let i=0;i<n;i++){
+    const inp=document.getElementById('ans-'+i);
+    inp.className='ans-inp '+(inp.value===resStr[i]?'ok':'ko');
+  }
+  if(val===cResult){
+    answered=true;
+    fb.textContent='✓ Molt bé! Correcte!';fb.className='ok';
+    if(!counted){
+      const s=loadStats();s.total=(s.total||0)+1;
+      s[key].c=(s[key].c||0)+1;s.streak=(s.streak||0)+1;
+      saveStats(s);gRender();gCorrect(3);counted=true;
+    }
+    fb.style.display='block';
+    document.getElementById('checkBtn').style.display='none';
+  }else{
+    fb.textContent=`✗ Revisa els dígits en vermell.`;fb.className='ko';
+    if(!counted){
+      const s=loadStats();s.total=(s.total||0)+1;
+      s[key].e=(s[key].e||0)+1;s.streak=0;
+      saveStats(s);gRender();gWrong();counted=true;
+    }
+    fb.style.display='block';
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function setMode(d){
+  mode=d;
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('active',+b.dataset.d===d));
+  nextExercise();
+}
+function nextExercise(){
+  answered=false;counted=false;
+  const d=selectDifficulty();cDigits=d;
+  const ex=generate(d);cA=ex.a;cB=ex.b;cResult=ex.result;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('feedback').className='';
+  document.getElementById('checkBtn').style.display='';
+  buildOp(cA,cB);
+  document.getElementById('ans-0').focus();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+nextExercise();
+gRender();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobs &amp; Professions</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── Job card (section 1) ── */
+.job-card{display:flex;flex-direction:column;align-items:center;gap:10px;margin:10px 0}
+.job-icon{font-size:3rem;line-height:1}
+.job-desc{font-size:.93rem;font-weight:500;text-align:center;color:var(--t);max-width:340px;line-height:1.6}
+
+/* ── Clue list (section 6) ── */
+.clue-list{list-style:none;padding:0;margin:8px 0 12px}
+.clue-list li{padding:4px 0 4px 18px;font-size:.9rem;line-height:1.5;position:relative}
+.clue-list li::before{content:'•';position:absolute;left:0;color:var(--a);font-weight:900}
+
+/* ── Q blocks ── */
+.q-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b)}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-sent{font-size:.93rem;font-weight:500;margin-bottom:8px;line-height:1.5}
+.blank{color:var(--a);font-weight:800}
+
+/* ── Word reorder ── */
+.reorder-block{padding:12px 0;border-bottom:1px solid var(--b)}
+.reorder-block:last-child{border-bottom:none;padding-bottom:0}
+.word-bank{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#f8faff;border-radius:8px;border:1.5px dashed var(--b);min-height:40px;margin:4px 0}
+.sentence-area{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-radius:8px;border:2px solid var(--b);min-height:40px;margin:4px 0}
+.word-chip{padding:5px 10px;background:#fff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;transition:all .15s;user-select:none}
+.word-chip:hover{background:#eff6ff}
+.placed-chip{padding:5px 10px;background:#eff6ff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;transition:all .15s;user-select:none}
+.placed-chip:hover{background:#dbeafe}
+
+.done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Jobs &amp; Professions</h1>
+    <div class="muted">Unit 4 · Jobs · Wears a uniform · Does he / she...?</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<!-- ── 1: What's the job? ── -->
+<div class="card">
+  <h2><span class="num">1</span> What's the job?</h2>
+  <p class="card-sub">Read the description and choose the correct profession.</p>
+  <div class="job-card" id="s1-card"></div>
+  <div class="opts-row" id="s1-opts"></div>
+  <div class="fb" id="s1-fb"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s1-next" onclick="s1Next()" style="display:none">Next job ▶</button>
+  </div>
+  <div id="s1-done" class="done-banner" style="display:none">
+    All jobs done! ✓ <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="s1Init()">Again</button>
+  </div>
+</div>
+
+<!-- ── 2: True or False ── -->
+<div class="card">
+  <h2><span class="num">2</span> True or False?</h2>
+  <p class="card-sub">Read the statement and decide.</p>
+  <div id="s2-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s2Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 3: Wears / doesn't wear ── -->
+<div class="card">
+  <h2><span class="num">3</span> Wears a uniform?</h2>
+  <p class="card-sub">Complete each sentence with <em>wears</em> or <em>doesn't wear</em>.</p>
+  <div id="s3-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s3Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 4: Does...? Yes / No ── -->
+<div class="card">
+  <h2><span class="num">4</span> Does he / she...?</h2>
+  <p class="card-sub">Answer the questions with Yes or No.</p>
+  <div id="s4-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s4Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 5: Word order ── -->
+<div class="card">
+  <h2><span class="num">5</span> Put the words in order</h2>
+  <p class="card-sub">Click the words to build the sentence. Click a placed word to remove it.</p>
+  <div id="s5-list"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-outline btn-sm" onclick="s5Init()">New sentences ▶</button>
+  </div>
+</div>
+
+<!-- ── 6: Guess the job ── -->
+<div class="card">
+  <h2><span class="num">6</span> Guess the job!</h2>
+  <p class="card-sub">Read the clues and choose the correct profession.</p>
+  <div id="s6-wrap"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s6-next" onclick="s6Next()" style="display:none">Next mystery ▶</button>
+  </div>
+  <div id="s6-done" class="done-banner" style="display:none">
+    All mysteries solved! ✓ <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="s6Init()">Again</button>
+  </div>
+</div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+const ENOK = ["Well done! ⭐","Excellent! 🎉","Great job! 🌟","Perfect! 🏆","Amazing! 💪","Fantastic! 🎊"];
+const ENKO = ["Try again!","Not quite...","Almost there!","Have another go!"];
+
+const EXER_KEY = 'ex_ang_prof_v1';
+GAM_ACHS = [...GAM_ACHS,
+  {id:'ang_prof1',  s:'💼', n:'Career Starter', d:'First profession question correct'},
+  {id:'ang_prof5',  s:'🏢', n:'Career Expert',  d:'5 profession questions correct'},
+  {id:'ang_prof15', s:'🌟', n:'Job Master',     d:'15 profession questions correct'},
+];
+
+function profOk(xp) {
+  const e = eLoad(); e.ok = (e.ok||0) + 1; eSave(e);
+  gCorrect(xp||3, tryA => {
+    tryA('ang_prof1',  e.ok >= 1);
+    tryA('ang_prof5',  e.ok >= 5);
+    tryA('ang_prof15', e.ok >= 15);
+  });
+}
+
+/* ── Data ── */
+const JOBS = [
+  {name:'police officer',   pronoun:'she', icon:'👮', desc:'She keeps people safe in the streets and catches criminals.'},
+  {name:'vet',              pronoun:'she', icon:'🐾', desc:'She helps sick and injured animals get better.'},
+  {name:'firefighter',      pronoun:'he',  icon:'🚒', desc:'He puts out fires and rescues people from danger.'},
+  {name:'doctor',           pronoun:'he',  icon:'🩺', desc:'He helps sick people and works in a hospital or clinic.'},
+  {name:'farmer',           pronoun:'he',  icon:'🌾', desc:'He grows vegetables and fruit and looks after animals on his farm.'},
+  {name:'nurse',            pronoun:'she', icon:'💊', desc:'She looks after patients and helps doctors in a hospital.'},
+  {name:'pop star',         pronoun:'she', icon:'🎤', desc:'She sings songs and performs on stage in front of big audiences.'},
+  {name:'shop assistant',   pronoun:'she', icon:'🛍️', desc:'She helps customers find and buy things in a shop.'},
+  {name:'fashion designer', pronoun:'she', icon:'👗', desc:'She designs and creates beautiful clothes for people to wear.'},
+  {name:'taxi driver',      pronoun:'he',  icon:'🚕', desc:'He drives people around the city in his car.'},
+  {name:'teacher',          pronoun:'she', icon:'📚', desc:'She teaches children and helps them learn new things at school.'},
+];
+
+const TF_POOL = [
+  {stmt:"A teacher works in a school.",          ans:true},
+  {stmt:"A vet helps sick people.",              ans:false},
+  {stmt:"A firefighter drives a taxi.",           ans:false},
+  {stmt:"A nurse works in a hospital.",           ans:true},
+  {stmt:"A farmer grows food.",                   ans:true},
+  {stmt:"A fashion designer makes clothes.",      ans:true},
+  {stmt:"A pop star works in a bank.",            ans:false},
+  {stmt:"A police officer keeps people safe.",    ans:true},
+  {stmt:"A doctor helps sick animals.",           ans:false},
+  {stmt:"A shop assistant works in a shop.",      ans:true},
+  {stmt:"A taxi driver works in an office.",      ans:false},
+  {stmt:"A police officer wears a uniform.",      ans:true},
+  {stmt:"A vet wears a uniform.",                 ans:false},
+  {stmt:"A firefighter puts out fires.",          ans:true},
+  {stmt:"A pop star wears a uniform.",            ans:false},
+  {stmt:"A doctor works in a hospital.",          ans:true},
+  {stmt:"A farmer works outdoors.",               ans:true},
+  {stmt:"A fashion designer wears a uniform.",     ans:false},
+  {stmt:"A nurse looks after patients.",           ans:true},
+  {stmt:"A taxi driver works in a hospital.",      ans:false},
+  {stmt:"A teacher helps children learn.",         ans:true},
+  {stmt:"A vet works with plants.",                ans:false},
+  {stmt:"A pop star sings songs.",                 ans:true},
+  {stmt:"A police officer drives a fire engine.",  ans:false},
+  {stmt:"A firefighter is brave.",                 ans:true},
+  {stmt:"A shop assistant sells things in a shop.",ans:true},
+];
+
+const WEAR_POOL = [
+  {job:'police officer',   wears:true},
+  {job:'vet',              wears:false},
+  {job:'firefighter',      wears:true},
+  {job:'doctor',           wears:true},
+  {job:'nurse',            wears:true},
+  {job:'pop star',         wears:false},
+  {job:'farmer',           wears:false},
+  {job:'taxi driver',      wears:false},
+  {job:'fashion designer', wears:false},
+  {job:'teacher',          wears:false},
+  {job:'shop assistant',   wears:false},
+];
+
+const DOES_POOL = [
+  {q:"Does a nurse wear a uniform?",             pronoun:'she', ans:true},
+  {q:"Does a farmer work in an office?",          pronoun:'he',  ans:false},
+  {q:"Does a pop star work in a school?",         pronoun:'she', ans:false},
+  {q:"Does a doctor work in a hospital?",         pronoun:'he',  ans:true},
+  {q:"Does a vet help sick animals?",             pronoun:'she', ans:true},
+  {q:"Does a taxi driver wear a uniform?",        pronoun:'he',  ans:false},
+  {q:"Does a teacher work in a school?",          pronoun:'she', ans:true},
+  {q:"Does a fashion designer make clothes?",     pronoun:'she', ans:true},
+  {q:"Does a firefighter put out fires?",         pronoun:'he',  ans:true},
+  {q:"Does a police officer keep people safe?",   pronoun:'she', ans:true},
+  {q:"Does a shop assistant work in a shop?",     pronoun:'she', ans:true},
+  {q:"Does a pop star wear a uniform?",           pronoun:'she', ans:false},
+  {q:"Does a vet work in a hospital?",            pronoun:'she', ans:false},
+  {q:"Does a firefighter wear a uniform?",        pronoun:'he',  ans:true},
+  {q:"Does a farmer grow food?",                  pronoun:'he',  ans:true},
+  {q:"Does a shop assistant help customers?",     pronoun:'she', ans:true},
+  {q:"Does a doctor drive a taxi?",               pronoun:'he',  ans:false},
+  {q:"Does a nurse look after patients?",         pronoun:'she', ans:true},
+  {q:"Does a pop star sing songs?",               pronoun:'she', ans:true},
+  {q:"Does a taxi driver work in an office?",     pronoun:'he',  ans:false},
+  {q:"Does a fashion designer work in a school?", pronoun:'she', ans:false},
+  {q:"Does a teacher help students?",             pronoun:'she', ans:true},
+  {q:"Does a police officer work in the streets?",pronoun:'she', ans:true},
+];
+
+const S5_POOL = [
+  {words:["Does","a","nurse","wear","a","uniform?"],           correct:"Does a nurse wear a uniform?"},
+  {words:["A","vet","doesn't","wear","a","uniform."],          correct:"A vet doesn't wear a uniform."},
+  {words:["She","works","in","a","hospital."],                 correct:"She works in a hospital."},
+  {words:["Does","a","teacher","work","in","a","school?"],     correct:"Does a teacher work in a school?"},
+  {words:["He","doesn't","work","in","an","office."],          correct:"He doesn't work in an office."},
+  {words:["Does","a","pop","star","wear","a","uniform?"],      correct:"Does a pop star wear a uniform?"},
+  {words:["She","doesn't","wear","a","uniform."],              correct:"She doesn't wear a uniform."},
+  {words:["A","farmer","works","on","a","farm."],              correct:"A farmer works on a farm."},
+  {words:["Does","a","doctor","work","in","a","hospital?"],    correct:"Does a doctor work in a hospital?"},
+  {words:["He","doesn't","drive","a","taxi."],                 correct:"He doesn't drive a taxi."},
+  {words:["A","police","officer","wears","a","uniform."],      correct:"A police officer wears a uniform."},
+  {words:["Does","a","firefighter","put","out","fires?"],      correct:"Does a firefighter put out fires?"},
+  {words:["She","teaches","children","at","school."],          correct:"She teaches children at school."},
+  {words:["She","helps","sick","animals."],                    correct:"She helps sick animals."},
+  {words:["A","pop","star","doesn't","wear","a","uniform."],   correct:"A pop star doesn't wear a uniform."},
+  {words:["Does","a","shop","assistant","work","in","a","shop?"],correct:"Does a shop assistant work in a shop?"},
+  {words:["She","doesn't","work","in","a","hospital."],        correct:"She doesn't work in a hospital."},
+  {words:["A","taxi","driver","doesn't","wear","a","uniform."],correct:"A taxi driver doesn't wear a uniform."},
+];
+
+const GUESS_POOL = [
+  {icon:'🐾', ans:'vet',
+   clues:["She helps sick and injured animals.","She doesn't wear a uniform.","She works in a clinic, not a hospital."],
+   opts:['vet','doctor','nurse','farmer']},
+  {icon:'🚒', ans:'firefighter',
+   clues:["He puts out fires.","He wears a uniform.","He is very brave and helps people in danger."],
+   opts:['firefighter','police officer','taxi driver','doctor']},
+  {icon:'👗', ans:'fashion designer',
+   clues:["She creates beautiful clothes.","She doesn't wear a uniform.","She works in a studio and is very creative."],
+   opts:['fashion designer','pop star','shop assistant','teacher']},
+  {icon:'👮', ans:'police officer',
+   clues:["She keeps people safe.","She wears a uniform.","She works in the streets and can arrest criminals."],
+   opts:['police officer','firefighter','nurse','teacher']},
+  {icon:'🎤', ans:'pop star',
+   clues:["She performs on stage for thousands of fans.","She doesn't wear a uniform.","She is famous and sings songs."],
+   opts:['pop star','fashion designer','teacher','shop assistant']},
+  {icon:'🌾', ans:'farmer',
+   clues:["He grows vegetables and fruit.","He doesn't work in an office.","He wakes up very early and works outdoors."],
+   opts:['farmer','taxi driver','vet','shop assistant']},
+  {icon:'🚕', ans:'taxi driver',
+   clues:["He drives people around the city.","He works at night and during the day.","He knows all the streets very well."],
+   opts:['taxi driver','farmer','firefighter','police officer']},
+  {icon:'📚', ans:'teacher',
+   clues:["She works with children every day.","She doesn't wear a uniform.","She helps students learn new things."],
+   opts:['teacher','nurse','shop assistant','pop star']},
+  {icon:'💊', ans:'nurse',
+   clues:["She wears a uniform.","She works in a hospital.","She looks after sick patients and helps doctors."],
+   opts:['nurse','doctor','vet','police officer']},
+  {icon:'📚', ans:'teacher',
+   clues:["She works with children every day.","She doesn't wear a uniform.","She helps students learn new things at school."],
+   opts:['teacher','nurse','shop assistant','fashion designer']},
+  {icon:'🛍️', ans:'shop assistant',
+   clues:["She works in a shop.","She doesn't wear a uniform.","She helps customers find and buy things."],
+   opts:['shop assistant','fashion designer','pop star','teacher']},
+];
+
+/* ══ SECTION 1 ══ */
+let s1Queue = [], s1Idx = 0;
+function s1Init() {
+  s1Queue = sh([...JOBS]); s1Idx = 0;
+  document.getElementById('s1-done').style.display = 'none';
+  s1Show();
+}
+function s1Show() {
+  const nextBtn = document.getElementById('s1-next');
+  if (s1Idx >= s1Queue.length) {
+    document.getElementById('s1-card').innerHTML = '';
+    document.getElementById('s1-opts').innerHTML = '';
+    document.getElementById('s1-fb').className = 'fb';
+    nextBtn.style.display = 'none';
+    document.getElementById('s1-done').style.display = 'block';
+    return;
+  }
+  const it = s1Queue[s1Idx];
+  document.getElementById('s1-card').innerHTML =
+    `<div class="job-icon">${it.icon}</div><div class="job-desc">${it.desc}</div>`;
+  document.getElementById('s1-fb').className = 'fb';
+  nextBtn.style.display = 'none';
+  const opts = sh([it.name, ...sh(JOBS.filter(j => j.name !== it.name)).slice(0,3).map(j => j.name)]);
+  const od = document.getElementById('s1-opts'); od.innerHTML = '';
+  opts.forEach(o => {
+    const b = document.createElement('button'); b.className = 'aopt'; b.textContent = o;
+    b.onclick = () => {
+      od.querySelectorAll('.aopt').forEach(x => x.disabled = true);
+      const ok = o === it.name; b.classList.add(ok ? 'ok' : 'ko');
+      if (!ok) od.querySelectorAll('.aopt').forEach(x => { if (x.textContent === it.name) x.classList.add('show'); });
+      const fb = document.getElementById('s1-fb');
+      fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+      fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + it.name;
+      ok ? profOk(3) : gWrong();
+      nextBtn.style.display = 'inline-block';
+    };
+    od.appendChild(b);
+  });
+}
+function s1Next() { s1Idx++; s1Show(); }
+
+/* ══ SECTION 2 ══ */
+let s2Current = [];
+function s2Init() {
+  s2Current = sh([...TF_POOL]).slice(0, 5);
+  document.getElementById('s2-qs').innerHTML = s2Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">"${q.stmt}"</div>
+      <div class="opts-row" id="s2o${i}">
+        <button class="aopt" onclick="s2Ans(this,${i},true)">True ✓</button>
+        <button class="aopt" onclick="s2Ans(this,${i},false)">False ✗</button>
+      </div>
+      <div class="fb" id="s2fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s2Ans(btn, i, chosen) {
+  document.querySelectorAll('#s2o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = chosen === s2Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s2fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'It\'s ' + (s2Current[i].ans ? 'True' : 'False') + '!';
+  ok ? profOk(2) : gWrong();
+}
+
+/* ══ SECTION 3 ══ */
+let s3Current = [];
+function s3Init() {
+  s3Current = sh([...WEAR_POOL]).slice(0, 4);
+  document.getElementById('s3-qs').innerHTML = s3Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">A ${q.job} <span class="blank">___</span> a uniform.</div>
+      <div class="opts-row" id="s3o${i}">
+        <button class="aopt" onclick="s3Ans(this,${i},'wears')">wears</button>
+        <button class="aopt" onclick="s3Ans(this,${i},&quot;doesn't wear&quot;)">doesn't wear</button>
+      </div>
+      <div class="fb" id="s3fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s3Ans(btn, i, chosen) {
+  document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ans = s3Current[i].wears ? 'wears' : "doesn't wear";
+  const ok = chosen === ans; btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => { if (b.textContent === ans) b.classList.add('show'); });
+  const fb = document.getElementById('s3fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : `A ${s3Current[i].job} ${ans} a uniform.`;
+  ok ? profOk(2) : gWrong();
+}
+
+/* ══ SECTION 4 ══ */
+let s4Current = [];
+function s4Init() {
+  s4Current = sh([...DOES_POOL]).slice(0, 4).map(q => ({
+    ...q,
+    yes: `Yes, ${q.pronoun} does.`,
+    no:  `No, ${q.pronoun} doesn't.`,
+  }));
+  document.getElementById('s4-qs').innerHTML = s4Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent" style="font-weight:600">${q.q}</div>
+      <div class="opts-row" id="s4o${i}">
+        <button class="aopt" onclick="s4Ans(this,${i},&quot;${q.yes}&quot;)">${q.yes}</button>
+        <button class="aopt" onclick="s4Ans(this,${i},&quot;${q.no}&quot;)">${q.no}</button>
+      </div>
+      <div class="fb" id="s4fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s4Ans(btn, i, chosen) {
+  document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => b.disabled = true);
+  const q = s4Current[i], correct = q.ans ? q.yes : q.no;
+  const ok = chosen === correct; btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => { if (b.textContent === correct) b.classList.add('show'); });
+  const fb = document.getElementById('s4fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : correct;
+  ok ? profOk(2) : gWrong();
+}
+
+/* ══ SECTION 5 ══ */
+let s5State = [];
+function s5Init() {
+  const sel = sh([...S5_POOL]).slice(0, 3);
+  s5State = sel.map(it => ({
+    words: it.words, correct: it.correct,
+    shuffled: sh([...Array(it.words.length).keys()]),
+    placed: [], done: false
+  }));
+  document.getElementById('s5-list').innerHTML = s5State.map((_, i) => `
+    <div class="reorder-block">
+      <div class="label" style="margin-bottom:5px">Words:</div>
+      <div class="word-bank" id="s5b${i}"></div>
+      <div class="label" style="margin:5px 0 4px">Your sentence:</div>
+      <div class="sentence-area" id="s5s${i}"></div>
+      <div class="btn-row" style="margin-top:8px;justify-content:flex-start">
+        <button class="btn btn-dark btn-sm" onclick="s5Check(${i})">Check ✓</button>
+        <button class="btn btn-outline btn-sm" onclick="s5Clear(${i})">Clear</button>
+      </div>
+      <div class="fb" id="s5fb${i}"></div>
+    </div>
+  `).join('');
+  s5State.forEach((_, i) => s5Render(i));
+}
+function s5Render(i) {
+  const it = s5State[i];
+  const bank = document.getElementById('s5b'+i), sent = document.getElementById('s5s'+i);
+  bank.innerHTML = ''; sent.innerHTML = '';
+  if (it.done) { bank.innerHTML = '<span style="color:var(--ok);font-weight:600;font-size:.85rem">✓ ' + it.correct + '</span>'; return; }
+  it.shuffled.forEach(wi => {
+    if (it.placed.includes(wi)) return;
+    const c = document.createElement('span'); c.className = 'word-chip'; c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.push(wi); s5Render(i); };
+    bank.appendChild(c);
+  });
+  it.placed.forEach(wi => {
+    const c = document.createElement('span'); c.className = 'placed-chip'; c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.splice(it.placed.indexOf(wi), 1); s5Render(i); };
+    sent.appendChild(c);
+  });
+}
+function s5Check(i) {
+  const it = s5State[i];
+  const built = it.placed.map(wi => it.words[wi]).join(' ');
+  const ok = built === it.correct;
+  const fb = document.getElementById('s5fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'Correct: "' + it.correct + '"';
+  if (ok) { it.done = true; s5Render(i); profOk(4); } else gWrong();
+}
+function s5Clear(i) {
+  s5State[i].placed = []; s5State[i].done = false;
+  document.getElementById('s5fb'+i).className = 'fb';
+  s5Render(i);
+}
+
+/* ══ SECTION 6 ══ */
+let s6Queue = [], s6Idx = 0;
+function s6Init() {
+  s6Queue = sh([...GUESS_POOL]); s6Idx = 0;
+  document.getElementById('s6-done').style.display = 'none';
+  s6Show();
+}
+function s6Show() {
+  const nextBtn = document.getElementById('s6-next');
+  if (s6Idx >= s6Queue.length) {
+    document.getElementById('s6-wrap').innerHTML = '';
+    nextBtn.style.display = 'none';
+    document.getElementById('s6-done').style.display = 'block';
+    return;
+  }
+  const it = s6Queue[s6Idx];
+  const opts = sh([...it.opts]);
+  document.getElementById('s6-wrap').innerHTML =
+    `<div style="text-align:center;font-size:2.8rem;margin-bottom:8px">${it.icon}</div>`
+    + `<ul class="clue-list">${it.clues.map(c => `<li>${c}</li>`).join('')}</ul>`
+    + `<div class="opts-row" id="s6-opts">${opts.map(o => `<button class="aopt" onclick="s6Ans('${o}','${it.ans}')">${o}</button>`).join('')}</div>`
+    + `<div class="fb" id="s6-fb"></div>`;
+  nextBtn.style.display = 'none';
+}
+function s6Ans(chosen, correct) {
+  document.querySelectorAll('#s6-opts .aopt').forEach(b => b.disabled = true);
+  const ok = chosen === correct;
+  document.querySelectorAll('#s6-opts .aopt').forEach(b => {
+    if (b.textContent === chosen) b.classList.add(ok ? 'ok' : 'ko');
+    if (!ok && b.textContent === correct) b.classList.add('show');
+  });
+  const fb = document.getElementById('s6-fb');
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + correct;
+  ok ? profOk(4) : gWrong();
+  document.getElementById('s6-next').style.display = 'inline-block';
+}
+function s6Next() { s6Idx++; s6Show(); }
+
+/* ══ Bootstrap ══ */
+window.addEventListener('load', () => {
+  s1Init(); s2Init(); s3Init(); s4Init(); s5Init(); s6Init();
+  gRender();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estadística i sèries — 4t</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── CSS específic ── */
+.geo-inp{width:90px;padding:8px;border:2px solid var(--b);border-radius:8px;font-size:1.3rem;font-weight:800;text-align:center;outline:none;font-family:inherit}
+.geo-inp:focus{border-color:var(--a)}
+.geo-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.geo-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.inp-row{display:flex;align-items:center;gap:8px;justify-content:center;margin:10px 0}
+/* Gràfic de barres */
+.chart-wrap{background:var(--bg);border-radius:var(--r);padding:10px 6px 4px;margin-bottom:10px;overflow:hidden}
+.chart-title{font-size:.82rem;font-weight:700;color:var(--m);text-align:center;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+/* Sèrie */
+.serie-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;padding:12px 0;font-size:1.25rem;font-weight:800}
+.serie-num{min-width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--bg);border:2px solid var(--b);border-radius:10px;color:var(--t)}
+.serie-sep{color:var(--m);font-size:.9rem;font-weight:400}
+.serie-blank{min-width:52px;height:44px;display:flex;align-items:center;justify-content:center;border:2.5px dashed var(--a);border-radius:10px;background:#eff6ff;color:var(--a);font-size:.9rem}
+/* Regla */
+.rule-badge{display:inline-block;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:100px;padding:4px 14px;font-size:.88rem;font-weight:700;color:var(--a)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Estadística i sèries</h1>
+    <div class="muted">Gràfics de barres · Sèries numèriques · Dades</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- ═══════════ SEC 1: LLEGIR GRÀFIC ═══════════ -->
+<div class="card">
+  <h2><span class="num">1</span> Llegeix el gràfic</h2>
+  <div class="card-sub">Observa el gràfic de barres i respon la pregunta.</div>
+  <div class="chart-title" id="s1-title"></div>
+  <div class="chart-wrap"><div id="s1-chart"></div></div>
+  <div class="q-top" id="s1-q" style="text-align:center"></div>
+  <div id="s1-opts" class="opts-row"></div>
+  <div id="s1-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextSec1()">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 2: COMPARA BARRES ═══════════ -->
+<div class="card">
+  <h2><span class="num">2</span> Compara les barres</h2>
+  <div class="card-sub">Mira el gràfic i tria la resposta correcta.</div>
+  <div class="chart-title" id="s2-title"></div>
+  <div class="chart-wrap"><div id="s2-chart"></div></div>
+  <div class="q-top" id="s2-q" style="text-align:center"></div>
+  <div id="s2-opts" class="opts-row"></div>
+  <div id="s2-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextSec2()">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 3: QUIN NÚMERO SEGUEIX? ═══════════ -->
+<div class="card">
+  <h2><span class="num">3</span> Quin número segueix?</h2>
+  <div class="card-sub">Observa la sèrie i tria el número que continua.</div>
+  <div id="s3-serie" class="serie-row"></div>
+  <div id="s3-opts" class="opts-row"></div>
+  <div id="s3-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextSec3()">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 4: TROBA LA REGLA ═══════════ -->
+<div class="card">
+  <h2><span class="num">4</span> Troba la regla</h2>
+  <div class="card-sub">Quin és el patró d'aquesta sèrie?</div>
+  <div id="s4-serie" class="serie-row"></div>
+  <div id="s4-opts" class="opts-row"></div>
+  <div id="s4-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextSec4()">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 5: PROBLEMES ═══════════ -->
+<div class="card">
+  <h2><span class="num">5</span> Problemes</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="problemes.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_est_v1';
+
+
+GAM_ACHS = [
+  {id:'first',    s:'🌟', n:'Primer Encert',     d:'Primera resposta correcta'},
+  {id:'s3',       s:'🔥', n:'Ratxa x3',           d:'3 encerts seguits'},
+  {id:'s5',       s:'⚡', n:'Ratxa x5',           d:'5 encerts seguits'},
+  {id:'s10',      s:'💥', n:'Ratxa x10',          d:'10 encerts seguits'},
+  {id:'chart5',   s:'📊', n:'Lector de Gràfics',  d:'5 gràfics llegits'},
+  {id:'serie5',   s:'🔢', n:'Seguidor de Sèries', d:'5 sèries completades'},
+  {id:'ok50',     s:'🥉', n:'50 Encerts',          d:'50 respostes correctes'},
+  {id:'ok200',    s:'🥈', n:'200 Encerts',         d:'200 respostes correctes'}
+];
+
+function gExtraAchs(g,tryA){
+  const e=eLoad();
+  tryA('chart5',(e.chart||0)>=5);
+  tryA('serie5',(e.serie||0)>=5);
+}
+
+
+// ════════════════════════════════════════════════════════════
+// GRÀFICS DE BARRES — generador SVG
+// ════════════════════════════════════════════════════════════
+
+const CHART_THEMES = [
+  {title:'Fruites venudes', labels:['Pomes','Peres','Maduixes','Plàtans','Cireres'], colors:['#1d4ed8','#16a34a','#dc2626','#f59e0b','#7c3aed']},
+  {title:'Animals al parc', labels:['Gossos','Gats','Ocells','Conills','Peixos'],   colors:['#1d4ed8','#16a34a','#dc2626','#f59e0b','#7c3aed']},
+  {title:'Esports preferits',labels:['Futbol','Bàsquet','Tennis','Natació','Ciclisme'],colors:['#1d4ed8','#16a34a','#dc2626','#f59e0b','#7c3aed']},
+  {title:'Llibres llegits', labels:['Dilluns','Dimarts','Dimecres','Dijous','Divendres'],colors:['#1d4ed8','#16a34a','#dc2626','#f59e0b','#7c3aed']},
+  {title:'Cromos per color', labels:['Blaus','Verds','Vermells','Grocs','Liles'],   colors:['#1d4ed8','#16a34a','#dc2626','#f59e0b','#7c3aed']},
+];
+
+function genChartData(nBars){
+  const theme = pick(CHART_THEMES);
+  const idxs  = sh([0,1,2,3,4]).slice(0, nBars);
+  const labels = idxs.map(i => theme.labels[i]);
+  const colors = idxs.map(i => theme.colors[i]);
+  // Values: multiples of 5, between 5 and 50, all different
+  const vals = [];
+  while(vals.length < nBars){
+    const v = ri(1,10)*5;
+    if(!vals.includes(v)) vals.push(v);
+  }
+  return {title: theme.title, labels, colors, vals};
+}
+
+function buildBarSVG(labels, vals, colors){
+  const n     = labels.length;
+  const W     = 320, H = 160;
+  const PL    = 32, PR = 8, PT = 10, PB = 36;
+  const chartW= W - PL - PR;
+  const chartH= H - PT - PB;
+  const maxV  = Math.max(...vals);
+  const yTop  = Math.ceil(maxV / 10) * 10;
+  const barW  = Math.floor((chartW / n) * 0.55);
+  const gap   = chartW / n;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" preserveAspectRatio="xMidYMin meet">`;
+
+  // Y axis lines + labels
+  const ySteps = yTop / 10;
+  for(let s = 0; s <= ySteps; s++){
+    const v = s * 10;
+    const y = PT + chartH - (v / yTop) * chartH;
+    svg += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e2e8f0" stroke-width="${s===0?1.5:.8}"/>`;
+    svg += `<text x="${PL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="#64748b" font-family="'Segoe UI',sans-serif">${v}</text>`;
+  }
+
+  // Bars + labels
+  for(let i = 0; i < n; i++){
+    const bh = (vals[i] / yTop) * chartH;
+    const bx = PL + gap * i + (gap - barW) / 2;
+    const by = PT + chartH - bh;
+    svg += `<rect x="${bx}" y="${by}" width="${barW}" height="${bh}" rx="3" fill="${colors[i]}"/>`;
+    // value on top
+    svg += `<text x="${bx + barW/2}" y="${by - 3}" text-anchor="middle" font-size="9.5" fill="${colors[i]}" font-weight="700" font-family="'Segoe UI',sans-serif">${vals[i]}</text>`;
+    // x label
+    const lx = PL + gap * i + gap / 2;
+    const ly = H - PB + 14;
+    // wrap long labels
+    const words = labels[i].split('');
+    if(labels[i].length > 7){
+      const mid = Math.ceil(labels[i].length/2);
+      const l1  = labels[i].slice(0,mid);
+      const l2  = labels[i].slice(mid);
+      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9" fill="#1e293b" font-family="'Segoe UI',sans-serif">${l1}</text>`;
+      svg += `<text x="${lx}" y="${ly+11}" text-anchor="middle" font-size="9" fill="#1e293b" font-family="'Segoe UI',sans-serif">${l2}</text>`;
+    } else {
+      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9.5" fill="#1e293b" font-family="'Segoe UI',sans-serif">${labels[i]}</text>`;
+    }
+  }
+
+  // Axes
+  svg += `<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+chartH}" stroke="#94a3b8" stroke-width="1.5"/>`;
+  svg += `<line x1="${PL}" y1="${PT+chartH}" x2="${W-PR}" y2="${PT+chartH}" stroke="#94a3b8" stroke-width="1.5"/>`;
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ── SEC 1: llegir valor ──
+let _s1data;
+function nextSec1(){
+  _s1data = genChartData(ri(4,5));
+  document.getElementById('s1-title').textContent = _s1data.title;
+  document.getElementById('s1-chart').innerHTML   = buildBarSVG(_s1data.labels, _s1data.vals, _s1data.colors);
+  document.getElementById('s1-fb').textContent    = '';
+
+  // Pregunta: quin valor té la categoria X?
+  const qi  = ri(0, _s1data.labels.length - 1);
+  const ans = _s1data.vals[qi];
+  const lbl = _s1data.labels[qi];
+  document.getElementById('s1-q').textContent = `Quantes unitats té "${lbl}"?`;
+
+  // Opcions: la correcta + 2 distractors
+  const wrong = sh(_s1data.vals.filter(v => v !== ans)).slice(0, 2);
+  const opts  = sh([ans, ...wrong]);
+  renderOpts('s1-opts', opts, ans,
+    () => { setFb('s1-fb', true,  pick(OK)); gCorrect(7, 'chart'); setTimeout(nextSec1, 1500); },
+    () => { setFb('s1-fb', false, pick(KO)); gWrong(); }
+  );
+}
+
+// ── SEC 2: comparar (màxim, mínim, diferència) ──
+let _s2data;
+function nextSec2(){
+  _s2data = genChartData(ri(4,5));
+  document.getElementById('s2-title').textContent = _s2data.title;
+  document.getElementById('s2-chart').innerHTML   = buildBarSVG(_s2data.labels, _s2data.vals, _s2data.colors);
+  document.getElementById('s2-fb').textContent    = '';
+
+  const qtype = ri(0, 2);
+  let qText, ans, opts;
+
+  if(qtype === 0){
+    // Quina categoria té més?
+    const maxV = Math.max(..._s2data.vals);
+    ans = _s2data.labels[_s2data.vals.indexOf(maxV)];
+    qText = 'Quina categoria té MÉS unitats?';
+    opts = sh([..._s2data.labels]);
+  } else if(qtype === 1){
+    // Quina categoria té menys?
+    const minV = Math.min(..._s2data.vals);
+    ans = _s2data.labels[_s2data.vals.indexOf(minV)];
+    qText = 'Quina categoria té MENYS unitats?';
+    opts = sh([..._s2data.labels]);
+  } else {
+    // Diferència entre la més gran i la més petita
+    const maxV = Math.max(..._s2data.vals);
+    const minV = Math.min(..._s2data.vals);
+    ans = maxV - minV;
+    qText = 'Quina és la diferència entre la barra més gran i la més petita?';
+    const wrong = [ans + 5, ans + 10, ans - 5].filter(v => v > 0 && v !== ans);
+    opts = sh([ans, ...wrong.slice(0, 2)]);
+  }
+
+  document.getElementById('s2-q').textContent = qText;
+  renderOpts('s2-opts', opts, ans,
+    () => { setFb('s2-fb', true,  pick(OK)); gCorrect(8, 'chart'); setTimeout(nextSec2, 1500); },
+    () => { setFb('s2-fb', false, pick(KO)); gWrong(); }
+  );
+}
+
+// ════════════════════════════════════════════════════════════
+// SÈRIES NUMÈRIQUES
+// ════════════════════════════════════════════════════════════
+
+function genSerie(){
+  const types = [
+    () => { const s=ri(1,15), d=ri(2,9);  const t=[s,s+d,s+2*d,s+3*d]; return {terms:t, next:s+4*d, rule:`+${d}`}; },
+    () => { const s=ri(50,99),d=ri(2,9);  const t=[s,s-d,s-2*d,s-3*d]; return {terms:t, next:s-4*d, rule:`−${d}`}; },
+    () => { const s=ri(1,5),  d=ri(5,15); const t=[s,s+d,s+2*d,s+3*d]; return {terms:t, next:s+4*d, rule:`+${d}`}; },
+    () => { const s=ri(2,5),  f=2; const t=[s,s*f,s*f*f,s*f*f*f]; return {terms:t, next:s*f*f*f*f, rule:`×${f}`}; },
+    () => { const s=ri(1,4),  f=3; const t=[s,s*f,s*f*f,s*f*f*f]; return {terms:t, next:s*f*f*f*f, rule:`×${f}`}; },
+    () => { const s=ri(100,200), d=ri(10,25); const t=[s,s-d,s-2*d,s-3*d]; return {terms:t, next:s-4*d, rule:`−${d}`}; },
+    () => { const s=ri(2,10), d=ri(3,8); const t=[s,s+d,s+2*d,s+3*d]; return {terms:t, next:s+4*d, rule:`+${d}`}; },
+  ];
+  return pick(types)();
+}
+
+function renderSerieDOM(containerId, terms, showBlank){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  terms.forEach((n, i) => {
+    if(i > 0){
+      const sep = document.createElement('span');
+      sep.className = 'serie-sep'; sep.textContent = '→';
+      el.appendChild(sep);
+    }
+    const box = document.createElement('span');
+    box.className = 'serie-num'; box.textContent = n;
+    el.appendChild(box);
+  });
+  if(showBlank){
+    const sep = document.createElement('span');
+    sep.className = 'serie-sep'; sep.textContent = '→';
+    el.appendChild(sep);
+    const blank = document.createElement('span');
+    blank.className = 'serie-blank'; blank.textContent = '?';
+    el.appendChild(blank);
+  }
+}
+
+// ── SEC 3: quin número segueix? ──
+let _s3;
+function nextSec3(){
+  _s3 = genSerie();
+  renderSerieDOM('s3-serie', _s3.terms, true);
+  document.getElementById('s3-fb').textContent = '';
+  const wrong = sh([_s3.next + 1, _s3.next - 1, _s3.next + _s3.terms[1] - _s3.terms[0],
+                    _s3.next + 2, _s3.next - 2].filter(v => v !== _s3.next && v > 0)).slice(0, 2);
+  const opts  = sh([_s3.next, ...wrong]);
+  renderOpts('s3-opts', opts, _s3.next,
+    () => { setFb('s3-fb', true,  pick(OK)); gCorrect(6, 'serie'); setTimeout(nextSec3, 1500); },
+    () => { setFb('s3-fb', false, pick(KO)+` (Era: ${_s3.next})`); gWrong(); }
+  );
+}
+
+// ── SEC 4: troba la regla ──
+let _s4;
+function nextSec4(){
+  _s4 = genSerie();
+  // Show 5 terms (including next), no blank
+  renderSerieDOM('s4-serie', [..._s4.terms, _s4.next], false);
+  document.getElementById('s4-fb').textContent = '';
+
+  // Generate distractor rules
+  const diff = _s4.terms[1] - _s4.terms[0];
+  const wrongRules = [];
+  const candidates = [diff+1, diff-1, diff+2, diff-2, diff*2].filter(d => d !== 0);
+  for(const d of candidates){
+    const r = d > 0 ? `+${d}` : `${d}`;
+    if(r !== _s4.rule && !wrongRules.includes(r)) wrongRules.push(r);
+    if(wrongRules.length >= 2) break;
+  }
+  // If ×2 or ×3 rule, add subtract distractor
+  if(_s4.rule.startsWith('×') && wrongRules.length < 2){
+    wrongRules.push(`+${_s4.terms[1]-_s4.terms[0]}`);
+  }
+  const opts = sh([_s4.rule, ...wrongRules.slice(0,2)]);
+  renderOpts('s4-opts', opts, _s4.rule,
+    () => { setFb('s4-fb', true,  pick(OK)); gCorrect(8, 'serie'); setTimeout(nextSec4, 1500); },
+    () => { setFb('s4-fb', false, pick(KO)+` (Era: ${_s4.rule})`); gWrong(); }
+  );
+}
+
+// ════════════════════════════════════════════════════════════
+// SEC 5: PROBLEMES
+// ════════════════════════════════════════════════════════════
+const PROB_POOL=getProbs('estadistica');
+
+function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,5);}
+
+// ── INIT ──
+gRender();
+nextSec1();
+nextSec2();
+nextSec3();
+nextSec4();
+nextProblemes();
+</script>
+</body>
+</html>

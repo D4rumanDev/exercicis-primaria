@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiplicació</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.page{max-width:720px;margin:0 auto;padding:12px 14px 60px}
+/* Exercise 1 — flex column layout */
+.op-center{display:flex;justify-content:center;margin:16px 0 4px}
+.op-outer{display:flex;align-items:flex-start;font-family:'Courier New',monospace}
+.sign-col{display:flex;flex-direction:column;width:30px;align-items:flex-end;padding-right:3px}
+.sign-col .sr{display:flex;align-items:center;justify-content:flex-end}
+.sign-col .sr.top{height:60px}
+.sign-col .sr.mul{height:60px;font-size:2.2rem;font-weight:700;color:var(--a)}
+.sign-col .sr.dv{height:11px}
+.sign-col .sr.ans{height:66px}
+.sign-col .sr.lbl{height:22px}
+.digit-cols{display:flex}
+.dcol{display:flex;flex-direction:column;align-items:center;width:58px}
+.dcol .sr{display:flex;align-items:center;justify-content:center}
+.dcol .sr.top{height:60px;font-size:2.2rem;font-weight:700}
+.dcol .sr.mul{height:60px;font-size:2.2rem;font-weight:700}
+.dcol .sr.dv{height:11px;width:100%}
+.dcol .sr.ans{height:66px}
+.dcol .sr.lbl{height:22px;font-family:'Segoe UI',sans-serif;font-size:.7rem;font-weight:800;color:#94a3b8;letter-spacing:.6px}
+/* Exercise 2 — table layout */
+.mult-scroll{overflow-x:auto;text-align:center;margin:16px 0;padding:0 4px}
+.op-table{border-collapse:collapse;display:inline-table;table-layout:fixed}
+.op-table td{padding:0;vertical-align:middle;overflow:hidden}
+.sign-td{width:30px;min-width:30px;text-align:right;padding-right:5px;font-size:2.2rem;font-weight:700;color:var(--a);font-family:'Courier New',monospace}
+.num-td{width:58px;min-width:58px;height:60px;text-align:center;font-size:2.2rem;font-weight:700;font-family:'Courier New',monospace}
+.inp-td{width:58px;min-width:58px;height:66px;padding:4px 3px;text-align:center}
+.blank-td{width:58px;min-width:58px;height:66px;background:#f8fafc}
+.lbl-td{width:58px;min-width:58px;height:22px;text-align:center;font-size:.7rem;font-weight:800;color:#94a3b8;letter-spacing:.6px;font-family:'Segoe UI',sans-serif}
+.row-bb-thin td{border-bottom:2px solid var(--b)}
+.row-bb-thick td{border-bottom:3px solid var(--a)}
+/* Shared answer inputs */
+.ans-inp{width:52px;height:58px;text-align:center;font-size:2rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:10px;color:var(--a);background:var(--bg);outline:none;padding:0;transition:border-color .15s,background .15s;-moz-appearance:textfield}
+.ans-inp::-webkit-inner-spin-button,.ans-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.ans-inp:focus{border-color:var(--a);background:#eff6ff}
+.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+#feedback1,#feedback2,#feedback3{text-align:center;font-size:1rem;font-weight:600;padding:10px 14px;border-radius:10px;margin:10px 0;display:none}
+#feedback1.ok,#feedback2.ok,#feedback3.ok{background:#f0fdf4;color:var(--ok)}
+#feedback1.ko,#feedback2.ko,#feedback3.ko{background:#fef2f2;color:var(--ko)}
+.muted{color:var(--m);font-size:.88rem}
+/* Exercise 3 — Power of 10 */
+.pow10-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:16px 0}
+.pow10-q{font-size:2.4rem;font-weight:900;font-family:'Courier New',monospace;color:var(--t);display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+.pow10-mult{color:var(--a)}
+.pow10-ans{width:130px;height:66px;text-align:center;font-size:2rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:10px;color:var(--a);background:var(--bg);outline:none;padding:0;transition:border-color .15s,background .15s;-moz-appearance:textfield}
+.pow10-ans::-webkit-inner-spin-button,.pow10-ans::-webkit-outer-spin-button{-webkit-appearance:none}
+.pow10-ans:focus{border-color:var(--a);background:#eff6ff}
+.pow10-ans.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.pow10-ans.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.pow10-hint{font-size:.9rem;color:var(--m);text-align:center;background:#eff6ff;border-radius:var(--r);padding:8px 14px}
+/* Problems */
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr">
+  <div>
+    <h1>Multiplicació</h1>
+    <div class="muted">Taules · Multi-xifres · Potències de 10 · Problemes</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<div class="card" id="card1">
+  <h2><span class="num">1</span> Taules i Multiplicació Simple</h2>
+  <div class="section-lbl">Taules</div>
+  <div class="diff-row">
+    <button class="dbtn active" data-m="taules" onclick="setMode1('taules')">Totes</button>
+    <button class="dbtn" data-m="2" onclick="setMode1(2)">×2</button>
+    <button class="dbtn" data-m="3" onclick="setMode1(3)">×3</button>
+    <button class="dbtn" data-m="4" onclick="setMode1(4)">×4</button>
+    <button class="dbtn" data-m="5" onclick="setMode1(5)">×5</button>
+    <button class="dbtn" data-m="6" onclick="setMode1(6)">×6</button>
+    <button class="dbtn" data-m="7" onclick="setMode1(7)">×7</button>
+    <button class="dbtn" data-m="8" onclick="setMode1(8)">×8</button>
+    <button class="dbtn" data-m="9" onclick="setMode1(9)">×9</button>
+  </div>
+  <div class="section-lbl">Multiplicació llarga</div>
+  <div class="diff-row" style="margin-bottom:16px">
+    <button class="dbtn" data-m="m2" onclick="setMode1('m2')">2 xif.</button>
+    <button class="dbtn" data-m="m3" onclick="setMode1('m3')">3 xif.</button>
+    <button class="dbtn" data-m="m4" onclick="setMode1('m4')">4 xif.</button>
+    <button class="dbtn" data-m="mauto" onclick="setMode1('mauto')">Auto</button>
+  </div>
+  <div class="op-center">
+    <div id="opWrap1" class="op-outer"></div>
+  </div>
+  <div id="feedback1"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="checkBtn1" onclick="checkAnswer1()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="nextBtn1" onclick="nextExercise1()">Següent →</button>
+  </div>
+</div>
+
+<div class="card" id="card2">
+  <h2><span class="num">2</span> Multiplicació per 2 i 3 Xifres</h2>
+  <div class="diff-row">
+    <button class="dbtn active" data-m="auto" onclick="setMode2('auto')">Auto</button>
+    <button class="dbtn" data-m="22" onclick="setMode2('22')">2×2</button>
+    <button class="dbtn" data-m="32" onclick="setMode2('32')">3×2</button>
+    <button class="dbtn" data-m="42" onclick="setMode2('42')">4×2</button>
+    <button class="dbtn" data-m="33" onclick="setMode2('33')">3×3</button>
+    <button class="dbtn" data-m="43" onclick="setMode2('43')">4×3</button>
+  </div>
+  <div class="mult-scroll">
+    <div id="multGrid2"></div>
+  </div>
+  <div id="feedback2"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="checkBtn2" onclick="checkAnswer2()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="nextBtn2" onclick="nextExercise2()">Següent →</button>
+  </div>
+</div>
+
+<div class="card" id="card3">
+  <h2><span class="num">3</span> Multiplicació per 10, 100 i 1000</h2>
+  <div class="diff-row">
+    <button class="dbtn active" data-m3="auto" onclick="setMode3('auto')">Auto</button>
+    <button class="dbtn" data-m3="10" onclick="setMode3(10)">×10</button>
+    <button class="dbtn" data-m3="100" onclick="setMode3(100)">×100</button>
+    <button class="dbtn" data-m3="1000" onclick="setMode3(1000)">×1000</button>
+  </div>
+  <div class="pow10-wrap">
+    <div class="pow10-q">
+      <span id="p3-a"></span>
+      <span class="pow10-mult">×</span>
+      <span id="p3-p"></span>
+      <span>=</span>
+      <input class="pow10-ans" id="p3-inp" type="number" min="0" inputmode="numeric" autocomplete="off">
+    </div>
+    <div id="p3-hint" class="pow10-hint" style="display:none"></div>
+  </div>
+  <div id="feedback3"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="checkBtn3" onclick="checkAnswer3()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="nextBtn3" onclick="nextExercise3()">Següent →</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2><span class="num">4</span> Problemes</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
+  </div>
+</div>
+
+<script src="problemes.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY='ex_mult_v1';
+GAM_ACHS=[
+  {id:'first',s:'🌟',n:'Primer Encert',d:'Primera resposta correcta'},
+  {id:'s3',s:'🔥',n:'Ratxa x3',d:'3 encerts seguits'},
+  {id:'s5',s:'⚡',n:'Ratxa x5',d:'5 encerts seguits'},
+  {id:'s10',s:'⚡',n:'Ratxa x10',d:'10 encerts seguits'},
+  {id:'s20',s:'💥',n:'Ratxa x20',d:'20 encerts seguits'},
+  {id:'t-all',s:'📊',n:'Totes les Taules',d:'Almenys 1 encert a cada taula (×2–×9)'},
+  {id:'t-mast',s:'🎯',n:'Mestre de Taules',d:'Almenys 5 encerts a cada taula (×2–×9)'},
+  {id:'mult5',s:'🔢',n:'Multiplicador',d:'5 multiplicacions simples correctes'},
+  {id:'all5',s:'🏅',n:'Tots els nivells',d:'Almenys 1 encert a cada modalitat avançada'},
+  {id:'big5',s:'🥇',n:'Expert 4×3',d:'5 multiplicacions 4×3 correctes'},
+  {id:'ok50',s:'🥉',n:'50 Encerts',d:'50 respostes correctes'},
+  {id:'ok200',s:'🥈',n:'200 Encerts',d:'200 respostes correctes'},
+  {id:'ok500',s:'🏆',n:'500 Encerts',d:'500 respostes correctes'},
+  {id:'pow5',s:'💡',n:'Zeros Màgics',d:'5 multiplicacions per 10, 100 o 1000 correctes'}
+];
+function gResetExtra(){
+  localStorage.removeItem(KEY1);
+  localStorage.removeItem(KEY2);
+  localStorage.removeItem(KEY3);
+  location.reload();
+}
+function gExtraAchs(g,tryA){
+  tryA('s20',g.streak>=20);
+  const s1=loadStats1(),s2=loadStats2(),s3=loadStats3();
+  tryA('t-all',[2,3,4,5,6,7,8,9].every(t=>(s1['t'+t]||{c:0}).c>=1));
+  tryA('t-mast',[2,3,4,5,6,7,8,9].every(t=>(s1['t'+t]||{c:0}).c>=5));
+  tryA('mult5',(s1.m2.c||0)+(s1.m3.c||0)+(s1.m4.c||0)>=5);
+  tryA('all5',MODES.every(m=>(s2[m.key]||{c:0}).c>=1));
+  tryA('big5',(s2.m43||{c:0}).c>=5);
+  tryA('pow5',(s3.p10.c||0)+(s3.p100.c||0)+(s3.p1000.c||0)>=5);
+}
+function gRender(){
+  const g=gLoad(),lv=gLv(g.xp),nx=gNext(g.xp);
+  const pct=nx?Math.min(100,Math.round((g.xp-lv.x)/(nx.x-lv.x)*100)):100;
+  const el=document.getElementById('gam-bar');if(!el)return;
+  const xpNums=g.xp+' XP'+(nx?' · fins '+nx.n+': '+(nx.x-g.xp)+' XP':' · Nivell màxim');
+  const achH=GAM_ACHS.map(function(a){
+    const e=g.achs.includes(a.id);
+    return '<div class="ach-row'+(e?' earned':' locked')+'">'
+      +'<div class="ach-sym">'+a.s+'</div>'
+      +'<div><div class="ach-name">'+a.n+'</div><div class="ach-desc">'+a.d+'</div></div>'
+      +(e?'<span class="ach-earn">✓</span>':'')
+      +'</div>';
+  }).join('');
+  var statsH='';
+  if(gStatsVisible){
+    const s1=loadStats1(),s2=loadStats2(),s3=loadStats3();
+    const total=(s1.total||0)+(s2.total||0)+(s3.total||0);
+    const tabH=[2,3,4,5,6,7,8,9].map(function(t){
+      const st=s1['t'+t]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
+      return '<div class="stat-cell">'
+        +'<div class="stat-label">×'+t+'</div>'
+        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+        +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+        +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
+        +'</div>';
+    }).join('');
+    const multH=[['m2','2×1'],['m3','3×1'],['m4','4×1']].map(function(km){
+      const k=km[0],lbl=km[1],st=s1[k]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
+      return '<div class="stat-cell">'
+        +'<div class="stat-label">'+lbl+'</div>'
+        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+        +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+        +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
+        +'</div>';
+    }).join('');
+    const advH=MODES.map(function(m){
+      const st=s2[m.key]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
+      return '<div class="stat-cell">'
+        +'<div class="stat-label">'+m.label+'</div>'
+        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+        +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+        +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
+        +'</div>';
+    }).join('');
+    statsH='<div class="stats-row">'
+      +'<div class="stat"><div class="stat-num">'+g.ok+'</div><div class="stat-lbl">Encerts</div></div>'
+      +'<div class="stat"><div class="stat-num">'+g.ko+'</div><div class="stat-lbl">Errors</div></div>'
+      +'<div class="stat"><div class="stat-num">'+g.streak+'</div><div class="stat-lbl">Ratxa</div></div>'
+      +'<div class="stat"><div class="stat-num">'+total+'</div><div class="stat-lbl">Total</div></div>'
+      +'</div>'
+      +'<div class="section-lbl">Taules</div>'
+      +'<div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">'+tabH+'</div>'
+      +'<div class="section-lbl mt3">Multiplicació simple</div>'
+      +'<div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">'+multH+'</div>'
+      +'<div class="section-lbl mt3">Multiplicació avançada</div>'
+      +'<div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">'+advH+'</div>'
+      +'<div class="section-lbl mt3">Potències de 10</div>'
+      +'<div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">'
+      +[['p10','×10'],['p100','×100'],['p1000','×1000']].map(function(kl){
+          const st=s3[kl[0]]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
+          return '<div class="stat-cell">'
+            +'<div class="stat-label">'+kl[1]+'</div>'
+            +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+            +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+            +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
+            +'</div>';
+        }).join('')
+      +'</div>'
+      +'<button class="reset-lnk" onclick="gReset()">Reiniciar progrés</button>';
+  }
+  el.innerHTML=
+    '<div class="xp-block">'
+      +'<div class="xp-top"><span class="level-name">'+lv.n+'</span><span class="xp-nums">'+xpNums+'</span></div>'
+      +'<div class="xp-track"><div class="xp-fill" style="width:'+pct+'%"></div></div>'
+    +'</div>'
+    +'<div class="gam-tabs">'
+      +'<button class="gam-tab'+(gStatsVisible?' on':'')+'" onclick="gToggleStats()">Estadístiques</button>'
+      +'<button class="gam-tab'+(gAchsVisible?' on':'')+'" onclick="gToggleAchs()">Assoliments</button>'
+    +'</div>'
+    +statsH
+    +(gAchsVisible?'<div class="ach-grid">'+achH+'</div>':'');
+}
+
+// ── Exercise 2 modes — declared early so gRender/gCorrect can reference MODES
+const MODES=[
+  {key:'m22',dA:2,dB:2,label:'2×2',xp:4},
+  {key:'m32',dA:3,dB:2,label:'3×2',xp:6},
+  {key:'m42',dA:4,dB:2,label:'4×2',xp:7},
+  {key:'m33',dA:3,dB:3,label:'3×3',xp:8},
+  {key:'m43',dA:4,dB:3,label:'4×3',xp:10},
+];
+
+// ── Exercise 1 ───────────────────────────────────────────────────────────────
+const KEY1='ex_mult_v1';
+let e1A,e1B,e1Result,e1StatKey,e1XP,e1Answered=false,e1Counted=false,e1Mode='taules';
+function defStats1(){
+  return{t2:{c:0,e:0},t3:{c:0,e:0},t4:{c:0,e:0},t5:{c:0,e:0},
+         t6:{c:0,e:0},t7:{c:0,e:0},t8:{c:0,e:0},t9:{c:0,e:0},
+         m2:{c:0,e:0},m3:{c:0,e:0},m4:{c:0,e:0},streak:0,total:0};
+}
+function loadStats1(){try{return Object.assign(defStats1(),JSON.parse(localStorage.getItem(KEY1)||'{}'));}catch{return defStats1();}}
+function saveStats1(s){localStorage.setItem(KEY1,JSON.stringify(s));}
+function selectMode1(){
+  if(e1Mode==='taules'){
+    const s=loadStats1(),tables=[2,3,4,5,6,7,8,9];
+    const w=tables.map(t=>{const st=s['t'+t]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
+    const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
+    for(let i=0;i<tables.length;i++){r-=w[i];if(r<=0)return{type:'table',table:tables[i]};}
+    return{type:'table',table:9};
+  }
+  if(typeof e1Mode==='number') return{type:'table',table:e1Mode};
+  if(e1Mode==='m2') return{type:'mult',digits:2};
+  if(e1Mode==='m3') return{type:'mult',digits:3};
+  if(e1Mode==='m4') return{type:'mult',digits:4};
+  if(e1Mode==='mauto'){
+    const s=loadStats1(),mults=['m2','m3','m4'],digits=[2,3,4];
+    const w=mults.map(k=>{const st=s[k]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
+    const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
+    for(let i=0;i<mults.length;i++){r-=w[i];if(r<=0)return{type:'mult',digits:digits[i]};}
+    return{type:'mult',digits:4};
+  }
+  return{type:'table',table:5};
+}
+function genTable1(table){
+  const a=1+Math.floor(Math.random()*10);
+  return{a,b:table,result:a*table};
+}
+function genMult1(digits){
+  const mn=Math.pow(10,digits-1),mx=Math.pow(10,digits)-1;
+  const a=mn+Math.floor(Math.random()*(mx-mn+1));
+  const b=2+Math.floor(Math.random()*8);
+  return{a,b,result:a*b};
+}
+function buildOp1(a,b){
+  const as=String(a),n=String(a*b).length,aOff=n-as.length;
+  const POS=['U','D','C','M','DM','CDM'];
+  let html='<div class="sign-col">'
+    +'<div class="sr top"></div>'
+    +'<div class="sr mul">×</div>'
+    +'<div class="sr dv"></div>'
+    +'<div class="sr ans"></div>'
+    +'<div class="sr lbl"></div>'
+    +'</div>'
+    +'<div class="digit-cols">';
+  for(let i=0;i<n;i++){
+    const aDigit=i>=aOff?as[i-aOff]:'';
+    const bDigit=i===n-1?String(b):'';
+    const lbl=POS[n-1-i]||'';
+    html+='<div class="dcol">'
+      +'<div class="sr top">'+aDigit+'</div>'
+      +'<div class="sr mul">'+bDigit+'</div>'
+      +'<div class="sr dv"><div class="dvline"></div></div>'
+      +'<div class="sr ans"><input class="ans-inp" id="ans1-'+i+'" maxlength="1" inputmode="numeric"></div>'
+      +'<div class="sr lbl">'+lbl+'</div>'
+      +'</div>';
+  }
+  html+='</div>';
+  document.getElementById('opWrap1').innerHTML=html;
+  for(let i=0;i<n;i++) wireAns1(i,n);
+}
+function wireAns1(i,n){
+  const inp=document.getElementById('ans1-'+i);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){checkAnswer1();return;}
+    if(e.key==='ArrowLeft'||(e.key==='Backspace'&&inp.value==='')){
+      if(i>0){e.preventDefault();document.getElementById('ans1-'+(i-1)).focus();}
+      return;
+    }
+    if(e.key==='ArrowRight'){
+      if(i<n-1){e.preventDefault();document.getElementById('ans1-'+(i+1)).focus();}
+      return;
+    }
+    if(e.key.length===1&&!/\d/.test(e.key))e.preventDefault();
+  });
+  inp.addEventListener('input',()=>{
+    if(inp.value.length>1)inp.value=inp.value.slice(-1);
+    if(!/^\d?$/.test(inp.value)){inp.value='';return;}
+    if(inp.value.length===1&&i<n-1) document.getElementById('ans1-'+(i+1)).focus();
+  });
+}
+function checkAnswer1(){
+  if(e1Answered)return;
+  const n=String(e1Result).length;
+  const fb=document.getElementById('feedback1');
+  let ansStr='';
+  for(let i=0;i<n;i++){
+    const v=document.getElementById('ans1-'+i).value;
+    if(!v){fb.textContent='Omple tots els dígits!';fb.className='ko';fb.style.display='block';return;}
+    ansStr+=v;
+  }
+  const val=parseInt(ansStr);
+  const resStr=String(e1Result);
+  for(let i=0;i<n;i++){
+    const inp=document.getElementById('ans1-'+i);
+    inp.className='ans-inp '+(inp.value===resStr[i]?'ok':'ko');
+  }
+  if(val===e1Result){
+    e1Answered=true;
+    fb.textContent='✓ Molt bé! Correcte!';fb.className='ok';
+    if(!e1Counted){
+      const s=loadStats1();s.total=(s.total||0)+1;
+      s[e1StatKey].c=(s[e1StatKey].c||0)+1;s.streak=(s.streak||0)+1;
+      saveStats1(s);gCorrect(e1XP);e1Counted=true;
+    }
+    fb.style.display='block';
+    document.getElementById('checkBtn1').style.display='none';
+  }else{
+    fb.textContent='✗ Revisa els dígits en vermell.';fb.className='ko';
+    if(!e1Counted){
+      const s=loadStats1();s.total=(s.total||0)+1;
+      s[e1StatKey].e=(s[e1StatKey].e||0)+1;s.streak=0;
+      saveStats1(s);gWrong();e1Counted=true;
+    }
+    fb.style.display='block';
+  }
+}
+function setMode1(m){
+  e1Mode=m;
+  document.querySelectorAll('#card1 .dbtn').forEach(b=>b.classList.toggle('active',b.dataset.m===String(m)));
+  nextExercise1();
+}
+function nextExercise1(){
+  e1Answered=false;e1Counted=false;
+  const sel=selectMode1();
+  if(sel.type==='table'){
+    const ex=genTable1(sel.table);
+    e1A=ex.a;e1B=ex.b;e1Result=ex.result;
+    e1StatKey='t'+sel.table;e1XP=2;
+  }else{
+    const ex=genMult1(sel.digits);
+    e1A=ex.a;e1B=ex.b;e1Result=ex.result;
+    e1StatKey='m'+sel.digits;e1XP=sel.digits+1;
+  }
+  document.getElementById('feedback1').style.display='none';
+  document.getElementById('feedback1').className='';
+  document.getElementById('checkBtn1').style.display='';
+  buildOp1(e1A,e1B);
+  document.getElementById('ans1-0').focus({preventScroll:true});
+}
+
+// ── Exercise 2 ───────────────────────────────────────────────────────────────
+const KEY2='ex_mult2_v1';
+let e2A,e2B,e2Result,e2StatKey,e2XP,e2Answered=false,e2Counted=false,e2Mode='auto';
+function defStats2(){const d={streak:0,total:0};MODES.forEach(m=>d[m.key]={c:0,e:0});return d;}
+function loadStats2(){try{return Object.assign(defStats2(),JSON.parse(localStorage.getItem(KEY2)||'{}'));}catch{return defStats2();}}
+function saveStats2(s){localStorage.setItem(KEY2,JSON.stringify(s));}
+function selectMode2(){
+  if(e2Mode==='auto'){
+    const s=loadStats2();
+    const w=MODES.map(m=>{const st=s[m.key]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
+    const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
+    for(let i=0;i<MODES.length;i++){r-=w[i];if(r<=0)return MODES[i];}
+    return MODES[0];
+  }
+  return MODES.find(m=>m.key==='m'+e2Mode)||MODES[0];
+}
+function genMult2(dA,dB){
+  const mnA=Math.pow(10,dA-1),mxA=Math.pow(10,dA)-1;
+  const mnB=Math.pow(10,dB-1),mxB=Math.pow(10,dB)-1;
+  const a=mnA+Math.floor(Math.random()*(mxA-mnA+1));
+  let b,tries=0;
+  do{b=mnB+Math.floor(Math.random()*(mxB-mnB+1));tries++;}
+  while(String(b).includes('0')&&tries<30);
+  return{a,b,result:a*b};
+}
+function buildExercise2(a,b){
+  const as=String(a),bs=String(b);
+  const rs=String(a*b),n=rs.length,dB=bs.length;
+  const POS=['U','D','C','M','DM','CDM','BM'];
+  const pps=[];
+  for(let r=0;r<dB;r++){
+    const digit=parseInt(bs[dB-1-r]);
+    const val=a*digit,str=String(val);
+    pps.push({r,val,str,len:str.length});
+  }
+  const tw=30+n*58;
+  let html=`<table class="op-table" style="width:${tw}px"><colgroup><col style="width:30px">`;
+  for(let j=0;j<n;j++) html+='<col style="width:58px">';
+  html+='</colgroup>';
+  html+='<tr><td class="sign-td"></td>';
+  const aOff=n-as.length;
+  for(let j=0;j<n;j++) html+='<td class="num-td">'+(j>=aOff?as[j-aOff]:'')+'</td>';
+  html+='</tr>';
+  html+='<tr class="row-bb-thin"><td class="sign-td">×</td>';
+  const bOff=n-bs.length;
+  for(let j=0;j<n;j++) html+='<td class="num-td">'+(j>=bOff?bs[j-bOff]:'')+'</td>';
+  html+='</tr>';
+  pps.forEach((pp,idx)=>{
+    const isLast=idx===dB-1;
+    html+='<tr'+(isLast?' class="row-bb-thick"':'')+'>';
+    html+='<td class="sign-td">'+(pp.r>0?'+':'')+'</td>';
+    const left=n-pp.r-pp.len,right=n-1-pp.r;
+    for(let j=0;j<n;j++){
+      if(j>=left&&j<=right){
+        html+='<td class="inp-td"><input class="ans-inp" id="pp2-'+pp.r+'-'+j+'" maxlength="1" inputmode="numeric" data-exp="'+pp.str[j-left]+'"></td>';
+      }else{
+        html+='<td class="blank-td"></td>';
+      }
+    }
+    html+='</tr>';
+  });
+  html+='<tr><td class="sign-td"></td>';
+  for(let j=0;j<n;j++){
+    html+='<td class="inp-td"><input class="ans-inp" id="sum2-'+j+'" maxlength="1" inputmode="numeric" data-exp="'+rs[j]+'"></td>';
+  }
+  html+='</tr>';
+  html+='<tr><td class="sign-td"></td>';
+  for(let j=0;j<n;j++) html+='<td class="lbl-td">'+(POS[n-1-j]||'')+'</td>';
+  html+='</tr></table>';
+  document.getElementById('multGrid2').innerHTML=html;
+  wireAllInputs2(n,pps);
+  const pp0=pps[0],firstCol=n-pp0.len;
+  setTimeout(()=>{const el=document.getElementById('pp2-0-'+firstCol);if(el)el.focus({preventScroll:true});},30);
+}
+function wireAllInputs2(n,pps){
+  const all=[];
+  pps.forEach(pp=>{
+    for(let j=n-pp.r-pp.len;j<=n-1-pp.r;j++){
+      const el=document.getElementById('pp2-'+pp.r+'-'+j);
+      if(el)all.push(el);
+    }
+  });
+  for(let j=0;j<n;j++){const el=document.getElementById('sum2-'+j);if(el)all.push(el);}
+  all.forEach((inp,idx)=>{
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){checkAnswer2();return;}
+      if(e.key==='ArrowLeft'||(e.key==='Backspace'&&inp.value==='')){
+        if(idx>0){e.preventDefault();all[idx-1].focus();}return;
+      }
+      if(e.key==='ArrowRight'){
+        if(idx<all.length-1){e.preventDefault();all[idx+1].focus();}return;
+      }
+      if(e.key.length===1&&!/\d/.test(e.key))e.preventDefault();
+    });
+    inp.addEventListener('input',()=>{
+      if(inp.value.length>1)inp.value=inp.value.slice(-1);
+      if(!/^\d?$/.test(inp.value)){inp.value='';return;}
+      if(inp.value.length===1&&idx<all.length-1)all[idx+1].focus();
+    });
+  });
+}
+function checkAnswer2(){
+  if(e2Answered)return;
+  const fb=document.getElementById('feedback2');
+  const all=document.querySelectorAll('#multGrid2 .ans-inp');
+  let empty=false;
+  all.forEach(inp=>{if(!inp.value)empty=true;});
+  if(empty){fb.textContent='Omple tots els quadres!';fb.className='ko';fb.style.display='block';return;}
+  let ok=true;
+  all.forEach(inp=>{
+    const correct=inp.value===inp.dataset.exp;
+    inp.className='ans-inp '+(correct?'ok':'ko');
+    if(!correct)ok=false;
+  });
+  if(ok){
+    e2Answered=true;
+    fb.textContent='✓ Molt bé! Tot correcte!';fb.className='ok';
+    if(!e2Counted){
+      const s=loadStats2();s.total=(s.total||0)+1;
+      s[e2StatKey].c=(s[e2StatKey].c||0)+1;s.streak=(s.streak||0)+1;
+      saveStats2(s);gCorrect(e2XP);e2Counted=true;
+    }
+    fb.style.display='block';
+    document.getElementById('checkBtn2').style.display='none';
+  }else{
+    fb.textContent='✗ Revisa els quadres en vermell.';fb.className='ko';
+    if(!e2Counted){
+      const s=loadStats2();s.total=(s.total||0)+1;
+      s[e2StatKey].e=(s[e2StatKey].e||0)+1;s.streak=0;
+      saveStats2(s);gWrong();e2Counted=true;
+    }
+    fb.style.display='block';
+  }
+}
+function setMode2(m){
+  e2Mode=m;
+  document.querySelectorAll('#card2 .dbtn').forEach(b=>b.classList.toggle('active',b.dataset.m===m));
+  nextExercise2();
+}
+function nextExercise2(){
+  e2Answered=false;e2Counted=false;
+  const mode=selectMode2();
+  const ex=genMult2(mode.dA,mode.dB);
+  e2A=ex.a;e2B=ex.b;e2Result=ex.result;e2StatKey=mode.key;e2XP=mode.xp;
+  document.getElementById('feedback2').style.display='none';
+  document.getElementById('feedback2').className='';
+  document.getElementById('checkBtn2').style.display='';
+  buildExercise2(e2A,e2B);
+}
+
+// ── Exercise 3 — Multiplicació per 10, 100 i 1000 ───────────────────────────
+const KEY3='ex_mult3_v1';
+let e3A,e3P,e3Result,e3Answered=false,e3Counted=false,e3Mode='auto';
+function defStats3(){return{p10:{c:0,e:0},p100:{c:0,e:0},p1000:{c:0,e:0},total:0};}
+function loadStats3(){try{return Object.assign(defStats3(),JSON.parse(localStorage.getItem(KEY3)||'{}'));}catch{return defStats3();}}
+function saveStats3(s){localStorage.setItem(KEY3,JSON.stringify(s));}
+function genPow3(){
+  const powers=e3Mode==='auto'?[10,100,1000]:[e3Mode];
+  const p=powers[Math.floor(Math.random()*powers.length)];
+  const maxA=p===1000?99:999;
+  const a=2+Math.floor(Math.random()*(maxA-1));
+  return{a,p,result:a*p};
+}
+function nextExercise3(){
+  e3Answered=false;e3Counted=false;
+  const ex=genPow3();
+  e3A=ex.a;e3P=ex.p;e3Result=ex.result;
+  document.getElementById('p3-a').textContent=e3A;
+  document.getElementById('p3-p').textContent=e3P;
+  const inp=document.getElementById('p3-inp');
+  inp.value='';inp.className='pow10-ans';
+  document.getElementById('p3-hint').style.display='none';
+  document.getElementById('feedback3').style.display='none';
+  document.getElementById('feedback3').className='';
+  document.getElementById('checkBtn3').style.display='';
+  setTimeout(()=>inp.focus({preventScroll:true}),30);
+}
+function setMode3(m){
+  e3Mode=m;
+  document.querySelectorAll('#card3 .dbtn').forEach(b=>b.classList.toggle('active',b.dataset.m3===String(m)));
+  nextExercise3();
+}
+function checkAnswer3(){
+  if(e3Answered)return;
+  const inp=document.getElementById('p3-inp');
+  const fb=document.getElementById('feedback3');
+  const val=parseInt(inp.value);
+  if(isNaN(val)||inp.value===''){fb.textContent='Escriu la resposta!';fb.className='ko';fb.style.display='block';return;}
+  const zeros=Math.log10(e3P);
+  const hint=document.getElementById('p3-hint');
+  hint.textContent='Truc: '+e3A+' × '+e3P+' → afegeix '+zeros+' zero'+(zeros>1?'s':'')+' al final → '+e3Result;
+  hint.style.display='block';
+  if(val===e3Result){
+    e3Answered=true;
+    inp.className='pow10-ans ok';
+    fb.textContent='✓ Molt bé! Correcte!';fb.className='ok';
+    if(!e3Counted){
+      const s=loadStats3();s.total++;s['p'+e3P].c++;saveStats3(s);gCorrect(zeros+2);e3Counted=true;
+    }
+    fb.style.display='block';
+    document.getElementById('checkBtn3').style.display='none';
+  }else{
+    inp.className='pow10-ans ko';
+    fb.textContent='✗ La resposta era '+e3Result+'.';fb.className='ko';
+    if(!e3Counted){
+      const s=loadStats3();s.total++;s['p'+e3P].e++;saveStats3(s);gWrong();e3Counted=true;
+    }
+    fb.style.display='block';
+  }
+}
+
+// ── Sec 4: PROBLEMES ─────────────────────────────────────────────────────────
+const PROB_POOL=getProbs('multiplicacio');
+function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,5);}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+nextExercise1();
+nextExercise2();
+nextExercise3();
+nextProblemes();
+gRender();
+</script>
+</div>
+</body>
+</html>

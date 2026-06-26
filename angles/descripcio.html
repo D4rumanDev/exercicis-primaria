@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Physical Description</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.av-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.av-card{padding:10px 6px;border-radius:10px;border:2px solid var(--b);background:#f8faff;text-align:center}
+.av-emoji{font-size:2rem;line-height:1;margin-bottom:3px}
+.av-name{font-size:.8rem;font-weight:800;color:var(--t);margin-bottom:2px}
+.av-trait{font-size:.7rem;color:var(--m);line-height:1.4}
+.av-feat{font-size:.68rem;color:var(--a);margin-top:2px}
+
+.av-single{display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:14px;background:#f8faff;border-radius:12px;border:2px solid var(--b);margin:10px 0}
+.av-single .av-emoji{font-size:3rem}
+.av-single .av-name{font-size:1rem;font-weight:800;color:var(--t)}
+.av-single .av-trait{font-size:.85rem;color:var(--m)}
+.av-single .av-feat{font-size:.82rem;color:var(--a)}
+
+.vocab-word{font-size:1.8rem;font-weight:800;letter-spacing:.06em;color:var(--a);
+  font-family:monospace;text-align:center;margin:6px 0}
+.vocab-hint{font-size:.87rem;color:var(--m);text-align:center;margin-bottom:10px;line-height:1.4}
+
+.q-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b)}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-sent{font-size:.93rem;font-weight:500;margin-bottom:8px;line-height:1.5}
+.blank{color:var(--a);font-weight:800}
+
+.desc-box{background:#f8faff;border-radius:8px;padding:10px 14px;margin-bottom:12px;
+  font-size:.93rem;font-weight:500;line-height:1.7;border-left:3px solid var(--a)}
+
+.word-chip{padding:5px 10px;background:#fff;border:2px solid var(--a);border-radius:8px;
+  font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;user-select:none}
+.word-chip:hover{background:#eff6ff}
+.placed-chip{padding:5px 10px;background:#eff6ff;border:2px solid var(--a);border-radius:8px;
+  font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;user-select:none}
+.placed-chip:hover{background:#dbeafe}
+
+.done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;
+  border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Physical Description</h1>
+    <div class="muted">Unit 2 · He's/She's got · Has he/she got? · Hair &amp; features</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<!-- ── 1: Vocabulary ── -->
+<div class="card">
+  <h2><span class="num">1</span> Fill in the missing letter</h2>
+  <p class="card-sub">Choose the letter that completes the word.</p>
+  <div id="s1-wrap"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s1-next" onclick="s1Next()" style="display:none">Next ▶</button>
+  </div>
+  <div id="s1-done" class="done-banner" style="display:none">
+    All words done! ✓ <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="s1Init()">Again</button>
+  </div>
+</div>
+
+<!-- ── 2: He's / She's got ── -->
+<div class="card">
+  <h2><span class="num">2</span> Has got / hasn't got</h2>
+  <p class="card-sub">Look at the person and complete the sentences.</p>
+  <div id="s2-av"></div>
+  <div id="s2-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s2Init()">New person ▶</button>
+  </div>
+</div>
+
+<!-- ── 3: Has he / she got? ── -->
+<div class="card">
+  <h2><span class="num">3</span> Has he / she got...?</h2>
+  <p class="card-sub">Answer the questions about the person.</p>
+  <div id="s3-av"></div>
+  <div id="s3-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s3Init()">New person ▶</button>
+  </div>
+</div>
+
+<!-- ── 4: Word order ── -->
+<div class="card">
+  <h2><span class="num">4</span> Put the words in order</h2>
+  <p class="card-sub">Click the words to build the correct sentence.</p>
+  <div id="s4-list"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-outline btn-sm" onclick="s4Init()">New sentences ▶</button>
+  </div>
+</div>
+
+<!-- ── 5: Who is it? ── -->
+<div class="card">
+  <h2><span class="num">5</span> Who is it?</h2>
+  <p class="card-sub">Read the description and choose the correct person.</p>
+  <div class="av-grid" id="s5-grid"></div>
+  <div id="s5-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s5-next" onclick="s5Next()" style="display:none">Next description ▶</button>
+  </div>
+  <div id="s5-done" class="done-banner" style="display:none">
+    All matched! ✓ <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="s5Init()">Again</button>
+  </div>
+</div>
+
+<!-- ── 6: True or False ── -->
+<div class="card">
+  <h2><span class="num">6</span> True or False?</h2>
+  <p class="card-sub">Read the sentence about the person and decide.</p>
+  <div id="s6-av"></div>
+  <div id="s6-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s6Init()">New person ▶</button>
+  </div>
+</div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+const ENOK = ["Well done! ⭐","Excellent! 🎉","Great job! 🌟","Perfect! 🏆","Amazing! 💪","Fantastic! 🎊"];
+const ENKO = ["Try again!","Not quite...","Almost there!","Have another go!"];
+
+const EXER_KEY = 'ex_ang_desc_v1';
+GAM_ACHS = [...GAM_ACHS,
+  {id:'ang_desc1',  s:'👀', n:'Observant',     d:'First description question correct'},
+  {id:'ang_desc5',  s:'🔍', n:'Sharp Eyes',    d:'5 description questions correct'},
+  {id:'ang_desc15', s:'🏅', n:'Description Pro',d:'15 description questions correct'},
+];
+
+function descOk(xp) {
+  const e = eLoad(); e.ok = (e.ok||0) + 1; eSave(e);
+  gCorrect(xp||3, tryA => {
+    tryA('ang_desc1',  e.ok >= 1);
+    tryA('ang_desc5',  e.ok >= 5);
+    tryA('ang_desc15', e.ok >= 15);
+  });
+}
+
+/* ── Data ── */
+const VOCAB_POOL = [
+  {display:'f_ir',       correct:'a', hint:'light coloured hair',          emoji:'🟡', opts:['a','e','i','u']},
+  {display:'d_rk',       correct:'a', hint:'black or brown hair',           emoji:'🟤', opts:['a','e','i','o']},
+  {display:'sh_rt',      correct:'o', hint:'not long — e.g. a boy\'s cut', emoji:'✂️', opts:['a','e','o','u']},
+  {display:'l_ng',       correct:'o', hint:'not short — reaches the back',  emoji:'↕️', opts:['a','e','i','o']},
+  {display:'c_rly',      correct:'u', hint:'hair with tight spirals',        emoji:'🌀', opts:['a','e','i','u']},
+  {display:'str_ight',   correct:'a', hint:'hair with no curls or waves',   emoji:'➡️', opts:['a','e','i','o']},
+  {display:'w_vy',       correct:'a', hint:'between curly and straight',    emoji:'〰️', opts:['a','e','i','u']},
+  {display:'gl_sses',    correct:'a', hint:'you wear them on your nose',    emoji:'👓', opts:['a','e','i','o']},
+  {display:'b_ard',      correct:'e', hint:'hair on a man\'s face/chin',    emoji:'🧔', opts:['a','e','i','o']},
+  {display:'p_nytail',   correct:'o', hint:'long hair tied at the back',    emoji:'🎀', opts:['a','e','i','o']},
+  {display:'m_ustache',  correct:'o', hint:'hair above the upper lip',      emoji:'👨', opts:['a','e','i','o']},
+];
+
+const AVATARS = [
+  {id:0, name:'Alex',  pronoun:'he',  emoji:'👦',
+   traits:{hair:'short', color:'dark', type:'straight', glasses:false, beard:false, moustache:false, ponytail:false}},
+  {id:1, name:'Sara',  pronoun:'she', emoji:'👧',
+   traits:{hair:'long',  color:'fair', type:'curly',    glasses:false, beard:false, moustache:false, ponytail:true}},
+  {id:2, name:'Tom',   pronoun:'he',  emoji:'👨',
+   traits:{hair:'short', color:'fair', type:'wavy',     glasses:true,  beard:false, moustache:true,  ponytail:false}},
+  {id:3, name:'Laura', pronoun:'she', emoji:'👩',
+   traits:{hair:'long',  color:'dark', type:'straight', glasses:true,  beard:false, moustache:false, ponytail:false}},
+  {id:4, name:'Ben',   pronoun:'he',  emoji:'🧔',
+   traits:{hair:'short', color:'dark', type:'curly',    glasses:false, beard:true,  moustache:false, ponytail:false}},
+  {id:5, name:'Mia',   pronoun:'she', emoji:'👱‍♀️',
+   traits:{hair:'long',  color:'fair', type:'wavy',     glasses:true,  beard:false, moustache:false, ponytail:true}},
+];
+
+const S4_POOL = [
+  {words:["She","has","got","long","fair","curly","hair."],          correct:"She has got long fair curly hair."},
+  {words:["Has","he","got","glasses?"],                              correct:"Has he got glasses?"},
+  {words:["He","hasn't","got","a","beard."],                         correct:"He hasn't got a beard."},
+  {words:["Has","she","got","a","ponytail?"],                        correct:"Has she got a ponytail?"},
+  {words:["She","hasn't","got","straight","hair."],                  correct:"She hasn't got straight hair."},
+  {words:["Has","he","got","dark","curly","hair?"],                  correct:"Has he got dark curly hair?"},
+  {words:["He","has","got","short","wavy","fair","hair."],           correct:"He has got short wavy fair hair."},
+  {words:["She","has","got","a","ponytail","and","glasses."],        correct:"She has got a ponytail and glasses."},
+  {words:["Has","he","got","a","moustache?"],                        correct:"Has he got a moustache?"},
+  {words:["He","hasn't","got","long","dark","hair."],                correct:"He hasn't got long dark hair."},
+];
+
+/* ── Helpers ── */
+function avatarFeatList(av) {
+  const t = av.traits;
+  const f = [];
+  if (t.glasses)   f.push('👓 glasses');
+  if (t.beard)     f.push('🧔 beard');
+  if (t.moustache) f.push('moustache');
+  if (t.ponytail)  f.push('🎀 ponytail');
+  return f;
+}
+function avatarCardHtml(av) {
+  const feats = avatarFeatList(av);
+  const t = av.traits;
+  return `<div class="av-card">
+    <div class="av-emoji">${av.emoji}</div>
+    <div class="av-name">${av.name}</div>
+    <div class="av-trait">${t.hair} ${t.color} ${t.type} hair</div>
+    <div class="av-feat">${feats.length ? feats.join(' · ') : '—'}</div>
+  </div>`;
+}
+function avatarSingleHtml(av) {
+  const feats = avatarFeatList(av);
+  const t = av.traits;
+  return `<div class="av-single">
+    <div class="av-emoji">${av.emoji}</div>
+    <div class="av-name">${av.name}</div>
+    <div class="av-trait">${t.hair} · ${t.color} · ${t.type} hair</div>
+    <div class="av-feat">${feats.length ? feats.join(' · ') : 'no special features'}</div>
+  </div>`;
+}
+function avatarDesc(av) {
+  const t = av.traits;
+  const S = av.pronoun === 'he' ? 'He' : 'She';
+  let d = `${S} has got ${t.hair} ${t.color} ${t.type} hair.`;
+  const has = [];
+  if (t.glasses)   has.push('glasses');
+  if (t.beard)     has.push('a beard');
+  if (t.moustache) has.push('a moustache');
+  if (t.ponytail)  has.push('a ponytail');
+  if (has.length) d += ` ${S} has got ${has.join(' and ')}.`;
+  else d += ` ${S} hasn't got glasses, a beard, a moustache or a ponytail.`;
+  return d;
+}
+function hasGotPool(av) {
+  const t = av.traits;
+  const pool = [
+    {trait:'short hair',    ans:t.hair==='short'},
+    {trait:'long hair',     ans:t.hair==='long'},
+    {trait:'dark hair',     ans:t.color==='dark'},
+    {trait:'fair hair',     ans:t.color==='fair'},
+    {trait:'curly hair',    ans:t.type==='curly'},
+    {trait:'straight hair', ans:t.type==='straight'},
+    {trait:'wavy hair',     ans:t.type==='wavy'},
+    {trait:'glasses',       ans:t.glasses},
+  ];
+  if (av.pronoun === 'he') {
+    pool.push({trait:'a beard',     ans:t.beard});
+    pool.push({trait:'a moustache', ans:t.moustache});
+  } else {
+    pool.push({trait:'a ponytail',  ans:t.ponytail});
+  }
+  return sh(pool).slice(0, 5);
+}
+function hasGotQPool(av) {
+  const t = av.traits;
+  const p = av.pronoun;
+  const mk = (trait, ans) => ({
+    q:`Has ${p} got ${trait}?`,
+    yes:`Yes, ${p} has.`, no:`No, ${p} hasn't.`, ans
+  });
+  const pool = [
+    mk('short hair',    t.hair==='short'),
+    mk('long hair',     t.hair==='long'),
+    mk('dark hair',     t.color==='dark'),
+    mk('fair hair',     t.color==='fair'),
+    mk('curly hair',    t.type==='curly'),
+    mk('straight hair', t.type==='straight'),
+    mk('wavy hair',     t.type==='wavy'),
+    mk('glasses',       t.glasses),
+  ];
+  if (av.pronoun === 'he') {
+    pool.push(mk('a beard',     t.beard));
+    pool.push(mk('a moustache', t.moustache));
+  } else {
+    pool.push(mk('a ponytail',  t.ponytail));
+  }
+  return sh(pool).slice(0, 4);
+}
+function tfPool(av) {
+  const t = av.traits;
+  const S = av.pronoun === 'he' ? 'He' : 'She';
+  const hg = `${S} has got`;
+  const hn = `${S} hasn't got`;
+  const pool = [
+    {stmt:`${hg} ${t.color} hair.`,    ans:true},
+    {stmt:`${hn} ${t.color} hair.`,    ans:false},
+    {stmt:`${hg} ${t.hair} hair.`,     ans:true},
+    {stmt:`${hn} ${t.hair} hair.`,     ans:false},
+    {stmt:`${hg} ${t.type} hair.`,     ans:true},
+    {stmt:`${hn} ${t.type} hair.`,     ans:false},
+    {stmt:`${hg} glasses.`,            ans:t.glasses},
+    {stmt:`${hn} glasses.`,            ans:!t.glasses},
+  ];
+  if (av.pronoun === 'he') {
+    pool.push({stmt:`${hg} a beard.`,      ans:t.beard},
+              {stmt:`${hn} a beard.`,      ans:!t.beard},
+              {stmt:`${hg} a moustache.`,  ans:t.moustache},
+              {stmt:`${hn} a moustache.`,  ans:!t.moustache});
+  } else {
+    pool.push({stmt:`${hg} a ponytail.`,   ans:t.ponytail},
+              {stmt:`${hn} a ponytail.`,   ans:!t.ponytail});
+  }
+  return sh(pool).slice(0, 5);
+}
+
+/* ══ SECTION 1 ══ */
+let s1Queue = [], s1Idx = 0;
+function s1Init() {
+  s1Queue = sh([...VOCAB_POOL]); s1Idx = 0;
+  document.getElementById('s1-done').style.display = 'none';
+  s1Show();
+}
+function s1Show() {
+  const nextBtn = document.getElementById('s1-next');
+  if (s1Idx >= s1Queue.length) {
+    document.getElementById('s1-wrap').innerHTML = '';
+    nextBtn.style.display = 'none';
+    document.getElementById('s1-done').style.display = 'block';
+    return;
+  }
+  const it = s1Queue[s1Idx];
+  const opts = sh([...it.opts]);
+  nextBtn.style.display = 'none';
+  document.getElementById('s1-wrap').innerHTML = `
+    <div style="text-align:center;font-size:2.5rem;margin-bottom:4px">${it.emoji}</div>
+    <div class="vocab-word">${it.display}</div>
+    <div class="vocab-hint">${it.hint}</div>
+    <div class="opts-row" id="s1-opts">
+      ${opts.map((l, j) => `<button class="aopt" style="font-size:1.1rem;min-width:52px" onclick="s1Ans(this,${j})">${l}</button>`).join('')}
+    </div>
+    <div class="fb" id="s1-fb"></div>
+  `;
+  s1CurOpts = opts;
+}
+let s1CurOpts = [];
+function s1Ans(btn, j) {
+  document.querySelectorAll('#s1-opts .aopt').forEach(b => b.disabled = true);
+  const chosen = s1CurOpts[j];
+  const it = s1Queue[s1Idx];
+  const ok = chosen === it.correct; btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s1-opts .aopt').forEach((b, bi) => { if (s1CurOpts[bi] === it.correct) b.classList.add('show'); });
+  const fb = document.getElementById('s1-fb');
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + it.display.replace('_', it.correct);
+  ok ? descOk(2) : gWrong();
+  document.getElementById('s1-next').style.display = 'inline-block';
+}
+function s1Next() { s1Idx++; s1Show(); }
+
+/* ══ SECTION 2 ══ */
+let s2Current = [], s2Av = null;
+function s2Init() {
+  s2Av = pick(AVATARS);
+  document.getElementById('s2-av').innerHTML = avatarSingleHtml(s2Av);
+  s2Current = hasGotPool(s2Av);
+  document.getElementById('s2-qs').innerHTML = s2Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">${s2Av.name} <span class="blank">___</span> ${q.trait}.</div>
+      <div class="opts-row" id="s2o${i}">
+        <button class="aopt" onclick="s2Ans(this,${i},1)">has got</button>
+        <button class="aopt" onclick="s2Ans(this,${i},0)">hasn't got</button>
+      </div>
+      <div class="fb" id="s2fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s2Ans(btn, i, choice) {
+  document.querySelectorAll('#s2o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s2Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const correct = s2Current[i].ans ? 'has got' : "hasn't got";
+  if (!ok) document.querySelectorAll('#s2o'+i+' .aopt').forEach(b => { if (b.textContent === correct) b.classList.add('show'); });
+  const fb = document.getElementById('s2fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : `${s2Av.name} ${correct} ${s2Current[i].trait}.`;
+  ok ? descOk(2) : gWrong();
+}
+
+/* ══ SECTION 3 ══ */
+let s3Current = [], s3Av = null;
+function s3Init() {
+  s3Av = pick(AVATARS);
+  document.getElementById('s3-av').innerHTML = avatarSingleHtml(s3Av);
+  s3Current = hasGotQPool(s3Av);
+  document.getElementById('s3-qs').innerHTML = s3Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent" style="font-weight:600">${q.q}</div>
+      <div class="opts-row" id="s3o${i}">
+        <button class="aopt" onclick="s3Ans(this,${i},1)">${q.yes}</button>
+        <button class="aopt" onclick="s3Ans(this,${i},0)">${q.no}</button>
+      </div>
+      <div class="fb" id="s3fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s3Ans(btn, i, choice) {
+  document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s3Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const correct = s3Current[i].ans ? s3Current[i].yes : s3Current[i].no;
+  if (!ok) document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => { if (b.textContent === correct) b.classList.add('show'); });
+  const fb = document.getElementById('s3fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : correct;
+  ok ? descOk(2) : gWrong();
+}
+
+/* ══ SECTION 4 ══ */
+let s4State = [];
+function s4Init() {
+  const sel = sh([...S4_POOL]).slice(0, 3);
+  s4State = sel.map(it => ({
+    words:it.words, correct:it.correct,
+    shuffled:sh([...Array(it.words.length).keys()]),
+    placed:[], done:false
+  }));
+  document.getElementById('s4-list').innerHTML = s4State.map((_, i) => `
+    <div style="padding:12px 0;border-bottom:1px solid var(--b)">
+      <div class="label" style="margin-bottom:5px">Words:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#f8faff;border-radius:8px;border:1.5px dashed var(--b);min-height:40px;margin:4px 0" id="s4b${i}"></div>
+      <div class="label" style="margin:5px 0 4px">Your sentence:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-radius:8px;border:2px solid var(--b);min-height:40px;margin:4px 0" id="s4s${i}"></div>
+      <div class="btn-row" style="margin-top:8px;justify-content:flex-start">
+        <button class="btn btn-dark btn-sm" onclick="s4Check(${i})">Check ✓</button>
+        <button class="btn btn-outline btn-sm" onclick="s4Clear(${i})">Clear</button>
+      </div>
+      <div class="fb" id="s4fb${i}"></div>
+    </div>
+  `).join('');
+  s4State.forEach((_, i) => s4Render(i));
+}
+function s4Render(i) {
+  const it = s4State[i];
+  const bank = document.getElementById('s4b'+i), sent = document.getElementById('s4s'+i);
+  bank.innerHTML = ''; sent.innerHTML = '';
+  if (it.done) {
+    bank.innerHTML = `<span style="color:var(--ok);font-weight:600;font-size:.85rem">✓ ${it.correct}</span>`;
+    return;
+  }
+  it.shuffled.forEach(wi => {
+    if (it.placed.includes(wi)) return;
+    const c = document.createElement('span'); c.className = 'word-chip';
+    c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.push(wi); s4Render(i); };
+    bank.appendChild(c);
+  });
+  it.placed.forEach(wi => {
+    const c = document.createElement('span'); c.className = 'placed-chip';
+    c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.splice(it.placed.indexOf(wi), 1); s4Render(i); };
+    sent.appendChild(c);
+  });
+}
+function s4Check(i) {
+  const it = s4State[i];
+  const built = it.placed.map(wi => it.words[wi]).join(' ');
+  const ok = built === it.correct;
+  const fb = document.getElementById('s4fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'Correct: "' + it.correct + '"';
+  if (ok) { it.done = true; s4Render(i); descOk(4); } else gWrong();
+}
+function s4Clear(i) {
+  s4State[i].placed = []; s4State[i].done = false;
+  document.getElementById('s4fb'+i).className = 'fb';
+  s4Render(i);
+}
+
+/* ══ SECTION 5 ══ */
+let s5Shown = [], s5Pool = [], s5Idx = 0, s5Opts = [];
+function s5Init() {
+  s5Shown = sh([...AVATARS]).slice(0, 4);
+  document.getElementById('s5-grid').innerHTML = s5Shown.map(av => avatarCardHtml(av)).join('');
+  s5Pool = sh([...s5Shown]); s5Idx = 0;
+  document.getElementById('s5-done').style.display = 'none';
+  s5Show();
+}
+function s5Show() {
+  const nextBtn = document.getElementById('s5-next');
+  if (s5Idx >= s5Pool.length) {
+    document.getElementById('s5-qs').innerHTML = '';
+    nextBtn.style.display = 'none';
+    document.getElementById('s5-done').style.display = 'block';
+    return;
+  }
+  const target = s5Pool[s5Idx];
+  s5Opts = sh([...s5Shown]);
+  document.getElementById('s5-qs').innerHTML = `
+    <div class="desc-box">${avatarDesc(target)}</div>
+    <div class="opts-row" id="s5-opts">
+      ${s5Opts.map((av, j) => `<button class="aopt" onclick="s5Ans(this,${target.id},${j})">${av.emoji} ${av.name}</button>`).join('')}
+    </div>
+    <div class="fb" id="s5-fb"></div>
+  `;
+  nextBtn.style.display = 'none';
+}
+function s5Ans(btn, targetId, j) {
+  document.querySelectorAll('#s5-opts .aopt').forEach(b => b.disabled = true);
+  const ok = s5Opts[j].id === targetId; btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s5-opts .aopt').forEach((b, bi) => { if (s5Opts[bi].id === targetId) b.classList.add('show'); });
+  const correctAv = s5Opts.find(av => av.id === targetId);
+  const fb = document.getElementById('s5-fb');
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + correctAv.name;
+  ok ? descOk(4) : gWrong();
+  document.getElementById('s5-next').style.display = 'inline-block';
+}
+function s5Next() { s5Idx++; s5Show(); }
+
+/* ══ SECTION 6 ══ */
+let s6Current = [], s6Av = null;
+function s6Init() {
+  s6Av = pick(AVATARS);
+  document.getElementById('s6-av').innerHTML = avatarSingleHtml(s6Av);
+  s6Current = tfPool(s6Av);
+  document.getElementById('s6-qs').innerHTML = s6Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">"${q.stmt}"</div>
+      <div class="opts-row" id="s6o${i}">
+        <button class="aopt" onclick="s6Ans(this,${i},1)">True ✓</button>
+        <button class="aopt" onclick="s6Ans(this,${i},0)">False ✗</button>
+      </div>
+      <div class="fb" id="s6fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s6Ans(btn, i, choice) {
+  document.querySelectorAll('#s6o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s6Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s6fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'It\'s ' + (s6Current[i].ans ? 'True' : 'False') + '!';
+  ok ? descOk(2) : gWrong();
+}
+
+/* ══ Bootstrap ══ */
+window.addEventListener('load', () => {
+  s1Init(); s2Init(); s3Init(); s4Init(); s5Init(); s6Init();
+  gRender();
+});
+</script>
+</body>
+</html>

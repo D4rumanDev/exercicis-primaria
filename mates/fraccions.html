@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aprenc Fraccions</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* Visual area */
+.vis-wrap{display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;margin:10px 0 14px}
+/* Option buttons (fraction) */
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:340px;margin:0 auto}
+.fopt{padding:13px 10px;border:1.5px solid var(--b);border-radius:var(--r);background:#fff;cursor:pointer;font-family:inherit;font-size:1.4rem;font-weight:800;color:var(--t);transition:border-color .15s;display:flex;flex-direction:column;align-items:center;gap:0}
+.fopt .fl{border-top:2.5px solid currentColor;width:28px;margin:3px auto}
+.fopt:hover:not(:disabled){border-color:var(--a);background:var(--bg)}
+.fopt.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.fopt.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.fopt.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.fopt:disabled{pointer-events:none}
+/* Write fraction */
+.fw-wrap{display:flex;justify-content:center;align-items:center;gap:18px;margin:10px 0 14px}
+.fw-box{display:flex;flex-direction:column;align-items:center;gap:3px}
+.fw-inp{width:58px;padding:7px;border:2px solid var(--b);border-radius:8px;font-size:1.3rem;font-weight:800;text-align:center;outline:none;font-family:inherit}
+.fw-inp:focus{border-color:var(--a)}
+.fw-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.fw-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.fw-line{width:58px;height:3px;background:var(--t);border-radius:2px}
+.fw-label{font-size:.72rem;color:var(--m);margin-top:3px}
+/* Compare */
+.cmp-wrap{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:10px 0 14px}
+.cmp-btn{padding:14px 18px;border:2px solid var(--b);border-radius:var(--r);background:#fff;cursor:pointer;font-family:inherit;font-weight:900;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:120px}
+.cmp-btn:hover:not(:disabled){border-color:var(--a);background:var(--bg)}
+.cmp-btn.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.cmp-btn.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.cmp-btn.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.cmp-btn:disabled{pointer-events:none}
+.cmp-frac{font-size:1.5rem;font-weight:800;color:var(--t);display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.cmp-frac .cfline{border-top:3px solid var(--t);width:34px;margin:3px auto}
+/* Sign selector */
+.sign-wrap{display:flex;gap:10px;justify-content:center;margin:10px 0 14px}
+.sopt{width:56px;height:56px;border:2px solid var(--b);border-radius:var(--r);background:#fff;cursor:pointer;font-size:1.5rem;font-weight:900;color:var(--t);display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit}
+.sopt:hover:not(:disabled){border-color:var(--a);background:var(--bg)}
+.sopt.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.sopt.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.sopt.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.sopt:disabled{pointer-events:none}
+.cmp-display{display:flex;align-items:center;gap:12px;justify-content:center;font-size:1.4rem;font-weight:800;margin-bottom:8px}
+.cmp-fbox{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1.3rem}
+.cmp-fbox span.fl{border-top:2.5px solid var(--t);width:30px;display:block;margin:2px auto}
+/* Paint */
+.paint-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.paint-target{font-size:1.05rem;font-weight:700;color:var(--a);margin-bottom:4px}
+.color-counter{font-size:.9rem;font-weight:600;color:var(--m)}
+.color-counter.ok{color:var(--ok)}
+.submit-btn{padding:9px 18px;background:var(--a);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:600;min-height:40px;transition:opacity .15s}
+.submit-btn:hover:not(:disabled){opacity:.82}
+.submit-btn:disabled{opacity:.4;cursor:default}
+.prob-frac{display:inline-flex;flex-direction:column;align-items:center;font-size:.9rem;font-weight:800;vertical-align:middle;margin:0 2px;line-height:1.15}
+.prob-frac span.fl{border-top:2px solid currentColor;width:18px;display:block;margin:1px auto}
+/* Animations */
+@keyframes popIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}60%{transform:translateX(8px)}}
+.pop{animation:popIn .25s ease}.shk{animation:shake .35s ease}
+.isv path,.isv rect{transition:fill .15s}
+@media(max-width:420px){.opt-grid{grid-template-columns:1fr 1fr;max-width:240px}.cmp-wrap{gap:8px}.cmp-btn{min-width:100px}}
+/* Words section */
+.wrd-q{font-size:1.35rem;font-weight:800;color:var(--a);text-align:center;padding:14px;background:#eff6ff;border-radius:var(--r);border:2px dashed #93c5fd;margin-bottom:10px;line-height:1.4}
+.wrd-frac-disp{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 0 8px}
+.wrd-frac-n{font-size:2.2rem;font-weight:900;line-height:1;color:var(--t)}
+.wrd-frac-line{width:52px;height:3px;background:var(--t);border-radius:2px}
+.wrd-frac-d{font-size:2.2rem;font-weight:900;line-height:1;color:var(--t)}
+/* Grid section */
+.grid-vis-wrap{display:flex;justify-content:center;margin:12px 0}
+.grid-cell{cursor:pointer;transition:fill .15s}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Fraccions</h1>
+    <div class="muted">Identificar · Escriure · Comparar · Pintar · Paraules · Quadrícula · Problemes</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: IDENTIFICA -->
+<div class="card">
+  <h2><span class="num">1</span> Quina fracció veus?</h2>
+  <div class="card-sub">Mira la figura i tria la fracció correcta.</div>
+  <div id="id-vis" class="vis-wrap"></div>
+  <div id="id-opts" class="opt-grid"></div>
+  <div id="id-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextIdentifica()">Següent →</button>
+  </div>
+</div>
+
+<!-- 2: ESCRIU -->
+<div class="card">
+  <h2><span class="num">2</span> Escriu la fracció</h2>
+  <div class="card-sub">Mira la figura i escriu el numerador i el denominador.</div>
+  <div id="wr-vis" class="vis-wrap"></div>
+  <div class="fw-wrap">
+    <div class="fw-box">
+      <input class="fw-inp" id="fw-n" type="number" min="0" max="20" autocomplete="off" placeholder="?">
+      <div class="fw-line"></div>
+      <input class="fw-inp" id="fw-d" type="number" min="1" max="20" autocomplete="off" placeholder="?">
+    </div>
+    <div style="font-size:.8rem;color:var(--m);line-height:1.6;max-width:180px">
+      ↑ numerador (parts pintades)<br>↓ denominador (parts totals)
+    </div>
+  </div>
+  <div id="wr-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-dark btn-sm" onclick="checkEscriu()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextEscriu()">Nova figura →</button>
+  </div>
+</div>
+
+<!-- 3: COMPARA -->
+<div class="card">
+  <h2><span class="num">3</span> Compara fraccions</h2>
+  <div class="card-sub">Fraccions amb el mateix denominador.</div>
+  <div id="cmp-q" class="q-top mt2"></div>
+  <div id="cmp-area"></div>
+  <div id="cmp-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextCompara()">Següent →</button>
+  </div>
+</div>
+
+<!-- 4: PINTA -->
+<div class="card">
+  <h2><span class="num">4</span> Pinta la fracció</h2>
+  <div class="card-sub">Toca les parts per pintar la fracció indicada.</div>
+  <div id="pt-area" class="paint-wrap"></div>
+  <div id="pt-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextPinta()">Nova fracció →</button>
+  </div>
+</div>
+
+<!-- 5: PARAULES -->
+<div class="card">
+  <h2><span class="num">5</span> Fraccions en paraules</h2>
+  <div class="card-sub">Relaciona la fracció escrita amb la seva forma de dir-la.</div>
+  <div class="section-lbl">Part A — Llegeix i tria la fracció</div>
+  <div id="wrd-q-a" class="wrd-q"></div>
+  <div id="wrd-opts-a" class="opt-grid"></div>
+  <div id="wrd-fb-a" class="fb mt3" style="text-align:center"></div>
+  <div class="sep"></div>
+  <div class="section-lbl">Part B — Veu la fracció i tria el nom</div>
+  <div id="wrd-frac-b" class="wrd-frac-disp"></div>
+  <div id="wrd-opts-b" class="prob-opts" style="justify-content:center;flex-wrap:wrap;gap:8px;margin:10px 0 0"></div>
+  <div id="wrd-fb-b" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextFracWords();nextFracWordB()">Següent →</button>
+  </div>
+</div>
+
+<!-- 6: QUADRÍCULA -->
+<div class="card">
+  <h2><span class="num">6</span> Representa a la quadrícula</h2>
+  <div class="card-sub">Pinta les caselles per representar la fracció indicada.</div>
+  <div id="grd-target" class="paint-target mt2"></div>
+  <div id="grd-vis" class="grid-vis-wrap"></div>
+  <div id="grd-cnt" class="color-counter" style="text-align:center">Parts pintades: <span id="grd-num">0</span></div>
+  <div id="grd-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-dark btn-sm" onclick="checkFracGrid()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextFracGrid()">Nova fracció →</button>
+  </div>
+</div>
+
+<!-- 7: PROBLEMES -->
+<div class="card">
+  <h2><span class="num">7</span> Problemes amb fraccions</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY='ex_frac_v1';
+GAM_ACHS=[
+  {id:'first',s:'🌟',n:'Primer Encert',d:'Primera resposta correcta'},
+  {id:'s3',s:'🔥',n:'Ratxa x3',d:'3 encerts seguits'},
+  {id:'s5',s:'⚡',n:'Ratxa x5',d:'5 encerts seguits'},
+  {id:'s10',s:'💥',n:'Ratxa x10',d:'10 encerts seguits'},
+  {id:'frac-id',s:'🔍',n:'Identificadora',d:'5 fraccions identificades'},
+  {id:'frac-wr',s:'✏️',n:'Escriptora',d:'5 fraccions escrites'},
+  {id:'frac-pt',s:'🎨',n:'Pintora',d:'5 fraccions pintades'},
+  {id:'frac-pb',s:'🧮',n:'Calculadora',d:'5 problemes resolts'},
+  {id:'ok50',s:'🥉',n:'50 Encerts',d:'50 respostes correctes'},
+  {id:'ok200',s:'🥈',n:'200 Encerts',d:'200 respostes correctes'},
+  {id:'frac-wrd',s:'📖',n:'Lingüista',d:'5 fraccions en paraules correctes'},
+  {id:'frac-grid',s:'🔲',n:'Artista de Quadrícula',d:'5 quadrícules correctes'}
+];
+function gExtraAchs(g,tryA){
+  const e=eLoad();
+  tryA('frac-id',(e.id||0)>=5);
+  tryA('frac-wr',(e.wr||0)>=5);
+  tryA('frac-pt',(e.pt||0)>=5);
+  tryA('frac-pb',(e.pb||0)>=5);
+  tryA('frac-wrd',(e.wrd||0)>=5);
+  tryA('frac-grid',(e.grid||0)>=5);
+}
+
+// ── UTILS ──
+const DENOMS=[2,3,4,5,6,8];
+function randFrac(){const d=pick(DENOMS);return{n:ri(1,d-1),d};}
+function fracStr(n,d){return `<span class="prob-frac"><span>${n}</span><span class="fl"></span><span>${d}</span></span>`;}
+
+// ── THEMES ──
+const THEMES=[
+  {fill:'#f87171',empty:'#fee2e2',stroke:'#ef4444'},
+  {fill:'#34d399',empty:'#d1fae5',stroke:'#059669'},
+  {fill:'#60a5fa',empty:'#dbeafe',stroke:'#2563eb'},
+  {fill:'#f472b6',empty:'#fce7f3',stroke:'#db2777'},
+  {fill:'#fbbf24',empty:'#fef3c7',stroke:'#d97706'},
+  {fill:'#a78bfa',empty:'#ede9fe',stroke:'#7c3aed'}
+];
+const randTheme=()=>pick(THEMES);
+
+// ── SVG BUILDERS ──
+function circleSVG(n,d,th,size=175,inter=false){
+  const cx=size/2,cy=size/2,r=size/2-7;
+  if(d===1)return`<svg width="${size}" height="${size}" class="${inter?'isv':''}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${th.fill}" stroke="${th.stroke}" stroke-width="3"/></svg>`;
+  const ang=2*Math.PI/d;let paths='';
+  for(let i=0;i<d;i++){
+    const a0=-Math.PI/2+i*ang,a1=a0+ang;
+    const x1=(cx+r*Math.cos(a0)).toFixed(3),y1=(cy+r*Math.sin(a0)).toFixed(3);
+    const x2=(cx+r*Math.cos(a1)).toFixed(3),y2=(cy+r*Math.sin(a1)).toFixed(3);
+    const la=ang>Math.PI?1:0,fill=i<n?th.fill:th.empty;
+    const ic=inter?`onclick="sliceClick(this)" data-a="${i<n?1:0}" style="cursor:pointer"`:'';
+    paths+=`<path ${ic} data-i="${i}" d="M${cx},${cy}L${x1},${y1}A${r},${r} 0 ${la} 1 ${x2},${y2}Z" fill="${fill}" stroke="white" stroke-width="3"/>`;
+  }
+  return`<svg width="${size}" height="${size}" class="${inter?'isv':''}">${paths}<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${th.stroke}" stroke-width="3"/></svg>`;
+}
+
+function barSVG(n,d,th,W=260,H=72,inter=false){
+  const cw=Math.floor(W/d),tw=cw*d;let rects='';
+  for(let i=0;i<d;i++){
+    const fill=i<n?th.fill:th.empty;
+    const ic=inter?`onclick="cellClick(this)" data-a="${i<n?1:0}" style="cursor:pointer"`:'';
+    rects+=`<rect ${ic} data-i="${i}" x="${i*cw}" y="2" width="${cw}" height="${H-4}" fill="${fill}" stroke="${th.stroke}" stroke-width="2" rx="5"/>`;
+  }
+  return`<svg width="${tw}" height="${H}" class="${inter?'isv':''}">${rects}</svg>`;
+}
+
+function dominoSVG(n,d,th,W=90,H=26*Math.min(d,8)+20){
+  H=Math.max(H,80);
+  const rowH=(H-12)/d;let s='';
+  s+=`<rect x="2" y="2" width="${W-4}" height="${H-4}" rx="10" fill="white" stroke="${th.stroke}" stroke-width="2.5"/>`;
+  for(let i=0;i<d;i++){
+    const y=6+i*rowH,h=rowH-4;
+    s+=`<rect x="9" y="${y.toFixed(1)}" width="${W-18}" height="${h.toFixed(1)}" rx="6" fill="${i<n?th.fill:th.empty}" stroke="${th.stroke}" stroke-width="1.5"/>`;
+  }
+  if(n>0&&n<d){
+    const ly=(6+n*rowH-2).toFixed(1);
+    s+=`<line x1="2" y1="${ly}" x2="${W-2}" y2="${ly}" stroke="${th.stroke}" stroke-width="3"/>`;
+  }
+  return`<svg width="${W}" height="${H}">${s}</svg>`;
+}
+
+function autoVis(n,d,th,size=175,inter=false){
+  if(inter)return d<=6?circleSVG(n,d,th,size,true):barSVG(n,d,th,260,80,true);
+  const r=Math.random();
+  if(r<0.35)return circleSVG(n,d,th,size);
+  if(r<0.70)return barSVG(n,d,th,260,72);
+  return dominoSVG(n,d,th);
+}
+
+// ── SEC 1: IDENTIFICA ──
+let idQ=null;
+function nextIdentifica(){
+  const th=randTheme(),{n,d}=randFrac();
+  const opts=[{n,d,ok:true}];const used=new Set([n+'/'+d]);
+  while(opts.length<4){const wd=pick(DENOMS),wn=ri(1,wd-1),k=wn+'/'+wd;if(!used.has(k)){used.add(k);opts.push({n:wn,d:wd,ok:false});}}
+  idQ={n,d,th,opts:sh(opts)};
+  document.getElementById('id-vis').innerHTML=autoVis(n,d,th);
+  document.getElementById('id-fb').textContent='';
+  const od=document.getElementById('id-opts');od.innerHTML='';
+  idQ.opts.forEach(o=>{
+    const b=document.createElement('button');b.className='fopt';
+    b.innerHTML=`<span>${o.n}</span><span class="fl"></span><span>${o.d}</span>`;
+    b.onclick=()=>{
+      od.querySelectorAll('.fopt').forEach(x=>x.disabled=true);
+      if(o.ok){b.classList.add('ok');setFb('id-fb',true,pick(OK));gCorrect(2,'id');}
+      else{b.classList.add('ko');b.classList.add('shk');od.querySelectorAll('.fopt').forEach(x=>{if(x.dataset.ok==='true')x.classList.add('ok');});setFb('id-fb',false,`${pick(KO)} Era ${idQ.n}/${idQ.d}`);gWrong();}
+    };
+    b.dataset.ok=o.ok;
+    od.appendChild(b);
+  });
+}
+
+// ── SEC 2: ESCRIU ──
+let wrQ=null;
+function nextEscriu(){
+  const th=randTheme(),{n,d}=randFrac();
+  wrQ={n,d};
+  document.getElementById('wr-vis').innerHTML=autoVis(n,d,th);
+  ['fw-n','fw-d'].forEach(id=>{const el=document.getElementById(id);el.value='';el.classList.remove('ok','ko');});
+  document.getElementById('wr-fb').textContent='';
+}
+function checkEscriu(){
+  const inN=document.getElementById('fw-n'),inD=document.getElementById('fw-d');
+  [inN,inD].forEach(e=>e.classList.remove('ok','ko'));
+  const vn=parseInt(inN.value),vd=parseInt(inD.value);
+  if(isNaN(vn)||isNaN(vd)){setFb('wr-fb',false,'Escriu els dos números!');return;}
+  const nOk=vn===wrQ.n,dOk=vd===wrQ.d;
+  inN.classList.add(nOk?'ok':'ko');inD.classList.add(dOk?'ok':'ko');
+  if(nOk&&dOk){setFb('wr-fb',true,pick(OK));gCorrect(5,'wr');}
+  else if(nOk){setFb('wr-fb',false,'El numerador és correcte! Revisa el denominador (parts totals).');gWrong();}
+  else if(dOk){setFb('wr-fb',false,'El denominador és correcte! Revisa el numerador (parts pintades).');gWrong();}
+  else{setFb('wr-fb',false,`Era ${wrQ.n}/${wrQ.d}. El número de dalt = parts pintades, el de baix = parts totals.`);gWrong();}
+}
+
+// ── SEC 3: COMPARA ──
+let cmpQ=null;
+const CMP_TYPES=['gran','petita','signe'];
+function nextCompara(){
+  const d=pick([3,4,5,6,8]);
+  let n1,n2;
+  do{n1=ri(1,d-1);n2=ri(1,d-1);}while(n1===n2);
+  const th=randTheme(),type=pick(CMP_TYPES);
+  cmpQ={n1,n2,d,th,type};
+  document.getElementById('cmp-fb').textContent='';
+  const q=document.getElementById('cmp-q');
+  const area=document.getElementById('cmp-area');
+
+  if(type==='signe'){
+    q.innerHTML=`Posa el signe correcte entre les dues fraccions:`;
+    const bar1=barSVG(n1,d,th,200,56);
+    const bar2=barSVG(n2,d,th,200,56);
+    const correct=n1>n2?'>':n1<n2?'<':'=';
+    area.innerHTML=`<div class="cmp-display">
+      <div class="cmp-fbox"><span>${n1}</span><span class="fl"></span><span>${d}</span></div>
+      <span style="font-size:1.2rem;color:var(--m)">?</span>
+      <div class="cmp-fbox"><span>${n2}</span><span class="fl"></span><span>${d}</span></div>
+    </div>
+    <div class="vis-wrap">${bar1}<span style="font-size:1.4rem;color:var(--m)">vs</span>${bar2}</div>
+    <div class="sign-wrap">
+      ${['<','>','='].map(s=>`<button class="sopt" onclick="chkSigne('${s}','${correct}')">${s}</button>`).join('')}
+    </div>`;
+  } else {
+    const askBig=type==='gran';
+    q.innerHTML=`Quina fracció és <strong>${askBig?'MÉS GRAN':'MÉS PETITA'}</strong>?`;
+    const bar1=barSVG(n1,d,th,200,56);
+    const bar2=barSVG(n2,d,th,200,56);
+    const biggerIsA=n1>n2;
+    const correctA=askBig?biggerIsA:!biggerIsA;
+    area.innerHTML=`<div class="vis-wrap">${bar1}<span style="font-size:1.4rem;color:var(--m)">vs</span>${bar2}</div>
+    <div class="cmp-wrap">
+      <button class="cmp-btn" onclick="chkCmp(this,${correctA})" data-ok="${correctA}">
+        <div class="cmp-frac"><span>${n1}</span><span class="cfline"></span><span>${d}</span></div>
+      </button>
+      <button class="cmp-btn" onclick="chkCmp(this,${!correctA})" data-ok="${!correctA}">
+        <div class="cmp-frac"><span>${n2}</span><span class="cfline"></span><span>${d}</span></div>
+      </button>
+    </div>`;
+  }
+}
+function chkCmp(btn,ok){
+  document.querySelectorAll('.cmp-btn').forEach(b=>b.disabled=true);
+  if(ok){btn.classList.add('ok');setFb('cmp-fb',true,pick(OK));gCorrect(3,'cmp');}
+  else{btn.classList.add('ko');btn.classList.add('shk');document.querySelectorAll('.cmp-btn').forEach(b=>{if(b.dataset.ok==='true')b.classList.add('show');});setFb('cmp-fb',false,`${pick(KO)} Com més gran el numerador, més gran la fracció (amb el mateix denominador).`);gWrong();}
+}
+function chkSigne(chose,correct){
+  document.querySelectorAll('.sopt').forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('show');});
+  const picked=document.querySelector(`.sopt:not(:disabled), .sopt[disabled]`);
+  document.querySelectorAll('.sopt').forEach(b=>{if(b.textContent===chose)b.classList.add(chose===correct?'ok':'ko');});
+  if(chose===correct){setFb('cmp-fb',true,pick(OK));gCorrect(3,'cmp');}
+  else{setFb('cmp-fb',false,`Era "${correct}". Recorda: amb el mateix denominador, compara els numeradors.`);gWrong();}
+}
+
+// ── SEC 4: PINTA ──
+let ptQ=null,ptEmptyC='#e2e8f0';
+function nextPinta(){
+  const th=randTheme(),{n,d}=randFrac();
+  ptQ={n,d,th};
+  const area=document.getElementById('pt-area');
+  area.innerHTML='';
+  const target=document.createElement('div');target.className='paint-target';
+  target.innerHTML=`Pinta <strong>${n}/${d}</strong> de la figura`;
+  const interTh={...th,empty:ptEmptyC,stroke:'#94a3b8'};
+  const vis=document.createElement('div');vis.id='pt-vis';vis.innerHTML=autoVis(0,d,interTh,175,true);
+  const cnt=document.createElement('div');cnt.className='color-counter';cnt.id='pt-cnt';cnt.innerHTML='Parts pintades: <span id="pt-num">0</span>';
+  const sbtn=document.createElement('button');sbtn.className='submit-btn';sbtn.textContent='Comprovat!';sbtn.disabled=true;sbtn.onclick=submitPinta;
+  area.appendChild(target);area.appendChild(vis);area.appendChild(cnt);area.appendChild(sbtn);
+  document.getElementById('pt-fb').textContent='';
+}
+function sliceClick(el){
+  const on=el.dataset.a==='1';el.dataset.a=on?'0':'1';
+  el.style.fill=on?ptEmptyC:ptQ.th.fill;refreshPaint();
+}
+function cellClick(el){
+  const on=el.dataset.a==='1';el.dataset.a=on?'0':'1';
+  el.style.fill=on?ptEmptyC:ptQ.th.fill;refreshPaint();
+}
+function refreshPaint(){
+  const n=document.getElementById('pt-vis').querySelectorAll('[data-a="1"]').length;
+  const num=document.getElementById('pt-num'),sbtn=document.querySelector('.submit-btn');
+  if(num)num.textContent=n;if(sbtn)sbtn.disabled=n===0;
+  const cnt=document.getElementById('pt-cnt');
+  if(cnt)cnt.className='color-counter'+(n===ptQ.n?' ok':'');
+}
+function submitPinta(){
+  const n=document.getElementById('pt-vis').querySelectorAll('[data-a="1"]').length;
+  if(n===ptQ.n){
+    document.querySelector('.submit-btn').disabled=true;
+    setFb('pt-fb',true,pick(OK));gCorrect(4,'pt');
+  }else{
+    setFb('pt-fb',false,`Calia pintar ${ptQ.n} parts, tu n'has pintat ${n}. Intenta-ho de nou!`);gWrong();
+  }
+}
+
+// ── SEC 5: PROBLEMES ──
+const PROB_POOL=[
+  ()=>{
+    const total=pick([8,12,16,20,24]),d=pick([2,4]),n=d===2?1:pick([1,3]);
+    const ans=total*n/d;
+    return{text:`De <strong>${total}</strong> alumnes, <strong>${n}/${d}</strong> han portat esmorzar. Quants alumnes han portat esmorzar?`,opts:sh([ans,ans+(total/d),ans-(total/d)].map(x=>x+' alumnes')),ans:ans+' alumnes'};
+  },
+  ()=>{
+    const kmUnit=ri(2,8),d=pick([3,4]);
+    const n2=d-1;const ans=kmUnit*n2;
+    return{text:`Un ciclista recorre <strong>${kmUnit} km</strong> en ${fracStr(1,d)} d'hora. Quants quilòmetres recorre en ${fracStr(n2,d)} d'hora?`,opts:sh([ans,kmUnit,ans+kmUnit].map(x=>x+' km')),ans:ans+' km'};
+  },
+  ()=>{
+    const d=pick([4,6,8]),n1=ri(1,d-2),n2=ri(1,d-n1-1);
+    const ans=n1+n2;
+    return{text:`La Maria menja ${fracStr(n1,d)} d'un pastís i la Laia en menja ${fracStr(n2,d)}. Quant han menjat en total?`,opts:sh([`${ans}/${d}`,`${n1*n2}/${d}`,`${ans+1}/${d}`]),ans:`${ans}/${d}`};
+  },
+  ()=>{
+    const d=pick([4,6,8]),n1=ri(3,d),n2=ri(1,n1-1);
+    const ans=n1-n2;
+    return{text:`Tenim ${fracStr(n1,d)} d'un litre de suc. En consumim ${fracStr(n2,d)}. Quant queda?`,opts:sh([`${ans}/${d}`,`${n1+n2}/${d}`,`${ans-1}/${d}`]),ans:`${ans}/${d}`};
+  },
+  ()=>{
+    const metres=pick([12,16,20,24]),d=pick([3,4]);const n=pick([1,2,3]).valueOf();
+    const ans=(metres/d)*n;
+    return{text:`Una cinta de <strong>${metres} metres</strong> es talla en <strong>${d}</strong> trossos iguals. Quants metres mesura ${fracStr(n,d)} de la cinta?`,opts:sh([ans,metres/d,(metres/d)*(n+1)].map(x=>x+' metres')),ans:ans+' metres'};
+  },
+  ()=>{
+    const total=pick([6,8,10,12,15]),d=pick([2,3,5]);
+    if(total%d!==0)return PROB_POOL[5]();
+    const ans=total/d;
+    return{text:`La Sara té <strong>${total}</strong> galetes i en regala <strong>1/${d}</strong> a la seva amiga. Quantes galetes regala?`,opts:sh([ans,total-ans,ans*2].map(x=>x+' galetes')),ans:ans+' galetes'};
+  },
+  ()=>{
+    const mH=pick([2,4,6,8]);
+    const ans=mH/2;
+    return{text:`En Jordi camina ${fracStr(1,2)} km cada dia. Quants km camina en <strong>${mH}</strong> dies?`,opts:sh([ans,mH,mH*2].map(x=>x+' km')),ans:ans+' km'};
+  },
+  ()=>{
+    const n1=ri(1,4),n2=ri(1,4),d=pick([6,8]);
+    const v1=n1/d,v2=n2/d;const more=v1>=v2?'A':'B';
+    const nameA=pick(['la Noa','la Clara','la Mar']),nameB=pick(['la Lia','la Iris','l\'Aroa']);
+    return{text:`${nameA} té ${fracStr(n1,d)} de pizza i ${nameB} en té ${fracStr(n2,d)}. Qui en té <strong>més</strong>?`,opts:sh([nameA,nameB,'Les dues igual']),ans:n1>n2?nameA:n1<n2?nameB:'Les dues igual'};
+  }
+];
+function nextProblemes(){
+  const sel=sh([...PROB_POOL]).slice(0,3).map(f=>{let r;try{r=f();}catch{r=PROB_POOL[0]();}return r;});
+  const list=document.getElementById('prob-list');list.innerHTML='';
+  sel.forEach((p,i)=>{
+    const div=document.createElement('div');div.className='prob';
+    div.innerHTML=`<div class="prob-t">${p.text}</div><div class="prob-opts" id="pp${i}"></div><div class="fb mt2" id="ppfb${i}"></div>`;
+    list.appendChild(div);
+    p.opts.forEach(o=>{
+      const b=document.createElement('button');b.className='popt';b.textContent=o;
+      b.onclick=()=>{
+        div.querySelectorAll('.popt').forEach(x=>x.disabled=true);
+        const fb=document.getElementById(`ppfb${i}`);
+        if(o===p.ans){b.classList.add('ok');fb.className='fb ok';fb.textContent=pick(OK);gCorrect(5,'pb');}
+        else{b.classList.add('ko');div.querySelectorAll('.popt').forEach(x=>{if(x.textContent===p.ans)x.classList.add('show');});fb.className='fb ko';fb.textContent='✗ Era: '+p.ans;gWrong();}
+      };
+      document.getElementById(`pp${i}`).appendChild(b);
+    });
+  });
+}
+
+// ── SEC 5: FRACCIONS EN PARAULES ──
+const FWNUM={1:'un',2:'dos',3:'tres',4:'quatre',5:'cinc',6:'sis',7:'set',8:'vuit'};
+const FWDEN={2:'mig',3:'terç',4:'quart',5:'cinquè',6:'sisè',7:'setè',8:'vuitè'};
+const FWDEN_P={2:'meitats',3:'terços',4:'quarts',5:'cinquens',6:'sisens',7:'setens',8:'vuitens'};
+function fracToW(n,d){
+  if(n===1&&d===2)return'Un mig';
+  if(n===1&&d===4)return'Un quart';
+  if(n===3&&d===4)return'Tres quarts';
+  const num=FWNUM[n]||n;
+  const den=(n===1?(FWDEN[d]||d+'è'):(FWDEN_P[d]||d+'ens'));
+  return num.charAt(0).toUpperCase()+num.slice(1)+' '+den;
+}
+let wrdQA=null;
+function nextFracWords(){
+  const {n,d}=randFrac();
+  const word=fracToW(n,d);
+  wrdQA={n,d,word};
+  document.getElementById('wrd-q-a').textContent=word;
+  document.getElementById('wrd-fb-a').textContent='';
+  const opts=[{n,d,ok:true}];const used=new Set([n+'/'+d]);
+  while(opts.length<4){const wd=pick(DENOMS),wn=ri(1,wd-1),k=wn+'/'+wd;if(!used.has(k)){used.add(k);opts.push({n:wn,d:wd,ok:false});}}
+  const od=document.getElementById('wrd-opts-a');od.innerHTML='';
+  sh(opts).forEach(o=>{
+    const b=document.createElement('button');b.className='fopt';
+    b.innerHTML=`<span>${o.n}</span><span class="fl"></span><span>${o.d}</span>`;
+    b.dataset.ok=o.ok;
+    b.onclick=()=>{
+      od.querySelectorAll('.fopt').forEach(x=>x.disabled=true);
+      if(o.ok){b.classList.add('ok');setFb('wrd-fb-a',true,pick(OK));gCorrect(3,'wrd');}
+      else{b.classList.add('ko');b.classList.add('shk');od.querySelectorAll('.fopt').forEach(x=>{if(x.dataset.ok==='true')x.classList.add('show');});setFb('wrd-fb-a',false,`Era ${n}/${d} = ${word}`);gWrong();}
+    };
+    od.appendChild(b);
+  });
+}
+let wrdQB=null;
+function nextFracWordB(){
+  const {n,d}=randFrac();
+  wrdQB={n,d};
+  const correct=fracToW(n,d);
+  document.getElementById('wrd-frac-b').innerHTML=
+    `<span class="wrd-frac-n">${n}</span><div class="wrd-frac-line"></div><span class="wrd-frac-d">${d}</span>`;
+  document.getElementById('wrd-fb-b').textContent='';
+  const optsSet=new Set([correct]);const wordOpts=[correct];
+  while(wordOpts.length<4){const wd=pick(DENOMS),wn=ri(1,wd-1),w=fracToW(wn,wd);if(!optsSet.has(w)){optsSet.add(w);wordOpts.push(w);}}
+  const od=document.getElementById('wrd-opts-b');od.innerHTML='';
+  sh(wordOpts).forEach(w=>{
+    const b=document.createElement('button');b.className='popt';b.textContent=w;
+    b.onclick=()=>{
+      od.querySelectorAll('.popt').forEach(x=>x.disabled=true);
+      if(w===correct){b.classList.add('ok');setFb('wrd-fb-b',true,pick(OK));gCorrect(3,'wrd');}
+      else{b.classList.add('ko');od.querySelectorAll('.popt').forEach(x=>{if(x.textContent===correct)x.classList.add('show');});setFb('wrd-fb-b',false,`Era: ${correct}`);gWrong();}
+    };
+    od.appendChild(b);
+  });
+}
+
+// ── SEC 6: QUADRÍCULA 2D ──
+const GRID_LAYOUT={2:[1,2],3:[1,3],4:[2,2],5:[1,5],6:[2,3],8:[2,4]};
+const G_CW=50,G_CH=50,G_GAP=6;
+let gridQ=null;
+function gridSVG(d){
+  const [rows,cols]=GRID_LAYOUT[d]||[1,d];
+  const W=cols*G_CW+(cols-1)*G_GAP,H=rows*G_CH+(rows-1)*G_GAP;
+  let s='';
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const i=r*cols+c,x=c*(G_CW+G_GAP),y=r*(G_CH+G_GAP);
+      s+=`<rect class="grid-cell" onclick="gridCellClick(this)" data-a="0" data-i="${i}" x="${x}" y="${y}" width="${G_CW}" height="${G_CH}" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>`;
+    }
+  }
+  return`<svg viewBox="0 0 ${W} ${H}" style="max-width:100%;width:${W}px;height:${H}px">${s}</svg>`;
+}
+function nextFracGrid(){
+  const {n,d}=randFrac();
+  gridQ={n,d};
+  document.getElementById('grd-target').innerHTML=`Pinta <strong>${n}/${d}</strong> de la quadrícula`;
+  document.getElementById('grd-vis').innerHTML=gridSVG(d);
+  document.getElementById('grd-num').textContent='0';
+  document.getElementById('grd-cnt').className='color-counter';
+  document.getElementById('grd-fb').textContent='';
+}
+function gridCellClick(el){
+  const on=el.dataset.a==='1';
+  el.dataset.a=on?'0':'1';
+  el.setAttribute('fill',on?'#e2e8f0':'#60a5fa');
+  const painted=document.getElementById('grd-vis').querySelectorAll('[data-a="1"]').length;
+  document.getElementById('grd-num').textContent=painted;
+  document.getElementById('grd-cnt').className='color-counter'+(painted===gridQ.n?' ok':'');
+}
+function checkFracGrid(){
+  const vis=document.getElementById('grd-vis');
+  const painted=vis.querySelectorAll('[data-a="1"]').length;
+  if(painted===0){setFb('grd-fb',false,'Pinta alguna casella primer!');return;}
+  vis.querySelectorAll('.grid-cell').forEach(el=>el.setAttribute('onclick',''));
+  if(painted===gridQ.n){setFb('grd-fb',true,pick(OK));gCorrect(4,'grid');}
+  else{
+    setFb('grd-fb',false,`Calia pintar ${gridQ.n} caselles, tu n'has pintat ${painted}. Prova de nou!`);gWrong();
+    vis.querySelectorAll('.grid-cell').forEach(el=>el.setAttribute('onclick','gridCellClick(this)'));
+  }
+}
+
+// ── INIT ──
+gRender();
+nextIdentifica();nextEscriu();nextCompara();nextPinta();nextFracWords();nextFracWordB();nextFracGrid();nextProblemes();
+</script>
+</body>
+</html>

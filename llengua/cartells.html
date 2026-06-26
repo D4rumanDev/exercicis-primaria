@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartells amb Faltes</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── Sign wrapper ── */
+.sign-wrap{display:flex;justify-content:center;margin:14px 0 16px;min-height:110px;align-items:center}
+.sign{border-radius:14px;padding:18px 24px;text-align:center;max-width:360px;width:100%;line-height:1.45;box-shadow:0 4px 22px rgba(0,0,0,.18)}
+.sign-main{font-size:1.45rem;font-weight:800;margin-bottom:4px}
+.sign-sub{font-size:.85rem;line-height:1.5}
+.sign-sub2{font-size:.78rem;line-height:1.5;margin-top:3px}
+
+/* Theater marquee */
+.sign-teatre{background:#1a1a2e;color:#ffd700;border:4px solid #ffd700;font-family:'Georgia',serif}
+.sign-teatre .sign-sub{color:#d4b800}
+
+/* Music school */
+.sign-musica{background:linear-gradient(135deg,#1e3a5f,#2d5986);color:#fff;border:3px solid #60a5fa}
+.sign-musica .sign-sub{color:#bfdbfe}
+
+/* Circus */
+.sign-circ{background:linear-gradient(135deg,#7f1d1d,#991b1b);color:#fef9c3;border:4px double #f59e0b}
+.sign-circ .sign-main{font-size:1.7rem;text-shadow:2px 2px 0 #000}
+.sign-circ .sign-sub{color:#fde68a}
+
+/* Restaurant */
+.sign-rest{background:#fef3c7;color:#92400e;border:3px solid #d97706;font-family:'Georgia',serif}
+.sign-rest .sign-sub{color:#b45309}
+
+/* Fish market */
+.sign-peix{background:#0c4a6e;color:#e0f2fe;border:3px solid #38bdf8}
+.sign-peix .sign-sub{color:#bae6fd}
+
+/* Gym */
+.sign-gimnàs{background:linear-gradient(135deg,#064e3b,#065f46);color:#d1fae5;border:3px solid #10b981}
+.sign-gimnàs .sign-sub{color:#a7f3d0}
+
+/* Bakery */
+.sign-forn{background:#fef3c7;color:#78350f;border:3px solid #b45309;font-family:'Georgia',serif}
+.sign-forn .sign-sub{color:#92400e}
+
+/* Dance school */
+.sign-dansa{background:linear-gradient(135deg,#4c1d95,#6d28d9);color:#ede9fe;border:3px solid #a78bfa}
+.sign-dansa .sign-sub{color:#c4b5fd}
+
+/* Pharmacy */
+.sign-farmacia{background:#fff;color:#166534;border:3px solid #166534}
+.sign-farmacia .sign-main{font-size:1.25rem}
+.sign-farmacia .sign-sub{color:#15803d}
+
+/* Market stall */
+.sign-mercat{background:#166534;color:#dcfce7;border:3px solid #4ade80}
+.sign-mercat .sign-sub{color:#bbf7d0}
+
+/* School */
+.sign-escola{background:#fffbeb;color:#1e3a5f;border:3px solid #1e3a5f}
+.sign-escola .sign-sub{color:#1e40af}
+
+/* Library */
+.sign-biblioteca{background:#f5f3ff;color:#4c1d95;border:3px solid #7c3aed}
+.sign-biblioteca .sign-sub{color:#6d28d9}
+
+/* Hairdresser */
+.sign-perruqueria{background:linear-gradient(135deg,#831843,#9d174d);color:#fce7f3;border:3px solid #f9a8d4}
+.sign-perruqueria .sign-sub{color:#fbcfe8}
+
+/* Cinema */
+.sign-cinema{background:#0f0a1e;color:#e879f9;border:3px solid #a855f7}
+.sign-cinema .sign-main{text-shadow:0 0 12px #a855f7}
+.sign-cinema .sign-sub{color:#d8b4fe}
+
+/* Toy store */
+.sign-jogueteria{background:#fffbeb;color:#7c2d12;border:4px dashed #f97316}
+.sign-jogueteria .sign-main{font-size:1.55rem}
+.sign-jogueteria .sign-sub{color:#c2410c}
+
+/* Museum */
+.sign-museu{background:#f5f5f0;color:#292524;border:2px solid #a8a29e}
+.sign-museu .sign-main{font-family:'Georgia',serif;letter-spacing:.04em}
+.sign-museu .sign-sub{color:#57534e}
+
+/* Pastry shop */
+.sign-pastisseria{background:linear-gradient(135deg,#fce7f3,#fff1f2);color:#9d174d;border:3px solid #ec4899}
+.sign-pastisseria .sign-sub{color:#be185d}
+
+/* Zoo */
+.sign-zoo{background:linear-gradient(135deg,#14532d,#166534);color:#dcfce7;border:4px solid #86efac}
+.sign-zoo .sign-main{font-size:1.6rem;text-shadow:1px 1px 0 #000}
+.sign-zoo .sign-sub{color:#bbf7d0}
+
+/* Error word */
+.err-word{text-decoration:underline;text-decoration-color:#ef4444;text-decoration-style:wavy;text-decoration-thickness:2px}
+
+/* Error type badge */
+.type-badge{display:inline-block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 9px;border-radius:100px;margin-bottom:10px}
+.type-lletra{background:#fef9c3;color:#854d0e}
+.type-accent{background:#fce7f3;color:#831843}
+.type-castella{background:#dcfce7;color:#14532d}
+
+/* Answer input */
+.ans-inp{padding:8px 14px;border:2px solid var(--b);border-radius:8px;font-size:1.05rem;font-weight:700;font-family:inherit;outline:none;transition:border-color .15s;text-align:center;width:200px}
+.ans-inp:focus{border-color:var(--a)}
+.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr"><h1>Cartells amb faltes</h1></div>
+<div id="gam-bar"></div>
+
+<div class="card">
+  <div class="diff-row">
+    <button class="dbtn active" data-f="all"      onclick="setFilter('all')">Tots</button>
+    <button class="dbtn"        data-f="lletra"   onclick="setFilter('lletra')">Lletra</button>
+    <button class="dbtn"        data-f="accent"   onclick="setFilter('accent')">Accent</button>
+    <button class="dbtn"        data-f="castella" onclick="setFilter('castella')">Castellà</button>
+  </div>
+
+  <div class="sign-wrap">
+    <div id="sign-container"></div>
+  </div>
+
+  <p style="font-size:.83rem;color:var(--m);text-align:center;margin-bottom:10px">
+    La paraula subratllada conté una falta. Escriu-la correctament:
+  </p>
+
+  <div style="display:flex;justify-content:center;margin-bottom:8px">
+    <input class="ans-inp" id="ans" type="text" autocomplete="off" autocorrect="off"
+      autocapitalize="none" spellcheck="false" placeholder="Resposta..."
+      onkeydown="if(event.key==='Enter')checkAnswer()">
+  </div>
+
+  <div id="feedback" class="fb" style="display:none;text-align:center"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="check-btn" onclick="checkAnswer()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="next-btn" onclick="nextCartell()">Següent →</button>
+  </div>
+</div>
+
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY='ex_cart_v1';
+GAM_ACHS=[...GAM_ACHS,
+  {id:'cart1', s:'🪧',n:'Primer Cartell',d:'Primer cartell corregit'},
+  {id:'cart5', s:'🔍',n:'5 Cartells',    d:'5 cartells corregits'},
+  {id:'cart15',s:'🏆',n:'15 Cartells',   d:'15 cartells corregits'},
+];
+
+const KEY='ex_cartells_v1';
+function defSt(){return{c:0,e:0,lletra:{c:0,e:0},accent:{c:0,e:0},castella:{c:0,e:0}};}
+function loadSt(){try{return Object.assign(defSt(),JSON.parse(localStorage.getItem(KEY)||'{}'));}catch{return defSt();}}
+function saveSt(s){localStorage.setItem(KEY,JSON.stringify(s));}
+
+function gStatsExtra(){
+  const s=loadSt();
+  const cats=[{k:'lletra',l:'Lletra'},{k:'accent',l:'Accent'},{k:'castella',l:'Castellà'}];
+  return '<div class="stats-grid">'+cats.map(c=>{
+    const st=s[c.k]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
+    return '<div class="stat-cell">'
+      +'<div class="stat-label">'+c.l+'</div>'
+      +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> / <span class="se">✗'+st.e+'</span></div>'
+      +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+      +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
+      +'</div>';
+  }).join('')+'</div>';
+}
+function gResetExtra(){const s=defSt();saveSt(s);}
+
+// ── Cartells data ─────────────────────────────────────────────────────────────
+// [[WORD]] marks the erroneous word (rendered with wavy underline via renderText)
+const CARTELLS=[
+  // ERRORS DE LLETRA
+  {theme:'teatre',  main:'GRAN [[TEATRA]] MUNICIPAL',      sub:'Espectacle de Nadal · 26 de desembre · 18 h',                              correct:'TEATRE',      type:'lletra',  exp:'La paraula «teatra» no existeix en català. El lloc on es fan obres d\'escena és el «teatre».'},
+  {theme:'musica',  main:'Escola de [[musika]]',            sub:'Classes de piano, guitarra i cant',   sub2:'Per a nens i adults · Tots els nivells',  correct:'música',      type:'lletra',  exp:'En català, el so [k] s\'escriu amb «c» (ca, co, cu) o «qu» (que, qui), mai «k». La paraula correcta és «música».'},
+  {theme:'circ',    main:'GRAN [[SIRC]] INTERNACIONAL',     sub:'Acròbates · Malabaristes · Animals',  sub2:'3 funcions diàries',                      correct:'CIRC',        type:'lletra',  exp:'La paraula correcta és «circ», amb «c» inicial, no «s».'},
+  {theme:'dansa',   main:'Escola de [[Dança]]',             sub:'Ballet · Jazz · Dansa contemporània', sub2:'Inscripcions obertes',                    correct:'Dansa',       type:'lletra',  exp:'En català, la paraula és «dansa». No porta ce trencada. La «ç» al mig seria un error.'},
+  {theme:'forn',    main:'Forn de Pa Cal Pau',              sub:'Obert de dilluns a [[dissapte]]',     sub2:'de 6:30 h fins a 13:30 h',                correct:'dissabte',    type:'lletra',  exp:'El dia correcte és «dissabte», amb «b» i «t» al final, no «dissapte».'},
+  {theme:'escola',  main:'Escola de [[Informatika]]',       sub:'Cursos de programació i robòtica',    sub2:'Per a nens de 6 a 14 anys',               correct:'Informàtica', type:'lletra',  exp:'La «k» no es fa servir en català per al so [k]. La paraula correcta és «Informàtica», amb «c» i accent a la «à».'},
+  // ERRORS D'ACCENT
+  {theme:'rest',         main:'Restaurant [[Familia]] Puig',   sub:'Cuina casolana de mercat',           sub2:'Menú del dia · Reserves: 93 000 00 00',   correct:'Família',     type:'accent',  exp:'«Família» és una paraula esdrúixola (accent a la 3a síl·laba des del final: «fà-mi-li-a») i porta accent a la «à».'},
+  {theme:'peix',         main:'Peix Fresc · [[Bacallá]]',      sub:'La millor qualitat del mercat',      sub2:'Obert de dimarts a dissabte',              correct:'Bacallà',     type:'accent',  exp:'«Bacallà» porta accent greu (`) sobre la darrera «a», no accent agut (´). En català les paraules agudes acabades en vocal porten accent greu.'},
+  {theme:'farmacia',     main:'[[Farmacia]] de Guàrdia',       sub:'Oberta les 24 hores',                sub2:'Per a urgències farmacèutiques',           correct:'Farmàcia',    type:'accent',  exp:'«Farmàcia» és una paraula esdrúixola («far-mà-ci-a») i porta accent a la «à». Sense accent és incorrecta.'},
+  {theme:'biblioteca',   main:'[[Bibliòteca]] Municipal',      sub:'Oberta de dilluns a dissabte',       sub2:'Préstec de llibres · Sala d\'estudi',      correct:'Biblioteca',  type:'accent',  exp:'«Biblioteca» és una paraula plana, sense accent. L\'accent en la «ò» és incorrecte: «bi-blio-te-ca».'},
+  {theme:'perruqueria',  main:'[[Perruquèria]] L\'Estrella',   sub:'Talls · Tenyit · Tractaments',       sub2:'Cita prèvia: 93 000 00 00',                correct:'Perruqueria', type:'accent',  exp:'«Perruqueria» és una paraula plana acabada en vocal, no porta accent. No s\'ha de confondre amb «família» o «farmàcia».'},
+  // ERRORS DE CASTELLÀ
+  {theme:'gimnàs',  main:'[[Siempre]] en forma!',            sub:'Gimnàs Municipal Can Biel',           sub2:'Obert tot l\'any · 7-22 h',               correct:'Sempre',  type:'castella',  exp:'«Siempre» és una paraula castellana. En català es diu «sempre».'},
+  {theme:'mercat',  main:'Fruites i [[cosas]] de l\'horta',  sub:'Directament del pagès',               sub2:'Cada dimecres i dissabte',                 correct:'coses',   type:'castella',  exp:'«Cosas» és castellà. En català es diu «coses».'},
+  {theme:'rest',    main:'[[Bienvenido]] al Restaurant Mas!', sub:'Cuina tradicional catalana',          sub2:'Obert cada dia · Reserves recomanades',   correct:'Benvingut', type:'castella', exp:'«Bienvenido» és castellà. En català es diu «benvingut».'},
+  {theme:'escola',  main:'[[Regalos]] per a tothom!',        sub:'Botiga de records i souvenirs',       sub2:'Obert cada dia',                           correct:'Regals',  type:'castella',  exp:'«Regalos» és castellà. En català es diu «regals».'},
+  {theme:'gimnàs',  main:'Escola de Futbol',                 sub:'Entrena com un [[campeon]]!',         sub2:'Inscripcions a la recepció',               correct:'campió',  type:'castella',  exp:'«Campeon» és castellà. En català es diu «campió».'},
+
+  // MÉS ERRORS DE LLETRA
+  {theme:'cinema',       main:'LA GRAN [[ABENTURA]]',            sub:'Nova pel·lícula d\'animació',         sub2:'A partir del 15 de juliol',                correct:'AVENTURA',    type:'lletra',  exp:'«Abentura» s\'escriu amb «v», no «b». En català, la paraula correcta és «aventura».'},
+  {theme:'biblioteca',   main:'Casa del [[Libre]]',              sub:'Llibres nous cada setmana',           sub2:'Obert tots els dies',                      correct:'Llibre',      type:'lletra',  exp:'«Libre» és incorrecte. En català, la paraula és «llibre», amb doble «l» inicial (ll).'},
+  {theme:'pastisseria',  main:'[[Pastelleria]] Can Dolç',        sub:'Pastissos · Croissants · Brioixos',  sub2:'Obert de dilluns a dissabte',              correct:'Pastisseria', type:'lletra',  exp:'La paraula correcta és «pastisseria», amb «ss» i «i». «Pastelleria» conté una lletra equivocada.'},
+  {theme:'zoo',          main:'Zoo de la Natura',                sub:'Avui visita la [[jirafa]]!',          sub2:'Obert de 10 a 19 h · Tots els dies',      correct:'girafa',      type:'lletra',  exp:'En català, l\'animal es diu «girafa», amb «g» inicial. La «j» és un error: «jirafa» és castellà.'},
+  {theme:'jogueteria',   main:'Taller de [[Bisikleta]]',         sub:'Aprèn a muntar i reparar',            sub2:'Per a nens de 6 a 12 anys',                correct:'bicicleta',   type:'lletra',  exp:'«Bisikleta» conté dues faltes: s\'escriu «bicicleta», amb «c» i sense «k».'},
+
+  // MÉS ERRORS D'ACCENT
+  {theme:'museu',        main:'Museu d\'[[Historia]] Local',     sub:'Exposicions permanents i temporals',  sub2:'Entrada gratuïta els diumenges',           correct:'Història',    type:'accent',  exp:'«Història» és una paraula esdrúixola («His-tò-ri-a»), amb accent a la «ò». Sense accent és incorrecte.'},
+  {theme:'circ',         main:'La Nit [[Magica]]',               sub:'Espectacle de màgia i il·lusionisme', sub2:'Dissabtes a les 20 h',                    correct:'Màgica',      type:'accent',  exp:'«Màgica» és una paraula esdrúixola («mà-gi-ca»). Porta accent a la primera síl·laba: «à».'},
+  {theme:'jogueteria',   main:'Taller de [[Comic]]',             sub:'Dibuixa els teus superherois',        sub2:'Cada dissabte · places limitades',         correct:'Còmic',       type:'accent',  exp:'«Còmic» és una paraula plana acabada en consonant, amb accent a la «ò». Sense accent, la pronunciació seria errònia.'},
+  {theme:'gimnàs',       main:'Festival [[Olimpic]] Escolar',    sub:'Curses · Salts · Llançaments',        sub2:'Dijous 22 de maig a les 10 h',             correct:'Olímpic',     type:'accent',  exp:'«Olímpic» és una paraula esdrúixola («o-lím-pic»). Porta accent a la «í». Sense accent és incorrecte.'},
+  {theme:'museu',        main:'[[Aquatica]] World',              sub:'El parc aquàtic més gran!',           sub2:'Obert del 15 de juny al 15 de setembre',   correct:'Aquàtica',    type:'accent',  exp:'«Aquàtica» és una paraula esdrúixola («a-quà-ti-ca»). Porta accent a la «à». «Aquatica» sense accent és incorrecte.'},
+
+  // MÉS ERRORS DE CASTELLÀ
+  {theme:'rest',         main:'Menú de [[verano]]',              sub:'Amanida · Arròs · Fruita',            sub2:'12 € · De dilluns a divendres',            correct:'estiu',   type:'castella',  exp:'«Verano» és castellà. En català, l\'estació càlida es diu «estiu».'},
+  {theme:'mercat',       main:'[[Precio]]: 2 € el quilo',        sub:'Tomàquets ecològics de l\'horta',     sub2:'Mercat setmanal · Dimecres i dissabte',    correct:'Preu',    type:'castella',  exp:'«Precio» és castellà. En català es diu «preu».'},
+  {theme:'escola',       main:'Activitats per a [[niños]]',      sub:'Teatre, dansa i pintura',             sub2:'Del 1 al 31 d\'agost',                     correct:'nens',    type:'castella',  exp:'«Niños» és castellà. En català es diu «nens» (o «infants»).'},
+  {theme:'jogueteria',   main:'[[Juguetes]] per a tothom!',      sub:'La millor selecció de la ciutat',     sub2:'Obert cada dia de 10 a 20 h',              correct:'Joguines', type:'castella', exp:'«Juguetes» és castellà. En català es diu «joguines».'},
+  {theme:'cinema',       main:'Compra les teves [[palomitas]]!',     sub:'Cinema del Centre',               sub2:'Projeccions diàries a les 17 h i 20 h',    correct:'crispetes', type:'castella', exp:'«Palomitas» és castellà. En català, les boletes de blat de moro fregit es diuen «crispetes».'},
+];
+
+// ── Build sign HTML ───────────────────────────────────────────────────────────
+function renderText(str){
+  return str.replace(/\[\[(.+?)\]\]/g,'<span class="err-word">$1</span>');
+}
+function buildSign(c){
+  const sub2H = c.sub2 ? `<div class="sign-sub2">${renderText(c.sub2)}</div>` : '';
+  return `<div class="sign sign-${c.theme}">
+    <div class="sign-main">${renderText(c.main)}</div>
+    ${c.sub ? `<div class="sign-sub">${renderText(c.sub)}</div>` : ''}
+    ${sub2H}
+  </div>`;
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let cFilter='all', cPool=[], cIdx=0, cAnswered=false, cCounted=false;
+
+function setFilter(f){
+  cFilter=f;
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
+  buildPool();
+  nextCartell();
+}
+
+function buildPool(){
+  const all=f=>f==='all'?CARTELLS:CARTELLS.filter(c=>c.type===f);
+  cPool=all(cFilter).slice();
+  // shuffle
+  for(let i=cPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cPool[i],cPool[j]]=[cPool[j],cPool[i]];}
+  cIdx=0;
+}
+
+function currentCartell(){ return cPool[cIdx % cPool.length]; }
+
+function nextCartell(){
+  if(cIdx>0||cAnswered) cIdx++;
+  cAnswered=false; cCounted=false;
+  const c=currentCartell();
+  document.getElementById('sign-container').innerHTML=buildSign(c);
+  const inp=document.getElementById('ans');
+  inp.value=''; inp.className='ans-inp';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('check-btn').style.display='';
+  inp.focus({preventScroll:true});
+}
+
+// ── Check ─────────────────────────────────────────────────────────────────────
+const BADGE_LBL={lletra:'Error de lletra',accent:'Error d\'accent',castella:'Mot castellà'};
+const BADGE_CLS={lletra:'type-lletra',accent:'type-accent',castella:'type-castella'};
+
+function checkAnswer(){
+  if(cAnswered) return;
+  const c=currentCartell();
+  const inp=document.getElementById('ans');
+  const fb=document.getElementById('feedback');
+  const raw=inp.value.trim();
+  if(!raw){ fb.textContent='Escriu la resposta!'; fb.className='fb ko'; fb.style.display='block'; return; }
+
+  const badge=`<span class="type-badge ${BADGE_CLS[c.type]}">${BADGE_LBL[c.type]}</span>`;
+  const isOk = raw.toLowerCase() === c.correct.toLowerCase();
+  inp.className='ans-inp '+(isOk?'ok':'ko');
+  cAnswered=true;
+
+  if(isOk){
+    fb.innerHTML=badge+'<br>✓ Correcte! '+c.exp;
+    fb.className='fb ok';
+    if(!cCounted){
+      const s=loadSt(); s.c++; (s[c.type]=s[c.type]||{c:0,e:0}).c++;
+      saveSt(s);
+      gCorrect(5,tryA=>{
+        tryA('cart1',s.c>=1);
+        tryA('cart5',s.c>=5);
+        tryA('cart15',s.c>=15);
+      });
+      cCounted=true;
+    }
+    document.getElementById('check-btn').style.display='none';
+  } else {
+    fb.innerHTML=badge+'<br>✗ La forma correcta és: <strong>'+c.correct+'</strong>. '+c.exp;
+    fb.className='fb ko';
+    if(!cCounted){
+      const s=loadSt(); s.e++; (s[c.type]=s[c.type]||{c:0,e:0}).e++;
+      saveSt(s); gWrong(); cCounted=true;
+    }
+  }
+  fb.style.display='block';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildPool();
+nextCartell();
+gRender();
+</script>
+</div>
+</body>
+</html>

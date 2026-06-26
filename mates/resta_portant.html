@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resta Portant-ne</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.card{padding:18px}
+.streak-row{text-align:center;font-size:.88rem;color:var(--m);margin-bottom:12px}
+.streak-row b{color:#f59e0b}
+.op-center{display:flex;justify-content:center;margin:10px 0 4px}
+.op-outer{display:flex;align-items:flex-start;font-family:'Courier New',monospace}
+.sign-col{display:flex;flex-direction:column;width:30px;align-items:flex-end;padding-right:3px}
+.sign-col .sr{display:flex;align-items:center;justify-content:flex-end}
+.sign-col .sr.brw{height:34px}
+.sign-col .sr.min{height:60px}
+.sign-col .sr.sub{height:60px;font-size:2.2rem;font-weight:700;color:#dc2626}
+.sign-col .sr.dv{height:11px}
+.sign-col .sr.ans{height:66px}
+.sign-col .sr.lbl{height:22px}
+.digit-cols{display:flex}
+.dcol{display:flex;flex-direction:column;align-items:center;width:58px}
+.dcol .sr{display:flex;align-items:center;justify-content:center}
+.dcol .sr.brw{height:34px}
+.dcol .sr.min{height:60px}
+.dcol .sr.sub{height:60px;font-size:2.2rem;font-weight:700}
+.dcol .sr.dv{height:11px;width:100%}
+.dcol .sr.ans{height:66px}
+.dcol .sr.lbl{height:22px;font-family:'Segoe UI',sans-serif;font-size:.7rem;font-weight:800;color:#94a3b8;letter-spacing:.6px}
+.brw-btn{width:26px;height:26px;border:2px dashed #fca5a5;border-radius:6px;background:#fff5f5;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:transparent;transition:all .15s;user-select:none;line-height:1}
+.brw-btn:hover{border-color:#f87171;background:#fff0f0}
+.brw-btn.on{border-style:solid;border-color:#dc2626;background:#fee2e2;color:#dc2626}
+.min-wrap{display:inline-flex;align-items:flex-start;font-weight:700}
+.sup-r,.sup-b{font-size:1.1rem;font-weight:900;color:#dc2626;line-height:1;margin-right:2px;padding-top:2px;display:none}
+.main-d{font-size:2.2rem;font-weight:700;line-height:1.25}
+.main-d.crossed{text-decoration:line-through;color:#6b7280}
+.ans-inp{width:52px;height:58px;text-align:center;font-size:2rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:10px;color:var(--a);background:var(--bg);outline:none;padding:0;transition:border-color .15s,background .15s;-moz-appearance:textfield}
+.ans-inp::-webkit-inner-spin-button,.ans-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.ans-inp:focus{border-color:var(--a);background:#eff6ff}
+.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+#feedback{text-align:center;font-size:1rem;font-weight:600;padding:10px 14px;border-radius:10px;margin:10px 0;display:none}
+#feedback.ok{background:#f0fdf4;color:var(--ok)}
+#feedback.ko{background:#fef2f2;color:var(--ko)}
+.btn-primary{background:var(--a);color:#fff}
+.btn-danger{background:transparent;color:var(--ko);border:1.5px solid #fecaca;font-size:.82rem;padding:8px 14px;min-height:38px}
+.btn-danger:hover{background:#fef2f2}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr"><h1>Resta Portant-ne</h1></div>
+<div id="gam-bar"></div>
+
+<div class="card">
+  <div class="diff-row">
+    <button class="dbtn" data-d="2" onclick="setMode(2)">2 xifres</button>
+    <button class="dbtn" data-d="3" onclick="setMode(3)">3 xifres</button>
+    <button class="dbtn" data-d="4" onclick="setMode(4)">4 xifres</button>
+    <button class="dbtn" data-d="5" onclick="setMode(5)">5 xifres</button>
+    <button class="dbtn active" data-d="0" onclick="setMode(0)">Auto</button>
+  </div>
+
+  <div class="op-center">
+    <div id="opWrap" class="op-outer"></div>
+  </div>
+
+  <div id="feedback"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="checkBtn" onclick="checkAnswer()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="nextBtn" onclick="nextExercise()">Següent →</button>
+  </div>
+</div>
+
+
+<script src="../shared.js"></script>
+<script>
+GAM_ACHS=[
+  {id:'first',s:'🌟',n:'Primer Encert',d:'Primera resposta correcta'},
+  {id:'s3',s:'🔥',n:'Ratxa x3',d:'3 encerts seguits'},
+  {id:'s5',s:'⚡',n:'Ratxa x5',d:'5 encerts seguits'},
+  {id:'s10',s:'⚡',n:'Ratxa x10',d:'10 encerts seguits'},
+  {id:'ok50',s:'🥉',n:'50 Encerts',d:'50 respostes correctes'},
+  {id:'ok200',s:'🥈',n:'200 Encerts',d:'200 respostes correctes'},
+  {id:'ok500',s:'🏆',n:'500 Encerts',d:'500 respostes correctes'}
+];
+const EXER_KEY='resta_portant_v1';
+function gResetExtra(){location.reload();}
+function gStatsExtra(){
+  const s=loadStats();
+  const digitH=[2,3,4,5].map(function(d){
+    const st=s['d'+d]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
+    return '<div class="stat-cell">'
+      +'<div class="stat-label">'+d+' XIF.</div>'
+      +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+      +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+      +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
+      +'</div>';
+  }).join('');
+  return '<div class="stats-grid">'+digitH+'</div>';
+}
+
+const KEY=EXER_KEY;
+let cA, cB, cResult, cDigits, answered=false, counted=false, mode=0;
+
+// ── Storage ───────────────────────────────────────────────────────────────────
+function defStats(){return{d2:{c:0,e:0},d3:{c:0,e:0},d4:{c:0,e:0},d5:{c:0,e:0},streak:0,total:0}}
+function loadStats(){try{return Object.assign(defStats(),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch{return defStats()}}
+function saveStats(s){localStorage.setItem(KEY,JSON.stringify(s))}
+// ── Stats display ─────────────────────────────────────────────────────────────
+function updateStatsDisplay(){gRender();}
+
+// ── Adaptive difficulty ───────────────────────────────────────────────────────
+function selectDifficulty(){
+  if(mode!==0)return mode;
+  const s=loadStats(),diffs=[2,3,4,5];
+  const w=diffs.map(d=>{const st=s['d'+d]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5});
+  const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
+  for(let i=0;i<diffs.length;i++){r-=w[i];if(r<=0)return diffs[i];}
+  return 5;
+}
+
+// ── Exercise generation ───────────────────────────────────────────────────────
+function needsBorrow(a,b){
+  const as=String(a),bs=String(b).padStart(as.length,'0');
+  let carry=0;
+  for(let i=as.length-1;i>=0;i--){
+    const ad=parseInt(as[i]),bd=parseInt(bs[i])+carry;
+    if(ad<bd){carry=1;return true;}
+    carry=0;
+  }
+  return false;
+}
+function generate(digits){
+  const mn=Math.pow(10,digits-1),mx=Math.pow(10,digits)-1;
+  let a,b,tries=0;
+  do{
+    a=mn+Math.floor(Math.random()*(mx-mn+1));
+    b=mn+Math.floor(Math.random()*(a-mn));
+    tries++;if(tries>200){b=Math.floor(a*0.4)+mn;break;}
+  }while(!needsBorrow(a,b)||a-b<mn);
+  return{a,b,result:a-b};
+}
+
+// ── Build column layout ───────────────────────────────────────────────────────
+function buildOp(a,b){
+  const as=String(a),bs=String(b).padStart(as.length,'0'),n=as.length;
+  const lblAll=['DM','M','C','D','U'],labels=lblAll.slice(5-n);
+
+  // Sign column (empty cells matching digit-column row heights)
+  let html=`<div class="sign-col">
+    <div class="sr brw"></div>
+    <div class="sr min"></div>
+    <div class="sr sub">−</div>
+    <div class="sr dv"></div>
+    <div class="sr ans"></div>
+    <div class="sr lbl"></div>
+  </div>`;
+
+  html+=`<div class="digit-cols">`;
+  for(let i=0;i<n;i++){
+    const dm=parseInt(as[i]); // minuend digit (original)
+    html+=`<div class="dcol">`;
+
+    // ── Borrow toggle button (not for leftmost — nothing to borrow from) ──
+    if(i>0){
+      html+=`<div class="sr brw">
+        <div class="brw-btn" id="brw-${i}" onclick="toggleBorrow(${i})" data-on="0">✓</div>
+      </div>`;
+    }else{
+      html+=`<div class="sr brw"></div>`;
+    }
+
+    // ── Minuend digit with two optional superscripts ──────────────────────
+    // sup-r-i: reduced value (dm−1), shown when column i+1 borrows FROM this col
+    // sup-b-i: "1", shown when THIS column i borrows (btn i is ON)
+    html+=`<div class="sr min"><div class="min-wrap">
+      <span class="sup-b" id="sup-b-${i}">1</span>
+      <span class="sup-r" id="sup-r-${i}">${dm>0?dm-1:9}</span>
+      <span class="main-d" id="md-${i}">${dm}</span>
+    </div></div>`;
+
+    // ── Subtrahend digit (no +1 label) ───────────────────────────────────
+    html+=`<div class="sr sub">${bs[i]}</div>`;
+
+    // ── Divider ───────────────────────────────────────────────────────────
+    html+=`<div class="sr dv"><div class="dvline"></div></div>`;
+
+    // ── Answer input ──────────────────────────────────────────────────────
+    html+=`<div class="sr ans"><input class="ans-inp" id="ans-${i}" maxlength="1" inputmode="numeric"></div>`;
+
+    // ── Label BELOW answer ────────────────────────────────────────────────
+    html+=`<div class="sr lbl">${labels[i]}</div>`;
+
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+
+  document.getElementById('opWrap').innerHTML=html;
+  for(let i=0;i<n;i++) wireAns(i,n);
+}
+
+// ── Toggle borrow for column i ────────────────────────────────────────────────
+// When ON: show "1" to the left of minuend[i] (it borrowed → effective value = digit+10)
+//          show (digit−1) to the left of minuend[i−1] (it gave away a ten)
+function toggleBorrow(i){
+  const btn=document.getElementById('brw-'+i);
+  const on=btn.dataset.on==='1';
+  btn.dataset.on=on?'0':'1';
+  btn.classList.toggle('on',!on);
+
+  // "1" prefix on this column's minuend
+  document.getElementById('sup-b-'+i).style.display=on?'none':'inline';
+
+  // Reduced value (digit−1) on left-neighbour's minuend + strikethrough on original
+  const supR=document.getElementById('sup-r-'+(i-1));
+  const mainD=document.getElementById('md-'+(i-1));
+  if(supR) supR.style.display=on?'none':'inline';
+  if(mainD) mainD.classList.toggle('crossed',!on);
+}
+
+// ── Wire answer input navigation ──────────────────────────────────────────────
+function wireAns(i,n){
+  const inp=document.getElementById('ans-'+i);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){checkAnswer();return;}
+    if(e.key==='ArrowLeft'||(e.key==='Backspace'&&inp.value==='')){
+      if(i>0){e.preventDefault();document.getElementById('ans-'+(i-1)).focus();}
+      return;
+    }
+    if(e.key==='ArrowRight'){
+      if(i<n-1){e.preventDefault();document.getElementById('ans-'+(i+1)).focus();}
+      return;
+    }
+    if(e.key.length===1&&!/\d/.test(e.key))e.preventDefault();
+  });
+  inp.addEventListener('input',()=>{
+    if(inp.value.length>1)inp.value=inp.value.slice(-1);
+    if(!/^\d?$/.test(inp.value)){inp.value='';return;}
+    if(inp.value.length===1&&i<n-1) document.getElementById('ans-'+(i+1)).focus();
+  });
+}
+
+// ── Check answer ──────────────────────────────────────────────────────────────
+function checkAnswer(){
+  if(answered)return;
+  const n=String(cA).length;
+  let ansStr='';
+  for(let i=0;i<n;i++) ansStr+=document.getElementById('ans-'+i).value;
+  const fb=document.getElementById('feedback');
+  if(ansStr.length<n||ansStr.includes(' ')){
+    fb.textContent='Omple tots els dígits!';fb.className='ko';fb.style.display='block';return;
+  }
+  const val=parseInt(ansStr),key='d'+cDigits;
+  const resStr=String(cResult).padStart(n,'0');
+  for(let i=0;i<n;i++){
+    const inp=document.getElementById('ans-'+i);
+    inp.className='ans-inp '+(inp.value===resStr[i]?'ok':'ko');
+  }
+  if(val===cResult){
+    answered=true;
+    fb.textContent='✓ Molt bé! Correcte!';fb.className='ok';
+    if(!counted){
+      const s=loadStats();s.total=(s.total||0)+1;
+      s[key].c=(s[key].c||0)+1;s.streak=(s.streak||0)+1;
+      saveStats(s);updateStatsDisplay();gCorrect(3);counted=true;
+    }
+    fb.style.display='block';
+    document.getElementById('checkBtn').style.display='none';
+  }else{
+    fb.textContent=`✗ Revisa els dígits en vermell.`;fb.className='ko';
+    if(!counted){
+      const s=loadStats();s.total=(s.total||0)+1;
+      s[key].e=(s[key].e||0)+1;s.streak=0;
+      saveStats(s);updateStatsDisplay();gWrong();counted=true;
+    }
+    fb.style.display='block';
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function setMode(d){
+  mode=d;
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('active',+b.dataset.d===d));
+  nextExercise();
+}
+function nextExercise(){
+  answered=false;counted=false;
+  const d=selectDifficulty();cDigits=d;
+  const ex=generate(d);cA=ex.a;cB=ex.b;cResult=ex.result;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('feedback').className='';
+  document.getElementById('checkBtn').style.display='';
+  buildOp(cA,cB);
+  document.getElementById('ans-0').focus();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+nextExercise();
+gRender();
+</script>
+</div>
+</body>
+</html>

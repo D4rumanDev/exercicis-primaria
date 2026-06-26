@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hobbies &amp; Likes</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.act-card{display:flex;flex-direction:column;align-items:center;gap:8px;margin:10px 0}
+.act-icon{font-size:3rem;line-height:1}
+.act-hint{font-size:.9rem;color:var(--m);text-align:center;max-width:300px;line-height:1.5}
+
+.like-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--b)}
+.like-row:last-child{border-bottom:none}
+.like-icon{font-size:2rem;min-width:2.2rem;text-align:center}
+.like-face{font-size:1.6rem;min-width:2rem;text-align:center}
+.like-label{font-size:.93rem;font-weight:600;color:var(--t);flex:1;font-style:italic}
+
+.pref-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.87rem}
+.pref-table th{background:#f0f4ff;padding:7px 10px;text-align:left;font-weight:700;color:var(--a);border-bottom:2px solid var(--b)}
+.pref-table td{padding:6px 10px;border-bottom:1px solid var(--b)}
+.pref-table td:not(:first-child){text-align:center}
+
+.q-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b)}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-sent{font-size:.93rem;font-weight:500;margin-bottom:8px;line-height:1.5}
+.blank{color:var(--a);font-weight:800}
+
+.err-sent{font-size:.95rem;font-weight:500;background:#fff3f3;border-left:3px solid #ef4444;
+  padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:10px;line-height:1.6;color:var(--t)}
+.err-sent em{color:#ef4444;font-style:normal;font-weight:800;text-decoration:underline wavy red}
+
+.done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;
+  border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Hobbies &amp; Likes</h1>
+    <div class="muted">Unit 5 · Gerunds · I like / don't like · He/She likes</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<!-- ── 1: What's the activity? ── -->
+<div class="card">
+  <h2><span class="num">1</span> What's the activity?</h2>
+  <p class="card-sub">Look at the emoji and choose the correct activity.</p>
+  <div class="act-card" id="s1-card"></div>
+  <div class="opts-row" id="s1-opts"></div>
+  <div class="fb" id="s1-fb"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s1-next" onclick="s1Next()" style="display:none">Next ▶</button>
+  </div>
+  <div id="s1-done" class="done-banner" style="display:none">
+    All activities done! ✓ <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="s1Init()">Again</button>
+  </div>
+</div>
+
+<!-- ── 2: I like / I don't like ── -->
+<div class="card">
+  <h2><span class="num">2</span> I like / I don't like</h2>
+  <p class="card-sub">Look at the face emoji and choose the correct sentence.</p>
+  <div id="s2-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s2Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 3: True or False? ── -->
+<div class="card">
+  <h2><span class="num">3</span> True or False?</h2>
+  <p class="card-sub">Look at Anna's hobbies and decide if the sentences are true or false.</p>
+  <table class="pref-table" id="s3-table"></table>
+  <div id="s3-qs" style="margin-top:14px"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s3Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 4: Likes or doesn't like? ── -->
+<div class="card">
+  <h2><span class="num">4</span> Likes or doesn't like?</h2>
+  <p class="card-sub">Look at the table and complete the sentences about Josh and Lily.</p>
+  <table class="pref-table" id="s4-table"></table>
+  <div id="s4-qs" style="margin-top:14px"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s4Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 5: Spot the error ── -->
+<div class="card">
+  <h2><span class="num">5</span> Spot the error!</h2>
+  <p class="card-sub">The underlined word is wrong. Choose the correct sentence.</p>
+  <div id="s5-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s5Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 6: Choose the correct word ── -->
+<div class="card">
+  <h2><span class="num">6</span> Choose the correct word</h2>
+  <p class="card-sub">Fill in the blank with the correct form.</p>
+  <div id="s6-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s6Init()">New questions ▶</button>
+  </div>
+</div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+const ENOK = ["Well done! ⭐","Excellent! 🎉","Great job! 🌟","Perfect! 🏆","Amazing! 💪","Fantastic! 🎊"];
+const ENKO = ["Try again!","Not quite...","Almost there!","Have another go!"];
+
+const EXER_KEY = 'ex_ang_act_v1';
+GAM_ACHS = [...GAM_ACHS,
+  {id:'ang_act1',  s:'🎯', n:'Hobby Hunter',  d:'First hobbies question correct'},
+  {id:'ang_act5',  s:'🎭', n:'Activity Star',  d:'5 hobbies questions correct'},
+  {id:'ang_act20', s:'🏅', n:'Hobby Champion', d:'20 hobbies questions correct'},
+];
+
+function actOk(xp) {
+  const e = eLoad(); e.ok = (e.ok||0) + 1; eSave(e);
+  gCorrect(xp||3, tryA => {
+    tryA('ang_act1',  e.ok >= 1);
+    tryA('ang_act5',  e.ok >= 5);
+    tryA('ang_act20', e.ok >= 20);
+  });
+}
+
+/* ── Data ── */
+const ACTIVITIES = [
+  {gerund:'rollerskating',       icon:'🛼', hint:'You put special boots on your feet and glide.'},
+  {gerund:'dancing',             icon:'💃', hint:'You move your body to the rhythm of music.'},
+  {gerund:'shopping',            icon:'🛒', hint:'You go to the shops and buy things.'},
+  {gerund:'playing the violin',  icon:'🎻', hint:'You play a stringed musical instrument with a bow.'},
+  {gerund:'painting pictures',   icon:'🎨', hint:'You use colours and a brush to make art.'},
+  {gerund:'reading comics',      icon:'📖', hint:'You read illustrated stories with speech bubbles.'},
+  {gerund:'collecting stickers', icon:'⭐', hint:'You keep and organise small sticky pictures.'},
+  {gerund:'going to museums',    icon:'🏛️', hint:'You visit a place full of art, history or science.'},
+  {gerund:'taking photos',       icon:'📷', hint:'You use a camera to capture special moments.'},
+  {gerund:'using a computer',    icon:'💻', hint:'You type, browse the internet or play online games.'},
+  {gerund:'playing tennis',      icon:'🎾', hint:'You hit a ball over a net using a racket.'},
+  {gerund:'watching films',      icon:'🎬', hint:'You sit down and enjoy a movie.'},
+  {gerund:'listening to music',  icon:'🎵', hint:'You enjoy songs through headphones or speakers.'},
+  {gerund:'cooking',             icon:'🍳', hint:'You prepare and make food in the kitchen.'},
+];
+
+const ANNA = [
+  {act:'dancing',            likes:true},
+  {act:'rollerskating',      likes:false},
+  {act:'taking photos',      likes:true},
+  {act:'playing the violin', likes:false},
+  {act:'cooking',            likes:true},
+  {act:'shopping',           likes:false},
+  {act:'going to museums',   likes:true},
+  {act:'watching films',     likes:false},
+  {act:'listening to music', likes:true},
+  {act:'collecting stickers',likes:false},
+];
+
+const CHARS = [
+  {name:'Josh', acts:{
+    'playing tennis':true,'watching films':true,'cooking':true,'using a computer':true,
+    'shopping':false,'dancing':false,'painting pictures':false,
+    'reading comics':false,'listening to music':false,
+  }},
+  {name:'Lily', acts:{
+    'dancing':true,'painting pictures':true,'reading comics':true,
+    'listening to music':true,'going to museums':true,
+    'playing tennis':false,'shopping':false,'using a computer':false,
+    'watching films':false,'cooking':false,
+  }},
+];
+const CHAR_ACTS = ['playing tennis','watching films','cooking','dancing','painting pictures',
+                   'reading comics','shopping','using a computer','listening to music'];
+
+const ERROR_POOL = [
+  {wrong:'She <em>collecting</em> stickers.',
+   correct:"She likes collecting stickers.",
+   opts:["She likes collecting stickers.","She like collecting stickers.","She is collecting stickers."]},
+  {wrong:'He <em>like</em> dancing.',
+   correct:"He likes dancing.",
+   opts:["He likes dancing.","He do like dancing.","He is like dancing."]},
+  {wrong:'I <em>likes</em> reading comics.',
+   correct:"I like reading comics.",
+   opts:["I like reading comics.","I am like reading comics.","I do likes reading comics."]},
+  {wrong:'Does he <em>likes</em> taking photos?',
+   correct:"Does he like taking photos?",
+   opts:["Does he like taking photos?","Do he likes taking photos?","Does he is like taking photos?"]},
+  {wrong:"She <em>doesn't likes</em> cooking.",
+   correct:"She doesn't like cooking.",
+   opts:["She doesn't like cooking.","She don't like cooking.","She isn't like cooking."]},
+  {wrong:'Do you <em>likes</em> watching films?',
+   correct:"Do you like watching films?",
+   opts:["Do you like watching films?","Does you like watching films?","Are you like watching films?"]},
+  {wrong:"He <em>doesn't</em> dancing.",
+   correct:"He doesn't like dancing.",
+   opts:["He doesn't like dancing.","He doesn't to dance.","He isn't dancing."]},
+  {wrong:'Does she <em>likes</em> painting pictures?',
+   correct:"Does she like painting pictures?",
+   opts:["Does she like painting pictures?","Do she like painting pictures?","Does she likes painting pictures?"]},
+  {wrong:'They <em>likes</em> listening to music.',
+   correct:"They like listening to music.",
+   opts:["They like listening to music.","They does like listening to music.","They is like listening to music."]},
+  {wrong:"Do she <em>like</em> dancing?",
+   correct:"Does she like dancing?",
+   opts:["Does she like dancing?","Does she likes dancing?","Do she likes dancing?"]},
+  {wrong:"He <em>don't</em> like painting pictures.",
+   correct:"He doesn't like painting pictures.",
+   opts:["He doesn't like painting pictures.","He don't like painting pictures.","He isn't like painting pictures."]},
+  {wrong:"Do they <em>likes</em> rollerskating?",
+   correct:"Do they like rollerskating?",
+   opts:["Do they like rollerskating?","Does they like rollerskating?","Do they likes rollerskating?"]},
+  {wrong:"I <em>doesn't</em> like using a computer.",
+   correct:"I don't like using a computer.",
+   opts:["I don't like using a computer.","I doesn't like using a computer.","I am not like using a computer."]},
+  {wrong:"She <em>is like</em> taking photos.",
+   correct:"She likes taking photos.",
+   opts:["She likes taking photos.","She like taking photos.","She is like taking photos."]},
+  {wrong:"Does they <em>like</em> reading comics?",
+   correct:"Do they like reading comics?",
+   opts:["Do they like reading comics?","Does they like reading comics?","Do they likes reading comics?"]},
+];
+
+const GRAMMAR_POOL = [
+  {sent:"Does he ___ dancing?",          opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"She ___ like cooking.",          opts:["doesn't","don't","isn't","aren't"],    correct:"doesn't"},
+  {sent:"I ___ rollerskating.",           opts:["like","likes","is like","am like"],    correct:"like"},
+  {sent:"He ___ playing tennis.",         opts:["likes","like","is likes","do likes"],  correct:"likes"},
+  {sent:"Do you ___ taking photos?",      opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"She doesn't ___ shopping.",      opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"They ___ collecting stickers.",  opts:["like","likes","is like","does like"],  correct:"like"},
+  {sent:"Does she ___ painting?",         opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"We ___ watching films.",         opts:["like","likes","is like","am like"],    correct:"like"},
+  {sent:"He ___ like dancing.",           opts:["doesn't","don't","isn't","aren't"],    correct:"doesn't"},
+  {sent:"I don't ___ reading comics.",    opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"She ___ taking photos.",         opts:["likes","like","is likes","do likes"],  correct:"likes"},
+  {sent:"Does Lily ___ using a computer?",opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"Josh ___ like shopping.",        opts:["doesn't","don't","isn't","aren't"],    correct:"doesn't"},
+  {sent:"___ you like dancing?",          opts:["Do","Does","Are","Is"],                correct:"Do"},
+  {sent:"He ___ like cooking.",           opts:["doesn't","don't","isn't","aren't"],    correct:"doesn't"},
+  {sent:"They don't ___ watching films.", opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"___ she like collecting stickers?", opts:["Does","Do","Is","Are"],            correct:"Does"},
+  {sent:"We ___ playing tennis.",         opts:["like","likes","is like","am like"],    correct:"like"},
+  {sent:"She ___ like rollerskating.",    opts:["doesn't","don't","isn't","aren't"],    correct:"doesn't"},
+  {sent:"Does he ___ reading comics?",    opts:["like","likes","liked","liking"],       correct:"like"},
+  {sent:"Anna ___ going to museums.",     opts:["likes","like","is likes","do like"],   correct:"likes"},
+];
+
+/* ══ SECTION 1 ══ */
+let s1Queue = [], s1Idx = 0;
+function s1Init() {
+  s1Queue = sh([...ACTIVITIES]); s1Idx = 0;
+  document.getElementById('s1-done').style.display = 'none';
+  s1Show();
+}
+function s1Show() {
+  const nextBtn = document.getElementById('s1-next');
+  if (s1Idx >= s1Queue.length) {
+    document.getElementById('s1-card').innerHTML = '';
+    document.getElementById('s1-opts').innerHTML = '';
+    document.getElementById('s1-fb').className = 'fb';
+    nextBtn.style.display = 'none';
+    document.getElementById('s1-done').style.display = 'block';
+    return;
+  }
+  const it = s1Queue[s1Idx];
+  document.getElementById('s1-card').innerHTML =
+    `<div class="act-icon">${it.icon}</div><div class="act-hint">${it.hint}</div>`;
+  document.getElementById('s1-fb').className = 'fb';
+  nextBtn.style.display = 'none';
+  const opts = sh([it.gerund, ...sh(ACTIVITIES.filter(a => a.gerund !== it.gerund)).slice(0,3).map(a => a.gerund)]);
+  const od = document.getElementById('s1-opts'); od.innerHTML = '';
+  opts.forEach(o => {
+    const b = document.createElement('button'); b.className = 'aopt'; b.textContent = o;
+    b.onclick = () => {
+      od.querySelectorAll('.aopt').forEach(x => x.disabled = true);
+      const ok = o === it.gerund; b.classList.add(ok ? 'ok' : 'ko');
+      if (!ok) od.querySelectorAll('.aopt').forEach(x => { if (x.textContent === it.gerund) x.classList.add('show'); });
+      const fb = document.getElementById('s1-fb');
+      fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+      fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + it.gerund;
+      ok ? actOk(3) : gWrong();
+      nextBtn.style.display = 'inline-block';
+    };
+    od.appendChild(b);
+  });
+}
+function s1Next() { s1Idx++; s1Show(); }
+
+/* ══ SECTION 2 ══ */
+let s2Current = [];
+function s2Init() {
+  s2Current = sh([...ACTIVITIES]).slice(0, 5).map(a => ({...a, likes: Math.random() < .5}));
+  document.getElementById('s2-qs').innerHTML = s2Current.map((q, i) => `
+    <div class="q-block">
+      <div class="like-row">
+        <span class="like-icon">${q.icon}</span>
+        <span class="like-face">${q.likes ? '😊' : '😞'}</span>
+        <span class="like-label">${q.gerund}</span>
+      </div>
+      <div class="opts-row" id="s2o${i}">
+        <button class="aopt" onclick="s2Ans(this,${i},0)">I like ${q.gerund}.</button>
+        <button class="aopt" onclick="s2Ans(this,${i},1)">I don't like ${q.gerund}.</button>
+      </div>
+      <div class="fb" id="s2fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s2Ans(btn, i, choice) {
+  document.querySelectorAll('#s2o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 0) === s2Current[i].likes; btn.classList.add(ok ? 'ok' : 'ko');
+  const correct = s2Current[i].likes
+    ? `I like ${s2Current[i].gerund}.`
+    : `I don't like ${s2Current[i].gerund}.`;
+  if (!ok) document.querySelectorAll('#s2o'+i+' .aopt').forEach(b => { if (b.textContent === correct) b.classList.add('show'); });
+  const fb = document.getElementById('s2fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : correct;
+  ok ? actOk(2) : gWrong();
+}
+
+/* ══ SECTION 3 ══ */
+let s3Current = [];
+function s3Init() {
+  const visible = sh([...ANNA]).slice(0, 6);
+  document.getElementById('s3-table').innerHTML =
+    '<tr><th>Activity</th><th>Anna</th></tr>'
+    + visible.map(r => `<tr><td>${r.act}</td><td>${r.likes ? '😊' : '😞'}</td></tr>`).join('');
+  const pool = [];
+  visible.forEach(r => {
+    pool.push({stmt:`Anna likes ${r.act}.`,        ans:r.likes});
+    pool.push({stmt:`Anna doesn't like ${r.act}.`, ans:!r.likes});
+  });
+  s3Current = sh(pool).slice(0, 5);
+  document.getElementById('s3-qs').innerHTML = s3Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">"${q.stmt}"</div>
+      <div class="opts-row" id="s3o${i}">
+        <button class="aopt" onclick="s3Ans(this,${i},1)">True ✓</button>
+        <button class="aopt" onclick="s3Ans(this,${i},0)">False ✗</button>
+      </div>
+      <div class="fb" id="s3fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s3Ans(btn, i, choice) {
+  document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s3Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s3fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'It\'s ' + (s3Current[i].ans ? 'True' : 'False') + '!';
+  ok ? actOk(2) : gWrong();
+}
+
+/* ══ SECTION 4 ══ */
+let s4Current = [];
+function s4Init() {
+  const actKeys = sh([...CHAR_ACTS]).slice(0, 5);
+  document.getElementById('s4-table').innerHTML =
+    '<tr><th>Activity</th><th>Josh</th><th>Lily</th></tr>'
+    + actKeys.map(a =>
+        `<tr><td>${a}</td><td>${CHARS[0].acts[a] ? '✓' : '✗'}</td><td>${CHARS[1].acts[a] ? '✓' : '✗'}</td></tr>`
+      ).join('');
+  const pool = [];
+  actKeys.forEach(a => CHARS.forEach(ch => pool.push({name:ch.name, act:a, likes:ch.acts[a]})));
+  s4Current = sh(pool).slice(0, 5);
+  document.getElementById('s4-qs').innerHTML = s4Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">${q.name} <span class="blank">___</span> ${q.act}.</div>
+      <div class="opts-row" id="s4o${i}">
+        <button class="aopt" onclick="s4Ans(this,${i},1)">likes</button>
+        <button class="aopt" onclick="s4Ans(this,${i},0)">doesn't like</button>
+      </div>
+      <div class="fb" id="s4fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s4Ans(btn, i, choice) {
+  document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s4Current[i].likes; btn.classList.add(ok ? 'ok' : 'ko');
+  const correct = s4Current[i].likes ? 'likes' : "doesn't like";
+  if (!ok) document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => { if (b.textContent === correct) b.classList.add('show'); });
+  const fb = document.getElementById('s4fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : `${s4Current[i].name} ${correct} ${s4Current[i].act}.`;
+  ok ? actOk(2) : gWrong();
+}
+
+/* ══ SECTION 5 ══ */
+let s5Current = [];
+function s5Init() {
+  s5Current = sh([...ERROR_POOL]).slice(0, 4).map(q => ({...q, shuffledOpts: sh([...q.opts])}));
+  document.getElementById('s5-qs').innerHTML = s5Current.map((q, i) => `
+    <div class="q-block">
+      <div class="err-sent">${q.wrong}</div>
+      <div class="opts-row" id="s5o${i}">
+        ${q.shuffledOpts.map((o, j) => `<button class="aopt" onclick="s5Ans(this,${i},${j})">${o}</button>`).join('')}
+      </div>
+      <div class="fb" id="s5fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s5Ans(btn, i, j) {
+  document.querySelectorAll('#s5o'+i+' .aopt').forEach(b => b.disabled = true);
+  const chosen = s5Current[i].shuffledOpts[j];
+  const ok = chosen === s5Current[i].correct; btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s5o'+i+' .aopt').forEach(b => { if (b.textContent === s5Current[i].correct) b.classList.add('show'); });
+  const fb = document.getElementById('s5fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'Correct: "' + s5Current[i].correct + '"';
+  ok ? actOk(3) : gWrong();
+}
+
+/* ══ SECTION 6 ══ */
+let s6Current = [];
+function s6Init() {
+  s6Current = sh([...GRAMMAR_POOL]).slice(0, 4).map(q => ({...q, shuffledOpts: sh([...q.opts])}));
+  document.getElementById('s6-qs').innerHTML = s6Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">${q.sent.replace('___', '<span class="blank">___</span>')}</div>
+      <div class="opts-row" id="s6o${i}">
+        ${q.shuffledOpts.map((o, j) => `<button class="aopt" onclick="s6Ans(this,${i},${j})">${o}</button>`).join('')}
+      </div>
+      <div class="fb" id="s6fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s6Ans(btn, i, j) {
+  document.querySelectorAll('#s6o'+i+' .aopt').forEach(b => b.disabled = true);
+  const chosen = s6Current[i].shuffledOpts[j];
+  const ok = chosen === s6Current[i].correct; btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s6o'+i+' .aopt').forEach(b => { if (b.textContent === s6Current[i].correct) b.classList.add('show'); });
+  const fb = document.getElementById('s6fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + s6Current[i].correct;
+  ok ? actOk(3) : gWrong();
+}
+
+/* ══ Bootstrap ══ */
+window.addEventListener('load', () => {
+  s1Init(); s2Init(); s3Init(); s4Init(); s5Init(); s6Init();
+  gRender();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesures de Capacitat</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.bp{background:var(--a);color:#fff}
+.bs{background:var(--bg);color:var(--t);border:1.5px solid var(--b)}
+.cont-grid{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.cont-item{display:flex;flex-direction:column;align-items:center;gap:5px}
+.cont-cap{font-size:.72rem;font-weight:700;color:var(--a);background:#eff6ff;border-radius:4px;padding:2px 7px}
+.opts{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.ob{padding:8px 12px;border:1.5px solid var(--b);border-radius:var(--r);background:var(--s);cursor:pointer;font-size:.88rem;font-weight:600;transition:all .15s;min-height:40px;font-family:inherit}
+.ob:hover{border-color:var(--a);color:var(--a)}
+.ob.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ob.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ob:disabled{cursor:default}
+.frac-ex{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+.fbot{display:flex;flex-direction:column;align-items:center;gap:4px}
+.fbot-lbl{font-size:.88rem;font-weight:800;color:var(--a)}
+.fop{font-size:1.8rem;font-weight:900;align-self:center}
+.fres{display:flex;flex-direction:column;align-items:center;gap:5px}
+.fi{width:82px;padding:5px;border:2px solid var(--b);border-radius:8px;font-size:.95rem;font-weight:700;text-align:center;outline:none}
+.fi:focus{border-color:var(--a)}
+.fi.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.fi.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ctable{width:100%;border-collapse:collapse;margin-bottom:10px}
+.ctable th{background:var(--a);color:#fff;padding:7px 4px;text-align:center;font-size:.85rem}
+.ctable td{border:1px solid #e2e8f0;padding:5px 2px;text-align:center;font-size:.88rem}
+.ctable tr:nth-child(even) td{background:#f8faff}
+.tg{font-weight:700;color:var(--t)}
+.ti{width:66px;padding:3px 4px;border:2px solid var(--b);border-radius:6px;font-size:.9rem;font-weight:700;text-align:center;outline:none}
+.ti:focus{border-color:var(--a)}
+.ti.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ti.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.conv-list{display:flex;flex-direction:column;gap:8px}
+.conv-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:.9rem;color:var(--t)}
+.ci{width:76px;padding:4px 6px;border:2px solid var(--b);border-radius:8px;font-size:.95rem;font-weight:700;text-align:center;outline:none}
+.ci:focus{border-color:var(--a)}
+.ci.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ci.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.cu{font-size:.82rem;color:var(--m);font-weight:600}
+.jar-ex{display:flex;flex-direction:column;align-items:center;gap:8px}
+.jar-q{font-size:.95rem;font-weight:600;line-height:1.5;color:var(--t);text-align:center;max-width:340px;margin-bottom:14px}
+.jar-q strong{color:var(--a)}
+.jar-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center}
+.ji{width:82px;padding:5px 7px;border:2px solid var(--b);border-radius:8px;font-size:.95rem;font-weight:700;text-align:center;outline:none}
+.ji:focus{border-color:var(--a)}
+.ji.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ji.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.prob-list{display:flex;flex-direction:column;gap:12px}
+.prob-t{font-size:.95rem;color:var(--t);margin-bottom:14px;line-height:1.5}
+.prob-r{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.pi{width:76px;padding:5px 7px;border:2px solid var(--b);border-radius:8px;font-size:.9rem;font-weight:700;text-align:center;outline:none}
+.pi:focus{border-color:var(--a)}
+.pi.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.pi.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.pu{font-size:.8rem;color:var(--m);font-weight:600}
+.pfb{font-size:.78rem;font-weight:600;margin-top:3px}
+.pfb.ok{color:var(--ok)}.pfb.ko{color:var(--ko)}
+.ph{font-size:.78rem;color:var(--m);margin-top:5px;display:none;background:var(--bg);border-radius:6px;padding:5px 9px;border-left:3px solid var(--b);line-height:1.5}
+.ph.show{display:block}
+.env-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.env-card{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg);border-radius:var(--r);padding:12px 10px;min-width:130px;border:1px solid var(--b)}
+.env-icon{font-size:2.4rem;line-height:1}
+.env-cap{font-size:.95rem;font-weight:800;color:var(--a);background:#eff6ff;border-radius:6px;padding:2px 10px}
+.env-q{font-size:.88rem;font-weight:600;color:var(--t);text-align:center;line-height:1.4}
+.env-opts{display:flex;flex-direction:column;gap:4px;width:100%}
+.env-ob{padding:8px;border:1.5px solid var(--b);border-radius:var(--r);background:var(--s);cursor:pointer;font-size:.88rem;font-weight:600;text-align:center;transition:all .15s;font-family:inherit}
+.env-ob:hover{border-color:var(--a);color:var(--a)}
+.env-ob.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.env-ob.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.env-ob:disabled{cursor:default}
+@media(max-width:440px){.btn{padding:8px 12px;font-size:.8rem}.ob,.env-ob{padding:7px 8px;font-size:.8rem}.ji,.fi,.ci,.pi{font-size:.88rem}.cont-grid{gap:10px}.frac-ex{gap:6px}}
+</style>
+</head>
+<body>
+
+<div class="page">
+<div class="hdr"><h1>Mesures de Capacitat</h1></div>
+<div id="gam-bar"></div>
+
+
+<!-- EXERCICI 1 -->
+<div class="card">
+  <h2><span class="num">1</span> Llegeix el recipient</h2>
+  <p class="card-sub">Cada recipient té 10 ratlles iguals. Mira fins on arriba el líquid i tria la quantitat correcta.</p>
+  <div class="cont-grid" id="cont-grid"></div>
+  <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="buildConts()">Nous recipients</button></div>
+</div>
+
+<!-- EXERCICI 2 -->
+<div class="card">
+  <h2><span class="num">2</span> Suma i resta de fraccions</h2>
+  <p class="card-sub">Suma o resta els dos recipients. Escriu el resultat en mil·lilitres. L'ampolla verda s'omple mentre escrius.</p>
+  <div id="frac-wrap"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" onclick="checkFrac()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="newFrac()">Nova operació</button>
+  </div>
+  <div class="fb" id="frac-fb"></div>
+</div>
+
+<!-- EXERCICI 3 -->
+<div class="card">
+  <h2><span class="num">3</span> Taula de conversions</h2>
+  <p class="card-sub">Completa les caselles buides. Recorda: 1 L = 10 dl = 100 cl = 1.000 ml.</p>
+  <table class="ctable" id="ctable">
+    <thead><tr><th>L</th><th>dl</th><th>cl</th><th>ml</th></tr></thead>
+    <tbody id="ctbody"></tbody>
+  </table>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" onclick="checkTable()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="buildTable()">Nova taula</button>
+  </div>
+  <div class="fb" id="table-fb"></div>
+</div>
+
+<!-- EXERCICI 4 -->
+<div class="card">
+  <h2><span class="num">4</span> Converteix les unitats</h2>
+  <p class="card-sub">Escriu el valor equivalent en la unitat indicada.</p>
+  <div class="conv-list" id="conv-list"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" onclick="checkConv()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="buildConv()">Nova sèrie</button>
+  </div>
+  <div class="fb" id="conv-fb"></div>
+</div>
+
+<!-- EXERCICI 5 -->
+<div class="card">
+  <h2><span class="num">5</span> Quant en falta?</h2>
+  <p class="card-sub">Mira la jarra i calcula quant de líquid hi falta per arribar a la mesura demanada.</p>
+  <div class="jar-ex" id="jar-ex"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" onclick="checkJar()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="newJar()">Nou exercici</button>
+  </div>
+  <div class="fb" id="fb"></div>
+</div>
+
+<!-- EXERCICI 6 -->
+<div class="card">
+  <h2><span class="num">6</span> Problemes</h2>
+  <div class="prob-list" id="prob-list"></div>
+  <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="buildProbs()">Nous problemes</button></div>
+</div>
+
+<!-- EXERCICI 7 -->
+<div class="card">
+  <h2><span class="num">7</span> Quants envasos calen?</h2>
+  <p class="card-sub">Mira la capacitat de cada envàs i calcula quants en necessites per arribar a la mesura indicada.</p>
+  <div class="env-grid" id="env-grid"></div>
+  <div class="btn-row"><button class="btn btn-outline btn-sm" onclick="buildEnv()">Nous envasos</button></div>
+</div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY='mesures_cap_v1';
+let S=JSON.parse(localStorage.getItem(EXER_KEY)||'{"ok":0,"ko":0,"pts":0}');
+const sv=()=>localStorage.setItem(EXER_KEY,JSON.stringify(S));
+const addOk=(p=1)=>{S.ok++;S.pts+=p;sv();gCorrect(p)};
+const addKo=()=>{S.ko++;sv();gWrong()};
+function gResetExtra(){S={ok:0,ko:0,pts:0};sv();}
+gRender();
+function fmtN(n){
+  // number → catalan string (comma decimal, dot thousands)
+  const s=String(n).replace('.',',');
+  const [int,dec]=s.split(',');
+  const intF=int.replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  return dec?intF+','+dec:intF;
+}
+function fmtMl(ml){
+  if(ml===1000)return'1 L';if(ml===500)return'½ L (500 ml)';
+  if(ml===250)return'¼ L (250 ml)';if(ml===750)return'¾ L (750 ml)';
+  if(ml>=1000&&ml%1000===0)return(ml/1000)+' L';
+  return ml+' ml';
+}
+
+// ── EXERCICI 1 — Recipients ────────────────────────────────
+const CAPS=[500,1000,2000];
+function buildConts(){
+  const g=document.getElementById('cont-grid');g.innerHTML='';
+  for(let ci=0;ci<6;ci++){
+    const cap=CAPS[Math.floor(Math.random()*CAPS.length)];
+    const mv=cap/10;
+    const lv=Math.floor(Math.random()*9)+1;
+    const cor=lv*mv;
+    const opts=new Set([cor]);
+    let t=0;
+    while(opts.size<4&&t++<60){const l2=lv+(Math.floor(Math.random()*4)+1)*(Math.random()<.5?1:-1);if(l2>=1&&l2<=10)opts.add(l2*mv);}
+    [2,5,8].forEach(l=>{if(opts.size<4)opts.add(l*mv);});
+    const opArr=sh([...opts].slice(0,4));
+
+    const H=160,W=56,wT=5,nH=14,bH=H-nH;
+    const fH=Math.round(bH*(lv/10)),fY=nH+bH-fH;
+    const marks=[];
+    for(let m=1;m<=10;m++){
+      const my=nH+bH-Math.round(bH*m/10);
+      const lg=m%5===0,ll=lg?11:6;
+      marks.push(`<line x1="${W-wT-ll}" y1="${my}" x2="${W-wT}" y2="${my}" stroke="${m===lv?'#fbbf24':'#94a3b8'}" stroke-width="${lg?2:1.2}"/>`);
+    }
+    const svg=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      <rect x="${wT}" y="${nH}" width="${W-wT*2}" height="${bH}" rx="4" fill="#e0f2fe" stroke="#93c5fd" stroke-width="${wT}"/>
+      <rect x="${wT}" y="${fY}" width="${W-wT*2}" height="${fH}" fill="#3b82f6" opacity=".75"/>
+      <rect x="${W/2-5}" y="0" width="11" height="${nH+2}" rx="3" fill="#bae6fd" stroke="#3b82f6" stroke-width="2"/>
+      <text x="${W/2}" y="${nH+10}" text-anchor="middle" font-size="8" font-weight="700" fill="#475569">${fmtN(cap)} ml</text>
+      ${marks.join('')}
+    </svg>`;
+
+    const item=document.createElement('div');item.className='cont-item';
+    const od=document.createElement('div');od.className='opts';
+    opArr.forEach(o=>{
+      const b=document.createElement('button');b.className='ob';b.textContent=fmtN(o)+' ml';
+      b.dataset.v=o;
+      b.onclick=()=>{
+        if(b.disabled)return;
+        const r=o===cor;
+        b.classList.add(r?'ok':'ko');
+        item.querySelectorAll('.ob').forEach(x=>{x.disabled=true;if(x!==b&&Number(x.dataset.v)===cor)x.classList.add('ok');});
+        if(r){addOk(1);boom();}else addKo();
+      };
+      od.appendChild(b);
+    });
+    item.innerHTML=`<div class="cont-cap">Capacitat: ${fmtN(cap)} ml</div>${svg}<div class="section-lbl">Quant hi ha?</div>`;
+    item.appendChild(od);g.appendChild(item);
+  }
+}
+buildConts();
+
+// ── EXERCICI 2 — Fraccions ─────────────────────────────────
+const FPOOL=[
+  {a:'½ L',b:'¼ L',am:500,bm:250,res:750,op:'+'},
+  {a:'¼ L',b:'¼ L',am:250,bm:250,res:500,op:'+'},
+  {a:'½ L',b:'½ L',am:500,bm:500,res:1000,op:'+'},
+  {a:'½ L',b:'100 ml',am:500,bm:100,res:600,op:'+'},
+  {a:'¼ L',b:'100 ml',am:250,bm:100,res:350,op:'+'},
+  {a:'½ L',b:'200 ml',am:500,bm:200,res:700,op:'+'},
+  {a:'¼ L',b:'200 ml',am:250,bm:200,res:450,op:'+'},
+  {a:'½ L',b:'300 ml',am:500,bm:300,res:800,op:'+'},
+  {a:'¼ L',b:'50 ml',am:250,bm:50,res:300,op:'+'},
+  {a:'½ L',b:'50 ml',am:500,bm:50,res:550,op:'+'},
+  {a:'½ L',b:'150 ml',am:500,bm:150,res:650,op:'+'},
+  {a:'½ L',b:'¼ L',am:500,bm:250,res:250,op:'-'},
+  {a:'½ L',b:'100 ml',am:500,bm:100,res:400,op:'-'},
+  {a:'½ L',b:'200 ml',am:500,bm:200,res:300,op:'-'},
+  {a:'½ L',b:'50 ml',am:500,bm:50,res:450,op:'-'},
+  {a:'¼ L',b:'50 ml',am:250,bm:50,res:200,op:'-'},
+  {a:'¼ L',b:'100 ml',am:250,bm:100,res:150,op:'-'},
+  {a:'600 ml',b:'½ L',am:600,bm:500,res:100,op:'-'},
+  {a:'700 ml',b:'½ L',am:700,bm:500,res:200,op:'-'},
+  {a:'750 ml',b:'¼ L',am:750,bm:250,res:500,op:'-'},
+  {a:'800 ml',b:'¼ L',am:800,bm:250,res:550,op:'-'},
+  {a:'750 ml',b:'½ L',am:750,bm:500,res:250,op:'-'},
+];
+let FC=null;
+function bsvg(ml,col){
+  const H=90,W=40,wT=4,nH=11,bH=H-nH;
+  const fH=Math.round(bH*(ml/1000)),fY=nH+bH-fH;
+  return`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="${wT}" y="${nH}" width="${W-wT*2}" height="${bH}" rx="3" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="${wT}"/>
+    ${fH>0?`<rect x="${wT}" y="${fY}" width="${W-wT*2}" height="${fH}" fill="${col}" opacity=".7"/>`:``}
+    <rect x="${W/2-4}" y="0" width="8" height="${nH+2}" rx="2" fill="#cbd5e1" stroke="${col}" stroke-width="2"/>
+  </svg>`;
+}
+function resBsvg(){
+  const H=90,W=40,wT=4,nH=11,bH=H-nH;
+  return`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="${wT}" y="${nH}" width="${W-wT*2}" height="${bH}" rx="3" fill="#f1f5f9" stroke="#16a34a" stroke-width="${wT}"/>
+    <rect id="rfill" x="${wT}" y="${nH+bH}" width="${W-wT*2}" height="0" fill="#16a34a" opacity=".7"/>
+    <rect x="${W/2-4}" y="0" width="8" height="${nH+2}" rx="2" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/>
+  </svg>`;
+}
+function updRes(ml){
+  const H=90,wT=4,nH=11,bH=H-nH;
+  const fH=Math.max(0,Math.min(bH,Math.round(bH*(ml/1000))));
+  const el=document.getElementById('rfill');
+  if(el){el.setAttribute('height',fH);el.setAttribute('y',nH+bH-fH);}
+}
+function newFrac(){
+  FC=FPOOL[Math.floor(Math.random()*FPOOL.length)];
+  const oc=FC.op==='+'?'#16a34a':'#dc2626';
+  document.getElementById('frac-wrap').innerHTML=`<div class="frac-ex">
+    <div class="fbot">${bsvg(FC.am,'#3b82f6')}<div class="fbot-lbl">${FC.a}</div></div>
+    <div class="fop" style="color:${oc}">${FC.op}</div>
+    <div class="fbot">${bsvg(FC.bm,'#7c3aed')}<div class="fbot-lbl">${FC.b}</div></div>
+    <div class="fop">=</div>
+    <div class="fres">${resBsvg()}
+      <input class="fi" id="fi" type="text" inputmode="decimal" placeholder="? ml">
+      <span style="font-size:.72rem;color:#64748b">ml</span>
+    </div></div>`;
+  document.getElementById('frac-fb').textContent='';
+  document.getElementById('frac-fb').className='fb';
+  const inp=document.getElementById('fi');
+  inp.addEventListener('input',()=>{const v=parseFloat(inp.value.replace(',','.'));updRes(isNaN(v)?0:v);});
+}
+function checkFrac(){
+  if(!FC)return;
+  const inp=document.getElementById('fi');if(!inp)return;
+  const val=parseFloat(inp.value.replace(',','.'));
+  const fb=document.getElementById('frac-fb');
+  if(val===FC.res){inp.className='fi ok';fb.textContent=`✓ Correcte! ${FC.a} ${FC.op} ${FC.b} = ${FC.res} ml`;fb.className='fb ok';addOk(2);boom();}
+  else{inp.className='fi ko';fb.textContent='No és correcte. Recorda: ½ L = 500 ml · ¼ L = 250 ml.';fb.className='fb ko';addKo();}
+}
+newFrac();
+
+// ── EXERCICI 3 — Taula de conversions ─────────────────────
+// Valors en L (tots múltiples de 0,25 per tenir cl enters)
+const TPOOL=[0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,2.5,3,3.5];
+const TCOLS=['l','dl','cl','ml'];
+const THDRS=['L','dl','cl','ml'];
+let tableRows=[];
+function toRow(lv){return{l:lv,dl:lv*10,cl:lv*100,ml:lv*1000};}
+function fmtCell(v){
+  // Show without unnecessary decimals; use comma
+  const s=v%1===0?String(v):(Math.round(v*100)/100).toFixed(v%0.1===0?1:2);
+  return s.replace('.',',');
+}
+function buildTable(){
+  tableRows=[];
+  const pool=sh(TPOOL).slice(0,6);
+  pool.forEach((lv,i)=>{
+    const row=toRow(lv);
+    // First 3 rows: show 2, blank 2. Last 3: show 1, blank 3.
+    const shown=sh(TCOLS).slice(0,i<3?2:1);
+    const blanks=TCOLS.filter(k=>!shown.includes(k));
+    tableRows.push({row,shown,blanks});
+  });
+  const tb=document.getElementById('ctbody');tb.innerHTML='';
+  tableRows.forEach((tr,ri)=>{
+    const tr_el=document.createElement('tr');
+    TCOLS.forEach(k=>{
+      const td=document.createElement('td');
+      if(tr.shown.includes(k)){td.className='tg';td.textContent=fmtCell(tr.row[k]);}
+      else{td.innerHTML=`<input class="ti" id="ti-${ri}-${k}" type="text" inputmode="decimal" placeholder="?">`;}
+      tr_el.appendChild(td);
+    });
+    tb.appendChild(tr_el);
+  });
+  document.getElementById('table-fb').textContent='';
+  document.getElementById('table-fb').className='fb';
+}
+buildTable();
+function checkTable(){
+  let nok=0,tot=0;
+  tableRows.forEach((tr,ri)=>{
+    tr.blanks.forEach(k=>{
+      const inp=document.getElementById(`ti-${ri}-${k}`);if(!inp)return;
+      tot++;
+      const val=parseFloat(inp.value.replace(',','.'));
+      const exp=tr.row[k];
+      if(Math.abs(val-exp)<0.01){inp.className='ti ok';nok++;}else{inp.className='ti ko';}
+    });
+  });
+  const fb=document.getElementById('table-fb');
+  if(nok===tot){fb.textContent='✓ Perfecte! Totes correctes!';fb.className='fb ok';addOk(nok);boom();}
+  else{fb.textContent=`${nok} de ${tot} correctes. Revisa les marcades en vermell.`;fb.className='fb ko';addOk(nok);if(nok<tot)addKo();}
+}
+
+// ── EXERCICI 4 — Conversions simples ──────────────────────
+const CPOOL=[
+  {q:'3 L = ',a:3000,u:'ml'},{q:'2.500 ml = ',a:2.5,u:'L'},
+  {q:'5 dl = ',a:500,u:'ml'},{q:'1 L = ',a:10,u:'dl'},
+  {q:'250 ml = ',a:25,u:'cl'},{q:'4 cl = ',a:40,u:'ml'},
+  {q:'2 L = ',a:200,u:'cl'},{q:'600 ml = ',a:6,u:'dl'},
+  {q:'1,5 L = ',a:1500,u:'ml'},{q:'½ L = ',a:500,u:'ml'},
+  {q:'¼ L = ',a:250,u:'ml'},{q:'3 dal = ',a:30,u:'L'},
+  {q:'1 L = ',a:100,u:'cl'},{q:'200 ml = ',a:2,u:'dl'},
+  {q:'1 dl = ',a:10,u:'cl'},{q:'750 ml = ',a:7.5,u:'dl'},
+  {q:'¾ L = ',a:75,u:'cl'},{q:'2 dl = ',a:20,u:'cl'},
+];
+let convSet=[];
+function buildConv(){
+  convSet=sh(CPOOL).slice(0,7);
+  const list=document.getElementById('conv-list');list.innerHTML='';
+  convSet.forEach((c,i)=>{
+    const r=document.createElement('div');r.className='conv-row';
+    r.innerHTML=`<span>${c.q}</span><input class="ci" id="ci${i}" type="text" inputmode="decimal" placeholder="?"><span class="cu">${c.u}</span>`;
+    list.appendChild(r);
+  });
+  document.getElementById('conv-fb').textContent='';document.getElementById('conv-fb').className='fb';
+}
+buildConv();
+function checkConv(){
+  let nok=0;
+  convSet.forEach((c,i)=>{
+    const inp=document.getElementById('ci'+i);
+    const val=parseFloat(inp.value.replace(',','.'));
+    if(Math.abs(val-c.a)<0.001){inp.className='ci ok';nok++;}else{inp.className='ci ko';}
+  });
+  const fb=document.getElementById('conv-fb');
+  if(nok===convSet.length){fb.textContent='✓ Perfecte!';fb.className='fb ok';addOk(nok);boom();}
+  else{fb.textContent=`${nok} de ${convSet.length} correctes.`;fb.className='fb ko';addOk(nok);if(nok<convSet.length)addKo();}
+}
+
+// ── EXERCICI 5 — Quant falta? ─────────────────────────────
+const JTARGETS=[500,600,700,750,800,900,1000];
+const JSNAP=100,JMAX=1000;
+let JE=null;
+function drawJar(cur,tar){
+  const H=190,SW=155,jX=55,jW=76,wT=5,nH=22,bH=H-nH;
+  const fH=Math.round(bH*(cur/JMAX)),fY=nH+bH-fH;
+  const tY=nH+bH-Math.round(bH*(tar/JMAX));
+  const marks=[];
+  for(let ml=100;ml<=JMAX;ml+=100){
+    const y=nH+bH-Math.round(bH*ml/JMAX);
+    const lg=ml%500===0;
+    const lx=jX-2,lx0=lx-(lg?12:6);
+    marks.push(`<line x1="${lx0}" y1="${y}" x2="${lx}" y2="${y}" stroke="#94a3b8" stroke-width="${lg?2:1.2}"/>
+    <text x="${lx0-2}" y="${y+4}" text-anchor="end" font-size="${lg?9.5:7.5}" font-weight="${lg?'700':'400'}" fill="${lg?'#475569':'#94a3b8'}">${ml<1000?ml:'1L'}</text>`);
+  }
+  return`<svg width="${SW}" height="${H}" viewBox="0 0 ${SW} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="${jX}" y="${nH}" width="${jW}" height="${bH}" rx="5" fill="#e0f2fe" stroke="#93c5fd" stroke-width="${wT}"/>
+    ${fH>0?`<rect x="${jX}" y="${fY}" width="${jW}" height="${fH}" fill="#3b82f6" opacity=".75"/>`:``}
+    <rect x="${jX+jW/2-7}" y="0" width="14" height="${nH+2}" rx="4" fill="#bae6fd" stroke="#3b82f6" stroke-width="2"/>
+    ${marks.join('')}
+    <line x1="${jX}" y1="${tY}" x2="${jX+jW}" y2="${tY}" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6,4"/>
+    <rect x="2" y="${tY-9}" width="${jX-5}" height="13" rx="3" fill="#fef3c7"/>
+    <text x="${jX-8}" y="${tY+1}" text-anchor="end" font-size="8.5" font-weight="700" fill="#d97706">${fmtMl(tar)}</text>
+  </svg>`;
+}
+function newJar(){
+  const tar=JTARGETS[Math.floor(Math.random()*JTARGETS.length)];
+  const steps=Math.floor((tar-JSNAP)/JSNAP);
+  const cur=(Math.floor(Math.random()*steps)+1)*JSNAP;
+  JE={cur,tar,miss:tar-cur};
+  document.getElementById('jar-ex').innerHTML=`
+    ${drawJar(cur,tar)}
+    <div class="jar-q">La jarra té <strong>${fmtMl(cur)}</strong>.<br>Quant en falta per arribar a <strong>${fmtMl(tar)}</strong>?</div>
+    <div class="jar-row"><input class="ji" id="ji" type="text" inputmode="decimal" placeholder="?"><span style="font-size:.82rem;color:#64748b">ml</span></div>`;
+  document.getElementById('fb').textContent='';document.getElementById('fb').className='fb';
+}
+function checkJar(){
+  if(!JE)return;
+  const inp=document.getElementById('ji');if(!inp)return;
+  const val=parseFloat(inp.value.replace(',','.'));
+  const fb=document.getElementById('fb');
+  if(val===JE.miss){inp.className='ji ok';fb.textContent=`✓ Correcte! ${fmtMl(JE.tar)} − ${fmtMl(JE.cur)} = ${JE.miss} ml`;fb.className='fb ok';addOk(2);boom();}
+  else{inp.className='ji ko';const d=val-JE.miss;fb.textContent=d>0?`Has posat ${Math.abs(d)} ml de més.`:`Falten ${Math.abs(d)} ml més.`;fb.className='fb ko';addKo();}
+}
+newJar();
+
+// ── EXERCICI 6 — Problemes ─────────────────────────────────
+function makeProbHtml(id,text,unit,ans){
+  return`<div class="prob">
+    <div class="q-top">Problema</div>
+    <div class="q-stem">${text}</div>
+    <div class="prob-r">
+      <input class="pi" id="pi${id}" type="text" inputmode="decimal" placeholder="?">
+      <span class="pu">${unit}</span>
+      <button class="btn btn-dark btn-sm" onclick="chkP('${id}',${ans})">Comprova</button>
+    </div>
+    <div class="pfb" id="pfb${id}"></div>
+  </div>`;
+}
+function chkP(id,ans){
+  const inp=document.getElementById('pi'+id);
+  const fb=document.getElementById('pfb'+id);
+  const val=parseFloat(inp.value.replace(',','.'));
+  if(Math.abs(val-ans)<0.001){inp.className='pi ok';fb.textContent='✓ Correcte!';fb.className='pfb ok';addOk(2);boom();}
+  else{inp.className='pi ko';fb.textContent='No és correcte. Torna-ho a intentar!';fb.className='pfb ko';addKo();}
+}
+
+const PROB_GEN=[
+  // DIVISIÓ
+  ()=>{const[t,d]=pick([[6,2],[6,3],[8,2],[8,4],[9,3],[10,2],[12,3],[12,4]]);return{t:`La Maria té una garrafa de <strong>${t} L</strong> d'aigua. Cada dia en beu <strong>${d} L</strong>. D'aquí quants dies s'acabarà?`,u:'dies',a:t/d};},
+  ()=>{const o=pick([{t:750,g:250},{t:600,g:200},{t:900,g:300},{t:1000,g:250},{t:800,g:200}]);return{t:`En Pere vol repartir <strong>${o.t} ml</strong> de suc en gots de <strong>${o.g} ml</strong>. Quants gots pot omplir?`,u:'gots',a:o.t/o.g};},
+  ()=>{const o=pick([{t:4000,h:1000},{t:6000,h:2000},{t:8000,h:2000},{t:9000,h:3000},{t:10000,h:2000}]);return{t:`Una piscina de <strong>${fmtN(o.t)} L</strong> es buida a raó de <strong>${fmtN(o.h)} L/hora</strong>. Quantes hores tarda a buidar-se?`,u:'hores',a:o.t/o.h};},
+  ()=>{const o=pick([{t:900,n:3},{t:1200,n:4},{t:1500,n:5},{t:1800,n:6},{t:1200,n:6}]);return{t:`La iaia ha fet <strong>${o.t} ml</strong> de sopa per a <strong>${o.n} plats</strong>. Quants ml hi ha a cada plat?`,u:'ml',a:o.t/o.n};},
+  ()=>{const o=pick([{l:1.5,p:3},{l:2,p:4},{l:2.5,p:5},{l:3,p:6},{l:2,p:5},{l:3,p:4}]);return{t:`Tenim <strong>${fmtN(o.l)} L</strong> de limonada per a <strong>${o.p} persones</strong>. Quants ml toca a cada persona?`,u:'ml',a:Math.round(o.l*1000/o.p)};},
+  ()=>{const o=pick([{l:2,m:200},{l:3,m:250},{l:4,m:500},{l:5,m:250},{l:3,m:500},{l:5,m:200}]);return{t:`En Jordi compra una garrafa de <strong>${o.l} L</strong>. Cada cop que en pren agafa <strong>${o.m} ml</strong>. Quantes vegades pot prendre'n?`,u:'vegades',a:Math.round(o.l*1000/o.m)};},
+  // POSAR I TREURE
+  ()=>{const o=pick([{s:'3 i quart',c:325,n:4,g:20},{s:'2 i mig',c:250,n:5,g:15},{s:'3 i mig',c:350,n:6,g:20},{s:'4 i quart',c:425,n:7,g:25},{s:'2 i quart',c:225,n:3,g:25}]);return{t:`Amb una ampolla de <strong>${o.s} litres</strong> de suc, l'Enric omple <strong>${o.n} gots de ${o.g} cl</strong>. Quants cl queden?`,u:'cl',a:o.c-o.n*o.g};},
+  ()=>{const o=pick([{n1:2,f1:'½ L',m1:500,n2:1,f2:'¼ L',m2:250},{n1:3,f1:'½ L',m1:500,n2:1,f2:'¼ L',m2:250},{n1:2,f1:'¼ L',m1:250,n2:1,f2:'½ L',m2:500},{n1:3,f1:'¼ L',m1:250,n2:2,f2:'½ L',m2:500}]);return{t:`La Sofia té <strong>${o.n1} ampolles de ${o.f1}</strong> i <strong>${o.n2} de ${o.f2}</strong>. Quants ml té en total?`,u:'ml',a:o.n1*o.m1+o.n2*o.m2};},
+  ()=>{const o=pick([{l:3,n:5,d:2},{l:4,n:5,d:2},{l:3,n:4,d:3},{l:5,n:5,d:4},{l:4,n:6,d:3}]);return{t:`El Pol omple <strong>${o.n} gots de ${o.d} dl</strong> d'una garrafa de <strong>${o.l} L</strong>. Quants dl queden?`,u:'dl',a:o.l*10-o.n*o.d};},
+  ()=>{const o=pick([{l:1.5,d:3},{l:2,d:4},{l:2.5,d:5},{l:3,d:3},{l:2,d:5}]);return{t:`L'Alba té <strong>${fmtN(o.l)} L</strong> de suc. Cada got té <strong>${o.d} dl</strong>. Quants gots pot omplir?`,u:'gots',a:Math.round(o.l*10/o.d)};},
+  ()=>{const o=pick([{n:3,s:'litre i quart',l:1.25,g:25},{n:4,s:'litre i quart',l:1.25,g:25},{n:3,s:'litre i mig',l:1.5,g:25},{n:4,s:'litre i mig',l:1.5,g:25}]);return{t:`En Marc compra <strong>${o.n} ampolles d'1 ${o.s}</strong>. Les reparteix en gots de <strong>${o.g} cl</strong>. Quants gots pot omplir?`,u:'gots',a:Math.round(o.n*o.l*100/o.g)};},
+  ()=>{const o=pick([{l:2,d:8},{l:3,d:12},{l:2,d:6},{l:4,d:15},{l:3,d:18}]);return{t:`Una ampolla de <strong>${o.l} L</strong> conté <strong>${o.d} dl</strong> d'aigua. Quants dl cal afegir per omplir-la?`,u:'dl',a:o.l*10-o.d};},
+  ()=>{const o=pick([{f:'¾',v:0.75,l:4},{f:'¾',v:0.75,l:2},{f:'½',v:0.5,l:5},{f:'¼',v:0.25,l:4},{f:'½',v:0.5,l:3}]);return{t:`La Clara omple <strong>${o.f} d'una garrafa de ${o.l} L</strong>. Quants ml de líquid té?`,u:'ml',a:Math.round(o.v*o.l*1000)};},
+  // ENVASOS DIA A DIA
+  ()=>{const o=pick([{g:20,up:'gots'},{g:25,up:'tasses'},{g:10,up:'gots'},{g:50,up:'gots'}]);return{t:`Tens un bric d'<strong>1 L</strong> de llet. Cada got té <strong>${o.g} cl</strong>. Quants ${o.up} pots omplir?`,u:o.up,a:1000/(o.g*10)};},
+  ()=>{const o=pick([{ml:300,n:20},{ml:250,n:25},{ml:400,n:20},{ml:200,n:10}]);return{t:`Un xampú de <strong>${o.ml} ml</strong> dura <strong>${o.n} rentades</strong>. Quants ml gastes cada cop?`,u:'ml',a:o.ml/o.n};},
+  ()=>{const o=pick([{ml:60,g:2},{ml:100,g:2},{ml:75,g:3},{ml:90,g:3}]);return{t:`Un tub de pasta de dents té <strong>${o.ml} ml</strong>. Cada rentada gastes <strong>${o.g} ml</strong>. Per quantes rentades et durarà?`,u:'vegades',a:o.ml/o.g};},
+  ()=>{const o=pick([{ml:200,d:10,c:3,dies:5},{ml:150,d:5,c:3,dies:7},{ml:200,d:10,c:2,dies:5},{ml:100,d:5,c:2,dies:5}]);return{t:`Un xarop de <strong>${o.ml} ml</strong>: dosi de <strong>${o.d} ml</strong>, <strong>${o.c} cops al dia</strong> durant <strong>${o.dies} dies</strong>. Quants ml queden a l'ampolla?`,u:'ml',a:o.ml-o.d*o.c*o.dies};},
+  ()=>{const o=pick([{d:10,c:4},{d:5,c:4},{d:10,c:3},{d:15,c:3}]);return{t:`Un xarop: dosi de <strong>${o.d} ml</strong>, fins a <strong>${o.c} vegades al dia</strong>. Quina és la dosi màxima diària?`,u:'ml',a:o.d*o.c};},
+];
+
+function buildProbs(){
+  const list=document.getElementById('prob-list');list.innerHTML='';
+  sh(PROB_GEN).slice(0,5).forEach((gen,i)=>{
+    const p=gen();
+    list.insertAdjacentHTML('beforeend',makeProbHtml('p'+i,p.t,p.u,p.a));
+  });
+}
+buildProbs();
+
+// ── EXERCICI 7 — Quants envasos calen? ────────────────────────────
+const ENV_GEN=[
+  // 1 L
+  ()=>({tl:'1 L',cl:'500 ml',ans:2,icon:'🍶',nom:'ampolles'}),
+  ()=>{const o=pick([{cl:'25 cl'},{cl:'250 ml'}]);return{tl:'1 L',cl:o.cl,ans:4,icon:'🥃',nom:'gots'};},
+  ()=>({tl:'1 L',cl:'200 ml',ans:5,icon:'🧃',nom:'brics'}),
+  ()=>({tl:'1 L',cl:'125 ml',ans:8,icon:'🫙',nom:'pots'}),
+  ()=>{const o=pick([{cl:'10 cl'},{cl:'100 ml'}]);return{tl:'1 L',cl:o.cl,ans:10,icon:'☕',nom:'tasses'};},
+  ()=>({tl:'1 L',cl:'50 ml',ans:20,icon:'💊',nom:'ampolles'}),
+  // 2 L
+  ()=>{const o=pick([{cl:'500 ml',ans:4},{cl:'400 ml',ans:5},{cl:'250 ml',ans:8},{cl:'200 ml',ans:10}]);return{tl:'2 L',cl:o.cl,ans:o.ans,icon:'🍶',nom:'ampolles'};},
+  ()=>({tl:'2 L',cl:'125 ml',ans:16,icon:'🫙',nom:'pots'}),
+  ()=>({tl:'2 L',cl:'100 ml',ans:20,icon:'🥤',nom:'gots'}),
+  // ½ L
+  ()=>{const o=pick([{cl:'25 cl',ans:2},{cl:'100 ml',ans:5},{cl:'50 ml',ans:10}]);return{tl:'½ L',cl:o.cl,ans:o.ans,icon:'🥃',nom:'gots'};},
+  ()=>({tl:'½ L',cl:'25 ml',ans:20,icon:'🥄',nom:'cullerades'}),
+  // 1½ L
+  ()=>{const o=pick([{cl:'500 ml',ans:3},{cl:'25 cl',ans:6},{cl:'150 ml',ans:10}]);return{tl:'1½ L',cl:o.cl,ans:o.ans,icon:'🍼',nom:'ampolles'};},
+  // ¼ L
+  ()=>{const o=pick([{cl:'50 ml',ans:5},{cl:'25 ml',ans:10}]);return{tl:'¼ L',cl:o.cl,ans:o.ans,icon:'💊',nom:'ampolles'};},
+  // 3 L
+  ()=>{const o=pick([{cl:'50 cl',ans:6},{cl:'300 ml',ans:10},{cl:'25 cl',ans:12}]);return{tl:'3 L',cl:o.cl,ans:o.ans,icon:'🫗',nom:'ampolles'};},
+  // 4 L
+  ()=>{const o=pick([{cl:'500 ml',ans:8},{cl:'400 ml',ans:10},{cl:'250 ml',ans:16}]);return{tl:'4 L',cl:o.cl,ans:o.ans,icon:'🪣',nom:'cubells'};},
+  // Mateix envàs, objectiu variable (25 cl gots)
+  ()=>{const o=pick([{tl:'1 L',ans:4},{tl:'2 L',ans:8},{tl:'½ L',ans:2},{tl:'1½ L',ans:6}]);return{tl:o.tl,cl:'25 cl',ans:o.ans,icon:'🥤',nom:'gots'};},
+  // Mateix envàs, objectiu variable (500 ml ampolles)
+  ()=>{const o=pick([{tl:'1 L',ans:2},{tl:'2 L',ans:4},{tl:'3 L',ans:6}]);return{tl:o.tl,cl:'500 ml',ans:o.ans,icon:'🍶',nom:'ampolles'};},
+  // Mateix envàs, objectiu variable (200 ml brics)
+  ()=>{const o=pick([{tl:'1 L',ans:5},{tl:'2 L',ans:10},{tl:'3 L',ans:15}]);return{tl:o.tl,cl:'200 ml',ans:o.ans,icon:'🧃',nom:'brics'};},
+  // Mateix envàs, objectiu variable (125 ml pots)
+  ()=>{const o=pick([{tl:'1 L',ans:8},{tl:'½ L',ans:4},{tl:'1½ L',ans:12}]);return{tl:o.tl,cl:'125 ml',ans:o.ans,icon:'🫙',nom:'pots'};},
+];
+function buildEnv(){
+  const g=document.getElementById('env-grid');g.innerHTML='';
+  sh(ENV_GEN).slice(0,4).forEach(gen=>{
+    const e=gen();
+    const card=document.createElement('div');card.className='env-card';
+    const opts=new Set([e.ans]);
+    let t=0;
+    while(opts.size<4&&t++<60){
+      const d=e.ans+(Math.floor(Math.random()*4)+1)*(Math.random()<.5?1:-1);
+      if(d>0)opts.add(d);
+    }
+    const oDivs=sh([...opts].slice(0,4)).map(o=>`<button class="env-ob" data-v="${o}" onclick="chkEnv(this,${e.ans})">${o} ${e.nom}</button>`).join('');
+    card.innerHTML=`<div class="env-cap">${e.cl}</div>
+      <div class="env-q">Quants per fer ${e.tl}?</div>
+      <div class="env-opts">${oDivs}</div>`;
+    g.appendChild(card);
+  });
+}
+function chkEnv(btn,ans){
+  if(btn.disabled)return;
+  const card=btn.closest('.env-card');
+  card.querySelectorAll('.env-ob').forEach(b=>{b.disabled=true;if(Number(b.dataset.v)===ans)b.classList.add('ok');});
+  if(Number(btn.dataset.v)===ans){btn.classList.add('ok');addOk(1);boom();}
+  else{btn.classList.add('ko');addKo();}
+}
+buildEnv();
+</script>
+</body>
+</html>

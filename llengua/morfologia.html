@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Morfologia i Ortografia</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── CSS ESPECÍFIC MORFOLOGIA ── */
+.word-big{font-size:2.2rem;font-weight:900;text-align:center;padding:16px 0;color:var(--t);letter-spacing:.02em}
+.syl-disp{font-size:1.7rem;font-weight:700;text-align:center;padding:14px 0;color:var(--t);letter-spacing:.06em}
+.syl-dot{color:var(--m);font-weight:400;margin:0 4px}
+.vb-word{font-size:1.9rem;font-weight:900;text-align:center;padding:14px 0;letter-spacing:.04em;color:var(--t)}
+.vb-blank{display:inline-block;min-width:34px;border-bottom:3px solid var(--a);color:var(--a);margin:0 2px;text-align:center}
+.hint-rule{font-size:.78rem;color:var(--m);text-align:center;margin-top:4px;min-height:1.2em}
+.accent-target{color:var(--a);text-decoration:underline;font-weight:900}
+.letter-focus{color:var(--a);font-weight:900;text-decoration:underline}
+.no-h-mark{color:var(--m);opacity:.35;font-size:.8em;vertical-align:middle;margin-right:1px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Morfologia i Ortografia</h1>
+    <div class="muted">Plural · Accent · Antònims · Article · V o B · Categories</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: PLURAL DELS NOMS -->
+<div class="card">
+  <h2><span class="num">1</span> Plural dels noms</h2>
+  <div class="card-sub">Tria el plural correcte de la paraula.</div>
+  <div id="plur-word" class="word-big"></div>
+  <div id="plur-opts" class="opts-row"></div>
+  <div id="plur-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextPlur()">Següent →</button>
+  </div>
+</div>
+
+<!-- 2: SÍL·LABA TÒNICA -->
+<div class="card">
+  <h2><span class="num">2</span> La síl·laba tònica</h2>
+  <div class="card-sub">Mira les síl·labes. La paraula és <strong>aguda</strong>, <strong>plana</strong> o <strong>esdrúixola</strong>?</div>
+  <div id="acc-syl" class="syl-disp"></div>
+  <div id="acc-opts" class="opts-row"></div>
+  <div id="acc-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextAccent()">Següent →</button>
+  </div>
+</div>
+
+<!-- 3: ANTÒNIMS -->
+<div class="card">
+  <h2><span class="num">3</span> Antònims</h2>
+  <div class="card-sub">Tria el contrari de la paraula.</div>
+  <div id="ant-word" class="word-big"></div>
+  <div id="ant-opts" class="opts-row"></div>
+  <div id="ant-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextAnton()">Següent →</button>
+  </div>
+</div>
+
+<!-- 4: PLURAL AMB ARTICLE -->
+<div class="card">
+  <h2><span class="num">4</span> Plural amb article</h2>
+  <div class="card-sub">Transforma al plural: <em>la → les</em>, <em>l' → les</em>.</div>
+  <div id="art-word" class="word-big"></div>
+  <div id="art-opts" class="opts-row"></div>
+  <div id="art-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextArt()">Següent →</button>
+  </div>
+</div>
+
+<!-- 5: V O B -->
+<div class="card">
+  <h2><span class="num">5</span> V o B?</h2>
+  <div class="card-sub">Quina lletra completa la paraula correctament?</div>
+  <div id="vb-word" class="vb-word"></div>
+  <div id="vb-hint" class="hint-rule"></div>
+  <div id="vb-opts" class="opts-row"></div>
+  <div id="vb-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextVB()">Següent →</button>
+  </div>
+</div>
+
+<!-- 6: CATEGORIES GRAMATICALS -->
+<div class="card">
+  <h2><span class="num">6</span> Categories gramaticals</h2>
+  <div class="card-sub">La paraula és un <strong>nom</strong>, un <strong>verb</strong> o un <strong>adjectiu</strong>?</div>
+  <div id="cat-word" class="word-big"></div>
+  <div id="cat-opts" class="opts-row"></div>
+  <div id="cat-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextCat()">Següent →</button>
+  </div>
+</div>
+
+<!-- 7: ACCENT CORRECTE -->
+<div class="card">
+  <h2><span class="num">7</span> L'accent correcte</h2>
+  <div class="card-sub">Quina és la forma escrita correcta? Tria entre les tres opcions: accent <strong>obert</strong> (à/è/ò), <strong>tancat</strong> (é/í/ó/ú) o <strong>cap accent</strong>.</div>
+  <div id="tipusacc-word" class="word-big"></div>
+  <div id="tipusacc-opts" class="opts-row"></div>
+  <div id="tipusacc-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextTipusAcc()">Següent →</button>
+  </div>
+</div>
+
+<!-- 8: PARAULES AMB H -->
+<div class="card">
+  <h2><span class="num">8</span> Porta H?</h2>
+  <div class="card-sub">Cal escriure <strong>h</strong> al lloc del guió, o <strong>cap h</strong>?</div>
+  <div id="h-word" class="vb-word"></div>
+  <div id="h-hint" class="hint-rule"></div>
+  <div id="h-opts" class="opts-row"></div>
+  <div id="h-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextH()">Següent →</button>
+  </div>
+</div>
+
+</div><!-- /page -->
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="morfologia_data.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cat_morf_v1';
+
+
+GAM_ACHS = [
+  {id:'first',    s:'🌟', n:'Primer Encert',     d:'Primera resposta correcta'},
+  {id:'s3',       s:'🔥', n:'Ratxa x3',           d:'3 encerts seguits'},
+  {id:'s5',       s:'⚡', n:'Ratxa x5',           d:'5 encerts seguits'},
+  {id:'s10',      s:'💥', n:'Ratxa x10',          d:'10 encerts seguits'},
+  {id:'plur10',   s:'📝', n:'Mestre del Plural',  d:'10 plurals correctes'},
+  {id:'accent10', s:'´',  n:'Expert en Accents',  d:'10 paraules classificades per accent'},
+  {id:'anton10',  s:'↔',  n:'Rei dels Antònims',  d:'10 antònims encertats'},
+  {id:'art10',    s:'🍎', n:'Plural Perfecte',    d:'10 plurals amb article correctes'},
+  {id:'vb10',     s:'✏️', n:'V o B Expert',       d:'10 paraules V/B correctes'},
+  {id:'cat10',      s:'🏷️', n:'Classificadora',       d:'10 categories identificades'},
+  {id:'tipusacc10', s:'è',  n:'Expert en Accents II', d:"10 tipus d'accent identificats"},
+  {id:'h10',        s:'H',  n:'Expert en H',          d:"10 paraules amb/sense h correctes"},
+  {id:'ok50',     s:'🥉', n:'50 Encerts',         d:'50 respostes correctes'},
+  {id:'ok200',    s:'🥈', n:'200 Encerts',        d:'200 respostes correctes'},
+  {id:'ok500',    s:'🏆', n:'500 Encerts',        d:'500 respostes correctes'}
+];
+
+function gExtraAchs(g, tryA){
+  const e = eLoad();
+  tryA('plur10',   (e.plur  ||0) >= 10);
+  tryA('accent10', (e.accent||0) >= 10);
+  tryA('anton10',  (e.anton ||0) >= 10);
+  tryA('art10',    (e.art   ||0) >= 10);
+  tryA('vb10',     (e.vb    ||0) >= 10);
+  tryA('cat10',      (e.cat      ||0) >= 10);
+  tryA('tipusacc10', (e.tipusacc ||0) >= 10);
+  tryA('h10',        (e.h        ||0) >= 10);
+}
+
+// ── SECCIÓ 1: PLURAL DELS NOMS ──
+let plurPrev = -1;
+function nextPlur(){
+  let idx; do { idx = ri(0, PLURAL_POOL.length-1); } while(idx===plurPrev && PLURAL_POOL.length>1);
+  plurPrev = idx;
+  const e = PLURAL_POOL[idx];
+  document.getElementById('plur-word').textContent = e.s;
+  document.getElementById('plur-fb').textContent = '';
+  const opts = sh([e.p, ...sh([...e.w]).slice(0,3)]);
+  renderOpts('plur-opts', opts, e.p,
+    () => { setFb('plur-fb', true,  pick(OK)); gCorrect(5,'plur'); },
+    () => { setFb('plur-fb', false, 'Era «'+e.p+'»'); gWrong(); }
+  );
+}
+
+// ── SECCIÓ 2: SÍL·LABA TÒNICA ──
+let accPrev = -1;
+function nextAccent(){
+  let idx; do { idx = ri(0, ACCENT_POOL.length-1); } while(idx===accPrev && ACCENT_POOL.length>1);
+  accPrev = idx;
+  const e = ACCENT_POOL[idx];
+  document.getElementById('acc-syl').innerHTML =
+    e.syl.replace(/·/g, '<span class="syl-dot">·</span>');
+  document.getElementById('acc-fb').textContent = '';
+  renderOpts('acc-opts', ACCENT_OPTS, e.t,
+    () => { setFb('acc-fb', true,  pick(OK)); gCorrect(5,'accent'); },
+    () => { setFb('acc-fb', false, 'Era «'+e.t+'»'); gWrong(); }
+  );
+}
+
+// ── SECCIÓ 3: ANTÒNIMS ──
+let antPrev = -1;
+function nextAnton(){
+  let idx; do { idx = ri(0, ANTON_POOL.length-1); } while(idx===antPrev && ANTON_POOL.length>1);
+  antPrev = idx;
+  const e = ANTON_POOL[idx];
+  document.getElementById('ant-word').textContent = e.w;
+  document.getElementById('ant-fb').textContent = '';
+  const opts = sh([e.a, ...sh([...e.wrong]).slice(0,3)]);
+  renderOpts('ant-opts', opts, e.a,
+    () => { setFb('ant-fb', true,  pick(OK)); gCorrect(5,'anton'); },
+    () => { setFb('ant-fb', false, 'Era «'+e.a+'»'); gWrong(); }
+  );
+}
+
+// ── SECCIÓ 4: PLURAL AMB ARTICLE ──
+let artPrev = -1;
+function nextArt(){
+  let idx; do { idx = ri(0, ART_POOL.length-1); } while(idx===artPrev && ART_POOL.length>1);
+  artPrev = idx;
+  const e = ART_POOL[idx];
+  document.getElementById('art-word').textContent = e.s;
+  document.getElementById('art-fb').textContent = '';
+  const opts = sh([e.p, ...sh([...e.w]).slice(0,3)]);
+  renderOpts('art-opts', opts, e.p,
+    () => { setFb('art-fb', true,  pick(OK)); gCorrect(5,'art'); },
+    () => { setFb('art-fb', false, 'Era «'+e.p+'»'); gWrong(); }
+  );
+}
+
+// ── SECCIÓ 5: V O B ──
+let vbPrev = -1;
+function nextVB(){
+  let idx; do { idx = ri(0, VB_POOL.length-1); } while(idx===vbPrev && VB_POOL.length>1);
+  vbPrev = idx;
+  const e = VB_POOL[idx];
+  document.getElementById('vb-word').innerHTML =
+    e.word.replace('_', '<span class="vb-blank">___</span>');
+  document.getElementById('vb-hint').textContent = '';
+  document.getElementById('vb-fb').textContent = '';
+  const showVB = () => {
+    const p = e.word.indexOf('_');
+    document.getElementById('vb-word').innerHTML =
+      e.full.slice(0,p) + '<span class="letter-focus">' + e.full[p] + '</span>' + e.full.slice(p+1);
+  };
+  renderOpts('vb-opts', ['V','B'], e.ans,
+    () => { showVB(); document.getElementById('vb-hint').textContent = e.hint;
+            setFb('vb-fb', true,  pick(OK)); gCorrect(5,'vb'); },
+    () => { showVB(); document.getElementById('vb-hint').textContent = e.hint;
+            setFb('vb-fb', false, 'Era «'+e.ans+'» → '+e.full); gWrong(); }
+  );
+}
+
+// ── SECCIÓ 6: CATEGORIES GRAMATICALS ──
+let catPrev = -1;
+function nextCat(){
+  let idx; do { idx = ri(0, CAT_POOL.length-1); } while(idx===catPrev && CAT_POOL.length>1);
+  catPrev = idx;
+  const e = CAT_POOL[idx];
+  document.getElementById('cat-word').textContent = e.w;
+  document.getElementById('cat-fb').textContent = '';
+  renderOpts('cat-opts', CAT_OPTS, e.cat,
+    () => { setFb('cat-fb', true,  pick(OK)+' — '+e.exp); gCorrect(5,'cat'); },
+    () => { setFb('cat-fb', false, 'Era «'+e.cat+'» — '+e.exp); gWrong(); }
+  );
+}
+
+// ── SECCIÓ 7: ACCENT CORRECTE ──
+let tipusaccPrev = -1;
+function nextTipusAcc(){
+  let idx; do { idx = ri(0, TIPUSACC_POOL.length-1); } while(idx===tipusaccPrev && TIPUSACC_POOL.length>1);
+  tipusaccPrev = idx;
+  const e = TIPUSACC_POOL[idx];
+  document.getElementById('tipusacc-word').textContent = e.base;
+  document.getElementById('tipusacc-fb').textContent = '';
+  const showAcc = () => {
+    const ba = [...e.base], fu = [...e.full];
+    const p = ba.findIndex((c, i) => c !== fu[i]);
+    if (p >= 0) {
+      document.getElementById('tipusacc-word').innerHTML =
+        e.full.slice(0,p) + '<span class="letter-focus">' + e.full[p] + '</span>' + e.full.slice(p+1);
+    } else {
+      document.getElementById('tipusacc-word').textContent = e.full;
+    }
+  };
+  const opts = sh([e.full, ...e.w]);
+  renderOpts('tipusacc-opts', opts, e.full,
+    () => { showAcc(); setFb('tipusacc-fb', true,  pick(OK)+' — '+e.hint); gCorrect(5,'tipusacc'); },
+    () => { showAcc(); setFb('tipusacc-fb', false, 'Era «'+e.full+'» — '+e.hint); gWrong(); }
+  );
+}
+
+// ── SECCIÓ 8: PARAULES AMB H ──
+let hPrev = -1;
+function nextH(){
+  let idx; do { idx = ri(0, HWORDS_POOL.length-1); } while(idx===hPrev && HWORDS_POOL.length>1);
+  hPrev = idx;
+  const e = HWORDS_POOL[idx];
+  document.getElementById('h-word').innerHTML =
+    e.word.replace('_', '<span class="vb-blank">___</span>');
+  document.getElementById('h-hint').textContent = '';
+  document.getElementById('h-fb').textContent = '';
+  const showH = () => {
+    if (e.ans === 'h') {
+      const p = e.word.indexOf('_');
+      document.getElementById('h-word').innerHTML =
+        e.full.slice(0,p) + '<span class="letter-focus">' + e.full[p] + '</span>' + e.full.slice(p+1);
+    } else {
+      document.getElementById('h-word').textContent = e.full;
+    }
+  };
+  renderOpts('h-opts', HWORDS_OPTS, e.ans,
+    () => { showH(); document.getElementById('h-hint').textContent = e.hint;
+            setFb('h-fb', true,  pick(OK)+' → '+e.full); gCorrect(5,'h'); },
+    () => { showH(); document.getElementById('h-hint').textContent = e.hint;
+            setFb('h-fb', false, 'Era «'+e.ans+'» → '+e.full); gWrong(); }
+  );
+}
+
+// ── INIT ──
+gRender();
+nextPlur();
+nextAccent();
+nextAnton();
+nextArt();
+nextVB();
+nextCat();
+nextTipusAcc();
+nextH();
+</script>
+</body>
+</html>

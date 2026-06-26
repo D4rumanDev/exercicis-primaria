@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valor Posicional</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── CSS ESPECÍFIC VALOR POSICIONAL ── */
+.num-big{font-size:2.4rem;font-weight:900;text-align:center;padding:10px 0;letter-spacing:.04em;font-family:'Courier New',monospace;line-height:1.3}
+.num-big .hl{color:var(--a);background:#dbeafe;border-radius:6px;padding:0 4px}
+.pos-wrap{overflow-x:auto;margin:10px 0}
+.pos-tbl{border-collapse:collapse;margin:0 auto}
+.pos-tbl th{background:var(--a);color:#fff;padding:5px 10px;text-align:center;font-size:.72rem;font-weight:700;min-width:44px;border:1px solid #1d4ed8}
+.pos-tbl td{text-align:center;padding:8px 10px;border:1px solid var(--b);font-size:1.5rem;font-weight:900;min-width:44px}
+.pos-tbl td.hl{background:#dbeafe;color:var(--a);border-color:var(--a)}
+.pos-lbl{font-size:.82rem;color:var(--m);text-align:center;margin-bottom:4px}
+.decomp-display{font-size:1.05rem;font-weight:800;color:var(--t);text-align:center;padding:12px 10px;background:var(--bg);border-radius:var(--r);margin:10px 0;line-height:1.8;border:1px solid var(--b)}
+.cmp-inp{width:130px;padding:8px;border:2px solid var(--b);border-radius:8px;font-size:1.5rem;font-weight:900;text-align:center;outline:none;font-family:inherit}
+.cmp-inp:focus{border-color:var(--a)}
+.cmp-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.cmp-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.inp-row{display:flex;align-items:center;gap:8px;justify-content:center;margin:10px 0}
+.q-dyn{font-size:.95rem;font-weight:700;color:var(--t);text-align:center;margin:8px 0;min-height:1.4em}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Valor Posicional</h1>
+    <div class="muted">Dígits · Valors · Descomposició · Composició</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: QUIN DÍGIT? -->
+<div class="card">
+  <h2><span class="num">1</span> Quin dígit hi ha?</h2>
+  <div class="card-sub">Llegeix bé el número. Quin dígit ocupa el lloc indicat?</div>
+  <div id="d1-num" class="num-big"></div>
+  <div id="d1-q" class="q-dyn"></div>
+  <div id="d1-opts" class="opts-row"></div>
+  <div id="d1-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextDig()">Següent →</button>
+  </div>
+</div>
+
+<!-- 2: QUIN VALOR? -->
+<div class="card">
+  <h2><span class="num">2</span> Quin és el valor?</h2>
+  <div class="card-sub">Un dígit pot valer molt o poc segons la seva posició. Quin és el seu valor real?</div>
+  <div id="d2-num" class="num-big"></div>
+  <div id="d2-q" class="q-dyn"></div>
+  <div id="d2-opts" class="opts-row"></div>
+  <div id="d2-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextVal()">Següent →</button>
+  </div>
+</div>
+
+<!-- 3: DESCOMPOSICIÓ -->
+<div class="card">
+  <h2><span class="num">3</span> Descomposa el número</h2>
+  <div class="card-sub">Quina descomposició és la correcta?</div>
+  <div id="d3-num" class="num-big"></div>
+  <div id="d3-opts" style="display:flex;flex-direction:column;gap:8px;margin:12px 0"></div>
+  <div id="d3-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextDec()">Següent →</button>
+  </div>
+</div>
+
+<!-- 4: COMPOSA EL NÚMERO -->
+<div class="card">
+  <h2><span class="num">4</span> Composa el número</h2>
+  <div class="card-sub">Llegeix la descomposició i escriu el número sencer.</div>
+  <div id="d4-decomp" class="decomp-display"></div>
+  <div class="inp-row mt3">
+    <input class="cmp-inp" id="d4-inp" type="number" min="1000" max="999999" inputmode="numeric" placeholder="?">
+  </div>
+  <div id="d4-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt3">
+    <button class="btn btn-dark btn-sm" onclick="checkCmp()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextCmp()">Nou →</button>
+  </div>
+</div>
+
+<!-- 5: PROBLEMES -->
+<div class="card">
+  <h2><span class="num">5</span> Problemes</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
+  </div>
+</div>
+
+</div><!-- /page -->
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="problemes.js"></script>
+<script src="../shared.js"></script>
+<script>
+// ── GAMIFICACIÓ ──
+const EXER_KEY = 'ex_vp_v1';
+
+
+GAM_ACHS = [
+  {id:'first',   s:'🌟', n:'Primer Encert',            d:'Primera resposta correcta'},
+  {id:'s3',      s:'🔥', n:'Ratxa x3',                  d:'3 encerts seguits'},
+  {id:'s5',      s:'⚡', n:'Ratxa x5',                  d:'5 encerts seguits'},
+  {id:'s10',     s:'💥', n:'Ratxa x10',                 d:'10 encerts seguits'},
+  {id:'vp-dig',  s:'🔍', n:'Detectiu de Dígits',        d:'5 dígits localitzats correctament'},
+  {id:'vp-val',  s:'💎', n:'Expert en Valors',           d:'5 valors posicionals identificats'},
+  {id:'vp-dec',  s:'🧩', n:'Mestra de la Descomposició', d:'5 descomposicions correctes'},
+  {id:'vp-cmp',  s:'🏗️', n:'Constructora de Números',   d:'5 números compostos correctament'},
+  {id:'ok50',    s:'🥉', n:'50 Encerts',                d:'50 respostes correctes'},
+  {id:'ok200',   s:'🥈', n:'200 Encerts',               d:'200 respostes correctes'}
+];
+
+function gExtraAchs(g, tryA){
+  const e=eLoad();
+  tryA('vp-dig',(e.dig||0)>=5);
+  tryA('vp-val',(e.val||0)>=5);
+  tryA('vp-dec',(e.dec||0)>=5);
+  tryA('vp-cmp',(e.cmp||0)>=5);
+}
+
+// ── HELPERS DE VALOR POSICIONAL ──
+const PLACE_SHORT=['U','D','C','UM','DM','CM'];
+const PLACE_PLUR =['unitats','desenes','centenes','unitats de miler','desenes de miler','centenes de miler'];
+const PLACE_SING =['unitat', 'desena', 'centena','unitat de miler', 'desena de miler', 'centena de miler'];
+
+// Genera array de dígits de nMin a nMax xifres (primer dígit ≥1)
+function genDigits(nMin,nMax){
+  const n=ri(nMin,nMax);
+  const d=[ri(1,9)];
+  for(let i=1;i<n;i++)d.push(ri(0,9));
+  return d;
+}
+
+// Valors posicionals
+function digVal(digits,pos){return digits[digits.length-1-pos]*Math.pow(10,pos);}
+
+// Format número amb punt de milers (ex: 45283 → "45.283")
+function numFmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+
+// Número gran amb dígit destacat (HTML)
+function numHLHtml(digits,hlPos){
+  const n=digits.length;
+  let parts=[];
+  for(let i=0;i<n;i++){
+    const pos=n-1-i;
+    const isHl=pos===hlPos;
+    parts.push(isHl?`<span class="hl">${digits[i]}</span>`:String(digits[i]));
+    const remaining=n-1-i;
+    if(remaining>0&&remaining%3===0)parts.push('.');
+  }
+  return parts.join('');
+}
+
+// Número gran sense destacat
+function numPlainHtml(digits){return numHLHtml(digits,-1);}
+
+// Taula de posicions HTML
+function posTblHTML(digits,hlPos){
+  const n=digits.length;
+  let ths='',tds='';
+  for(let i=0;i<n;i++){
+    const pos=n-1-i;
+    ths+=`<th>${PLACE_SHORT[pos]}</th>`;
+    tds+=`<td${pos===hlPos?' class="hl"':''}>${digits[i]}</td>`;
+  }
+  return `<div class="pos-lbl">Taula de posicions</div><div class="pos-wrap"><table class="pos-tbl"><thead><tr>${ths}</tr></thead><tbody><tr>${tds}</tr></tbody></table></div>`;
+}
+
+// Descomposició numèrica: "40.000 + 5.000 + 200 + 30 + 4"
+function decompNums(digits){
+  const n=digits.length;
+  return digits.map((d,i)=>d>0?numFmt(d*Math.pow(10,n-1-i)):null).filter(Boolean).join(' + ');
+}
+
+// Descomposició en paraules: "4 desenes de miler + 5 unitats de miler + 2 centenes + 3 desenes + 4 unitats"
+function decompWords(digits){
+  const n=digits.length;
+  return digits.map((d,i)=>{
+    if(d===0)return null;
+    const pos=n-1-i;
+    return `${d} ${d===1?PLACE_SING[pos]:PLACE_PLUR[pos]}`;
+  }).filter(Boolean).join(' + ');
+}
+
+// Genera una descomposició numèrica incorrecta (canvia un dígit)
+function wrongDecompNums(digits){
+  for(let tries=0;tries<20;tries++){
+    const d=[...digits];
+    const i=ri(0,d.length-1);
+    const delta=pick(d[i]===9?[-1,-2]:d[i]===0?[1,2]:[-2,-1,1,2]);
+    d[i]=Math.max(i===0?1:0,Math.min(9,d[i]+delta));
+    const s=decompNums(d);
+    if(s!==decompNums(digits))return s;
+  }
+  // fallback: canvia el primer dígit
+  const d=[...digits];d[0]=d[0]===9?8:d[0]+1;
+  return decompNums(d);
+}
+
+// ── BLOC 1: QUIN DÍGIT? ──
+function nextDig(){
+  const digits=genDigits(4,5);
+  const n=digits.length;
+  const hlPos=ri(0,n-1);
+  const correctDig=digits[n-1-hlPos];
+  document.getElementById('d1-num').innerHTML=numPlainHtml(digits);
+  document.getElementById('d1-q').textContent=`Quin dígit hi ha a la posició de les ${PLACE_PLUR[hlPos]}?`;
+  document.getElementById('d1-fb').textContent='';
+  // opcions: dígit correcte + 3 altres únics de 0-9
+  const others=sh([0,1,2,3,4,5,6,7,8,9].filter(d=>d!==correctDig)).slice(0,3);
+  renderOpts('d1-opts',sh([correctDig,...others]).map(String),String(correctDig),
+    ()=>{setFb('d1-fb',true,pick(OK)+` — el dígit de les ${PLACE_PLUR[hlPos]} és ${correctDig}`);gCorrect(2,'dig');},
+    ()=>{setFb('d1-fb',false,`Era ${correctDig} — el de les ${PLACE_PLUR[hlPos]}`);gWrong();}
+  );
+}
+
+// ── BLOC 2: QUIN VALOR? ──
+function nextVal(){
+  const digits=genDigits(4,6);
+  const n=digits.length;
+  // tria posició amb dígit no zero
+  let hlPos;
+  do{hlPos=ri(0,n-1);}while(digits[n-1-hlPos]===0);
+  const d=digits[n-1-hlPos];
+  const correctVal=d*Math.pow(10,hlPos);
+  document.getElementById('d2-num').innerHTML=numHLHtml(digits,hlPos);
+  document.getElementById('d2-q').textContent=`Quant val el dígit marcat en blau (a les ${PLACE_PLUR[hlPos]})?`;
+  document.getElementById('d2-fb').textContent='';
+  // opcions incorrectes: mateix dígit a posicions adjacents, i posició correcta amb dígit adjacent
+  const wrongSet=new Set();
+  const addW=v=>{if(v>0&&v!==correctVal)wrongSet.add(v);};
+  addW(d*Math.pow(10,hlPos+1));
+  addW(d*Math.pow(10,Math.max(0,hlPos-1)));
+  if(d+1<=9)addW((d+1)*Math.pow(10,hlPos));
+  if(d-1>=1)addW((d-1)*Math.pow(10,hlPos));
+  addW(d*Math.pow(10,hlPos+2));
+  const wrongs=sh([...wrongSet]).slice(0,3);
+  while(wrongs.length<3){
+    const v=(ri(1,9))*Math.pow(10,hlPos);
+    if(v!==correctVal&&!wrongs.includes(v))wrongs.push(v);
+  }
+  const opts=sh([correctVal,...wrongs]).map(v=>numFmt(v));
+  const correctStr=numFmt(correctVal);
+  renderOpts('d2-opts',opts,correctStr,
+    ()=>{setFb('d2-fb',true,pick(OK)+` — ${d} × ${numFmt(Math.pow(10,hlPos))} = ${correctStr}`);gCorrect(3,'val');},
+    ()=>{setFb('d2-fb',false,`Era ${correctStr} — ${d} a les ${PLACE_PLUR[hlPos]} val ${correctStr}`);gWrong();}
+  );
+}
+
+// ── BLOC 3: DESCOMPOSICIÓ ──
+function nextDec(){
+  const digits=genDigits(4,5);
+  const correct=decompNums(digits);
+  const w1=wrongDecompNums(digits);
+  let w2;
+  do{w2=wrongDecompNums(digits);}while(w2===w1);
+  const opts=sh([correct,w1,w2]);
+  document.getElementById('d3-num').innerHTML=numPlainHtml(digits);
+  document.getElementById('d3-fb').textContent='';
+  const od=document.getElementById('d3-opts');od.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='aopt';b.style.cssText='width:100%;text-align:left;padding:10px 14px;font-size:.88rem';
+    b.textContent=o;
+    b.onclick=()=>{
+      od.querySelectorAll('.aopt').forEach(x=>x.disabled=true);
+      if(o===correct){b.classList.add('ok');setFb('d3-fb',true,pick(OK));gCorrect(4,'dec');}
+      else{b.classList.add('ko');b.classList.add('shk');od.querySelectorAll('.aopt').forEach(x=>{if(x.textContent===correct)x.classList.add('show');});setFb('d3-fb',false,'Era: '+correct);gWrong();}
+    };
+    od.appendChild(b);
+  });
+}
+
+// ── BLOC 4: COMPOSA EL NÚMERO ──
+let cmpAns=0;
+function nextCmp(){
+  const digits=genDigits(4,5);
+  cmpAns=parseInt(digits.join(''));
+  document.getElementById('d4-decomp').textContent=decompWords(digits);
+  clrInp('d4-inp');
+  document.getElementById('d4-fb').textContent='';
+}
+function checkCmp(){
+  const inp=document.getElementById('d4-inp');
+  inp.classList.remove('ok','ko');
+  const val=parseInt(inp.value.replace(/\./g,''));
+  if(isNaN(val)||val<1000){setFb('d4-fb',false,'Escriu el número sencer (sense punts)!');return;}
+  if(val===cmpAns){
+    inp.classList.add('ok');
+    setFb('d4-fb',true,pick(OK)+` ✓ ${numFmt(cmpAns)}`);
+    gCorrect(5,'cmp');
+  } else {
+    inp.classList.add('ko');
+    setFb('d4-fb',false,`No! El número és ${numFmt(cmpAns)}`);
+    gWrong();
+  }
+}
+
+// ── BLOC 5: PROBLEMES ──
+const PROB_POOL=getProbs('valor_posicional');
+function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,4);}
+
+// ── INIT ──
+gRender();
+nextDig(); nextVal(); nextDec(); nextCmp(); nextProblemes();
+document.getElementById('d4-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkCmp();});
+</script>
+</body>
+</html>

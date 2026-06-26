@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timetable &amp; Time</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── Clock ── */
+.clk-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;margin:8px 0}
+.clk-opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.copt{padding:9px 14px;border:2px solid var(--b);border-radius:var(--r);background:#fff;cursor:pointer;font-size:.88rem;font-weight:600;transition:all .15s;font-family:inherit;line-height:1.3;text-align:center}
+.copt:hover{border-color:var(--a);color:var(--a)}
+.copt.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
+.copt.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko);pointer-events:none}
+.copt.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
+.copt:disabled{pointer-events:none}
+
+/* ── Info / narrative box ── */
+.info-box{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:.88rem;line-height:1.7;color:var(--t)}
+.info-box strong{color:var(--a)}
+
+/* ── Timetable ── */
+.tt-table{width:100%;border-collapse:collapse;font-size:.83rem;margin:6px 0}
+.tt-table th{background:var(--a);color:#fff;padding:6px 8px;text-align:center;font-size:.78rem;font-weight:700}
+.tt-table td{border:1px solid var(--b);padding:6px 8px;text-align:center;font-weight:500}
+.tt-table .tc{background:#f8faff;color:var(--m);font-size:.75rem;font-weight:700;white-space:nowrap}
+.tt-ok{background:#f0fdf4;color:var(--ok);font-weight:700}
+.tt-q{color:#94a3b8;font-style:italic}
+
+/* ── Digital input (section 2) ── */
+.conv-list{display:flex;flex-direction:column;gap:10px}
+.conv-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.conv-expr{flex:1;font-size:.92rem;font-weight:600;min-width:160px}
+.fi{width:72px;padding:6px;border:2px solid var(--b);border-radius:8px;font-size:.95rem;font-weight:700;text-align:center;outline:none;font-family:inherit;-moz-appearance:textfield}
+.fi:focus{border-color:var(--a)}
+.fi.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.fi.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+
+/* ── Q blocks ── */
+.q-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b)}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-sent{font-size:.93rem;font-weight:500;margin-bottom:8px;line-height:1.5}
+.blank{color:var(--a);font-weight:800;letter-spacing:.04em}
+
+/* ── Word reorder ── */
+.reorder-block{padding:12px 0;border-bottom:1px solid var(--b)}
+.reorder-block:last-child{border-bottom:none;padding-bottom:0}
+.word-bank{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#f8faff;border-radius:8px;border:1.5px dashed var(--b);min-height:40px;margin:4px 0}
+.sentence-area{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-radius:8px;border:2px solid var(--b);min-height:40px;margin:4px 0}
+.word-chip{padding:5px 10px;background:#fff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;transition:all .15s;user-select:none}
+.word-chip:hover{background:#eff6ff}
+.placed-chip{padding:5px 10px;background:#eff6ff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;transition:all .15s;user-select:none}
+.placed-chip:hover{background:#dbeafe}
+
+/* ── All-done banner ── */
+.done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
+
+@media(max-width:480px){.tt-table{font-size:.72rem}.tt-table th,.tt-table td{padding:4px 5px}.conv-expr{min-width:120px}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Timetable &amp; Time</h1>
+    <div class="muted">Unit 1 · School subjects · Telling the time · Have we got...?</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<!-- ── 1: Clock → MCQ ── -->
+<div class="card">
+  <h2><span class="num">1</span> What time is it?</h2>
+  <p class="card-sub">Look at the clock and choose the correct expression.</p>
+  <div class="clk-wrap">
+    <div id="s1-clk"></div>
+    <div class="clk-opts" id="s1-opts"></div>
+    <div class="fb" id="s1-fb"></div>
+  </div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" id="s1-next" onclick="s1Next()" style="display:none">Next ▶</button>
+  </div>
+  <div id="s1-done" class="done-banner" style="display:none">
+    All clocks done! ✓
+    <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="s1Init()">Again</button>
+  </div>
+</div>
+
+<!-- ── 2: Expression → Digital ── -->
+<div class="card">
+  <h2><span class="num">2</span> Write the digital time</h2>
+  <p class="card-sub">Read the time and write it in digital format (e.g. 9:15).</p>
+  <div class="conv-list" id="s2-list"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-outline btn-sm" onclick="s2Init()">New times ▶</button>
+  </div>
+</div>
+
+<!-- ── 3: I've got / haven't got ── -->
+<div class="card">
+  <h2><span class="num">3</span> I've got / I haven't got</h2>
+  <p class="card-sub">Look at the school timetable and complete the sentences.</p>
+  <div class="info-box" id="s3-tt"></div>
+  <div id="s3-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s3Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 4: Have we got? Yes/No ── -->
+<div class="card">
+  <h2><span class="num">4</span> Have we got...?</h2>
+  <p class="card-sub">Use the timetable above to answer.</p>
+  <div id="s4-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s4Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 5: Complete Sam's timetable ── -->
+<div class="card">
+  <h2><span class="num">5</span> Complete the timetable</h2>
+  <p class="card-sub">Read what Sam says and choose the correct subject for each slot.</p>
+  <div class="info-box">
+    <strong>Sam says:</strong> "On Monday, I've got <strong>English</strong> at nine o'clock, <strong>Science</strong> at ten o'clock and <strong>Art</strong> at eleven o'clock. On Tuesday, I've got <strong>Maths</strong> at nine o'clock and <strong>PE</strong> at ten o'clock. On Wednesday, I've got <strong>History</strong> at nine o'clock and <strong>Drama</strong> at ten o'clock."
+  </div>
+  <div id="s5-grid"></div>
+  <div id="s5-qs"></div>
+</div>
+
+<!-- ── 6: Word reorder ── -->
+<div class="card">
+  <h2><span class="num">6</span> Put the words in order</h2>
+  <p class="card-sub">Click the words to build the correct sentence. Click a placed word to remove it.</p>
+  <div id="s6-list"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-outline btn-sm" onclick="s6Init()">New sentences ▶</button>
+  </div>
+</div>
+
+<!-- ── 7: True / False ── -->
+<div class="card">
+  <h2><span class="num">7</span> True or False?</h2>
+  <p class="card-sub">Look at the timetable and decide.</p>
+  <div class="info-box" id="s7-tt"></div>
+  <div id="s7-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s7Init()">New questions ▶</button>
+  </div>
+</div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+/* ── English feedback arrays (can't reassign const OK/KO from shared.js) ── */
+const ENOK = ["Well done! ⭐","Excellent! 🎉","Great job! 🌟","Perfect! 🏆","Amazing! 💪","Fantastic! 🎊"];
+const ENKO = ["Try again!","Not quite...","Almost there!","Have another go!"];
+
+const EXER_KEY = 'ex_ang_hor_v1';
+GAM_ACHS = [...GAM_ACHS,
+  {id:'ang_hor1',  s:'⏰', n:'Time Starter',  d:'First timetable question correct'},
+  {id:'ang_hor5',  s:'📅', n:'Timetable Pro',  d:'5 timetable questions correct'},
+  {id:'ang_hor20', s:'🎓', n:'School Expert', d:'20 timetable questions correct'},
+];
+
+function horOk(xp) {
+  const e = eLoad();
+  e.ok = (e.ok || 0) + 1;
+  eSave(e);
+  gCorrect(xp || 3, tryA => {
+    tryA('ang_hor1',  e.ok >= 1);
+    tryA('ang_hor5',  e.ok >= 5);
+    tryA('ang_hor20', e.ok >= 20);
+  });
+}
+
+/* ── Analog clock SVG ── */
+function makeClock(h, m) {
+  const size = 150, cx = 75, cy = 75, r = 70;
+  const pt = (a, len) => [cx + len * Math.cos(a * Math.PI / 180), cy + len * Math.sin(a * Math.PI / 180)];
+  let marks = '', nums = '';
+  for (let i = 0; i < 12; i++) {
+    const a = i / 12 * 360 - 90;
+    const [x1,y1] = pt(a, r - 9); const [x2,y2] = pt(a, r - 2);
+    marks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${i%3===0?'#1e293b':'#cbd5e1'}" stroke-width="${i%3===0?2.5:1.5}" stroke-linecap="round"/>`;
+    const [nx,ny] = pt(a, r - 21);
+    nums += `<text x="${nx.toFixed(1)}" y="${(ny+4.5).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b" font-family="'Segoe UI',sans-serif">${[12,1,2,3,4,5,6,7,8,9,10,11][i]}</text>`;
+  }
+  const [hx,hy] = pt(((h%12)+m/60)/12*360-90, r*0.50);
+  const [mx,my] = pt(m/60*360-90, r*0.73);
+  return `<svg viewBox="0 0 150 150" width="150" height="150" style="display:block">
+    <circle cx="75" cy="75" r="${r}" fill="white" stroke="#1e293b" stroke-width="2.5"/>
+    ${marks}${nums}
+    <line x1="75" y1="75" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>
+    <line x1="75" y1="75" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="75" cy="75" r="4.5" fill="#1e293b"/>
+  </svg>`;
+}
+
+/* ── Data pools ── */
+const CLOCK_POOL = [
+  {h:3,  m:0,  expr:"It's three o'clock"},
+  {h:6,  m:0,  expr:"It's six o'clock"},
+  {h:9,  m:0,  expr:"It's nine o'clock"},
+  {h:12, m:0,  expr:"It's twelve o'clock"},
+  {h:1,  m:0,  expr:"It's one o'clock"},
+  {h:4,  m:15, expr:"It's quarter past four"},
+  {h:7,  m:15, expr:"It's quarter past seven"},
+  {h:9,  m:15, expr:"It's quarter past nine"},
+  {h:11, m:15, expr:"It's quarter past eleven"},
+  {h:2,  m:30, expr:"It's half past two"},
+  {h:5,  m:30, expr:"It's half past five"},
+  {h:8,  m:30, expr:"It's half past eight"},
+  {h:11, m:30, expr:"It's half past eleven"},
+  {h:3,  m:45, expr:"It's quarter to four"},
+  {h:6,  m:45, expr:"It's quarter to seven"},
+  {h:9,  m:45, expr:"It's quarter to ten"},
+  {h:11, m:45, expr:"It's quarter to twelve"},
+];
+
+const EXPR_POOL = [
+  {expr:"It's quarter past nine",   dig:"9:15"},
+  {expr:"It's half past two",       dig:"2:30"},
+  {expr:"It's quarter to six",      dig:"5:45"},
+  {expr:"It's three o'clock",       dig:"3:00"},
+  {expr:"It's quarter past twelve", dig:"12:15"},
+  {expr:"It's half past seven",     dig:"7:30"},
+  {expr:"It's quarter to four",     dig:"3:45"},
+  {expr:"It's one o'clock",         dig:"1:00"},
+  {expr:"It's half past eleven",    dig:"11:30"},
+  {expr:"It's quarter to ten",      dig:"9:45"},
+  {expr:"It's quarter past five",   dig:"5:15"},
+  {expr:"It's half past nine",      dig:"9:30"},
+  {expr:"It's four o'clock",        dig:"4:00"},
+  {expr:"It's eight o'clock",       dig:"8:00"},
+  {expr:"It's ten o'clock",         dig:"10:00"},
+  {expr:"It's two o'clock",         dig:"2:00"},
+  {expr:"It's quarter past one",    dig:"1:15"},
+  {expr:"It's quarter past three",  dig:"3:15"},
+  {expr:"It's quarter past six",    dig:"6:15"},
+  {expr:"It's half past one",       dig:"1:30"},
+  {expr:"It's half past three",     dig:"3:30"},
+  {expr:"It's half past six",       dig:"6:30"},
+  {expr:"It's quarter to two",      dig:"1:45"},
+  {expr:"It's quarter to five",     dig:"4:45"},
+  {expr:"It's quarter to eight",    dig:"7:45"},
+];
+
+/* Main timetable (sections 3, 4, 7) */
+const MTT = {
+  days: ['Monday','Tuesday','Wednesday'],
+  times: ['9:00','10:00','11:00'],
+  grid: [
+    ['Maths','English','Science'],
+    ['History','Art','Maths'],
+    ['PE','Science','Music'],
+  ]
+};
+
+const ALL_SUBJ = ['Maths','English','Science','History','Art','PE','Music','Geography','Drama','ICT'];
+
+/* Timetable HTML */
+function ttHtml(tt, cellIdPfx) {
+  let h = `<table class="tt-table"><thead><tr><th>Time</th>`;
+  tt.days.forEach(d => h += `<th>${d}</th>`);
+  h += '</tr></thead><tbody>';
+  tt.times.forEach((t, ti) => {
+    h += `<tr><td class="tc">${t}</td>`;
+    tt.days.forEach((_, di) => {
+      const cid = cellIdPfx ? ` id="${cellIdPfx}${ti}_${di}"` : '';
+      const cls = cellIdPfx ? ' class="tt-q"' : '';
+      const text = cellIdPfx ? '?' : tt.grid[ti][di];
+      h += `<td${cid}${cls}>${text}</td>`;
+    });
+    h += '</tr>';
+  });
+  return h + '</tbody></table>';
+}
+
+/* S3 pool: I've got / haven't got */
+function buildS3() {
+  const pool = [];
+  MTT.times.forEach((t, ti) => MTT.days.forEach((d, di) =>
+    pool.push({sent:`We ___ ${MTT.grid[ti][di]} on ${d} at ${t}.`, ans:'have got'})));
+  [{d:'Monday',t:'9:00',s:'Drama'},{d:'Monday',t:'10:00',s:'ICT'},
+   {d:'Tuesday',t:'9:00',s:'Geography'},{d:'Tuesday',t:'10:00',s:'Music'},
+   {d:'Wednesday',t:'11:00',s:'Drama'},{d:'Wednesday',t:'9:00',s:'History'}]
+  .forEach(({d,t,s}) => pool.push({sent:`We ___ ${s} on ${d} at ${t}.`, ans:"haven't got"}));
+  return pool;
+}
+
+/* S4 pool: Have we got? */
+function buildS4() {
+  const pool = [];
+  MTT.times.forEach((t, ti) => MTT.days.forEach((d, di) =>
+    pool.push({q:`Have we got ${MTT.grid[ti][di]} on ${d} at ${t}?`, ans:'Yes, we have.'})));
+  [{d:'Monday',t:'9:00',s:'Drama'},{d:'Tuesday',t:'10:00',s:'ICT'},
+   {d:'Wednesday',t:'9:00',s:'Geography'},{d:'Tuesday',t:'9:00',s:'PE'},
+   {d:'Monday',t:'11:00',s:'Music'}]
+  .forEach(({d,t,s}) => pool.push({q:`Have we got ${s} on ${d} at ${t}?`, ans:"No, we haven't."}));
+  return pool;
+}
+
+/* S5 — Sam's timetable */
+const S5 = {
+  days: ['Monday','Tuesday','Wednesday'],
+  times: ['9:00','10:00','11:00'],
+  grid: [
+    ['English','Maths','History'],
+    ['Science','PE','Drama'],
+    ['Art', null, null],
+  ]
+};
+let s5Scored = {};
+
+/* S6 sentences */
+const S6_POOL = [
+  {words:["Have","we","got","English","on","Monday?"],         correct:"Have we got English on Monday?"},
+  {words:["I've","got","Maths","at","nine","o'clock."],        correct:"I've got Maths at nine o'clock."},
+  {words:["We","haven't","got","PE","on","Tuesday."],          correct:"We haven't got PE on Tuesday."},
+  {words:["Have","we","got","Art","on","Wednesday?"],          correct:"Have we got Art on Wednesday?"},
+  {words:["She's","got","Science","on","Wednesday."],          correct:"She's got Science on Wednesday."},
+  {words:["We","haven't","got","Drama","on","Monday."],        correct:"We haven't got Drama on Monday."},
+  {words:["I've","got","History","at","ten","o'clock."],       correct:"I've got History at ten o'clock."},
+  {words:["Have","we","got","Music","on","Wednesday?"],        correct:"Have we got Music on Wednesday?"},
+  {words:["He","hasn't","got","Art","on","Thursday."],         correct:"He hasn't got Art on Thursday."},
+  {words:["She","hasn't","got","ICT","on","Friday."],          correct:"She hasn't got ICT on Friday."},
+  {words:["Have","you","got","PE","at","eleven","o'clock?"],   correct:"Have you got PE at eleven o'clock?"},
+  {words:["I've","got","Geography","on","Thursday."],           correct:"I've got Geography on Thursday."},
+  {words:["We","haven't","got","Drama","on","Wednesday."],      correct:"We haven't got Drama on Wednesday."},
+  {words:["I","haven't","got","Maths","on","Friday."],          correct:"I haven't got Maths on Friday."},
+];
+
+/* S7 T/F */
+const S7_POOL = [
+  {stmt:"We've got Maths on Monday at 9:00.",      ans:true},
+  {stmt:"We've got History on Tuesday at 10:00.",  ans:false},
+  {stmt:"We've got PE on Monday at 11:00.",        ans:true},
+  {stmt:"We've got English on Wednesday at 9:00.", ans:false},
+  {stmt:"We haven't got Drama this week.",          ans:true},
+  {stmt:"We've got Science on Tuesday at 11:00.",  ans:true},
+  {stmt:"We've got Music on Wednesday at 11:00.",  ans:true},
+  {stmt:"We've got Art on Wednesday at 10:00.",    ans:false},
+  {stmt:"We've got English on Tuesday at 9:00.",   ans:true},
+  {stmt:"We've got History on Wednesday at 10:00.",  ans:false},
+  {stmt:"We've got Science on Wednesday at 9:00.",   ans:true},
+  {stmt:"We've got History on Monday at 10:00.",     ans:true},
+  {stmt:"We've got Art on Tuesday at 10:00.",        ans:true},
+  {stmt:"We've got Maths on Tuesday at 11:00.",      ans:false},
+  {stmt:"We haven't got Geography this week.",        ans:true},
+];
+
+/* ══ SECTION 1 ══ */
+let s1Queue = [], s1Idx = 0;
+
+function s1Init() {
+  s1Queue = sh([...CLOCK_POOL]); s1Idx = 0;
+  document.getElementById('s1-done').style.display = 'none';
+  s1Show();
+}
+function s1Show() {
+  if (s1Idx >= s1Queue.length) {
+    document.getElementById('s1-clk').innerHTML = '';
+    document.getElementById('s1-opts').innerHTML = '';
+    document.getElementById('s1-fb').className = 'fb';
+    document.getElementById('s1-next').style.display = 'none';
+    document.getElementById('s1-done').style.display = 'block';
+    return;
+  }
+  const it = s1Queue[s1Idx];
+  document.getElementById('s1-clk').innerHTML = makeClock(it.h, it.m);
+  document.getElementById('s1-fb').className = 'fb';
+  document.getElementById('s1-next').style.display = 'none';
+  const opts = sh([it.expr, ...sh(CLOCK_POOL.filter(c => c.expr !== it.expr)).slice(0,3).map(c=>c.expr)]);
+  const od = document.getElementById('s1-opts'); od.innerHTML = '';
+  opts.forEach(o => {
+    const b = document.createElement('button'); b.className = 'copt'; b.textContent = o;
+    b.onclick = () => {
+      od.querySelectorAll('.copt').forEach(x => x.disabled = true);
+      const ok = o === it.expr; b.classList.add(ok ? 'ok' : 'ko');
+      if (!ok) od.querySelectorAll('.copt').forEach(x => { if (x.textContent === it.expr) x.classList.add('show'); });
+      const fb = document.getElementById('s1-fb');
+      fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+      fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + it.expr;
+      ok ? horOk(3) : gWrong();
+      document.getElementById('s1-next').style.display = 'inline-block';
+    };
+    od.appendChild(b);
+  });
+}
+function s1Next() { s1Idx++; s1Show(); }
+
+/* ══ SECTION 2 ══ */
+function s2Init() {
+  const sel = sh([...EXPR_POOL]).slice(0, 4);
+  document.getElementById('s2-list').innerHTML = sel.map((it, i) => `
+    <div class="conv-row" id="s2r${i}">
+      <span class="conv-expr">${it.expr}</span>
+      <span style="color:var(--m)">→</span>
+      <input class="fi" id="s2i${i}" type="text" placeholder="0:00" autocomplete="off">
+      <button class="btn btn-dark btn-sm" id="s2b${i}" onclick="s2Chk(${i},'${it.dig}')">✓</button>
+    </div>
+    <div class="fb" id="s2fb${i}"></div>
+  `).join('');
+  sel.forEach((it, i) => {
+    document.getElementById('s2i' + i).addEventListener('keydown', e => {
+      if (e.key === 'Enter') s2Chk(i, it.dig);
+    });
+  });
+}
+function s2Chk(i, correct) {
+  const inp = document.getElementById('s2i' + i);
+  if (inp.classList.contains('ok')) return;
+  const ok = inp.value.trim() === correct;
+  inp.classList.toggle('ok', ok); inp.classList.toggle('ko', !ok);
+  const fb = document.getElementById('s2fb' + i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'The answer is ' + correct;
+  if (ok) { inp.disabled = true; document.getElementById('s2b' + i).disabled = true; horOk(2); }
+  else gWrong();
+}
+
+/* ══ SECTION 3 ══ */
+let s3Current = [];
+function s3Init() {
+  s3Current = sh(buildS3()).slice(0, 4);
+  document.getElementById('s3-qs').innerHTML = s3Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">${q.sent.replace('___','<span class="blank">___</span>')}</div>
+      <div class="opts-row" id="s3o${i}">
+        <button class="aopt" onclick="s3Ans(this,${i},'have got')">have got</button>
+        <button class="aopt" onclick="s3Ans(this,${i},&quot;haven't got&quot;)">haven't got</button>
+      </div>
+      <div class="fb" id="s3fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s3Ans(btn, i, chosen) {
+  document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ans = s3Current[i].ans, ok = chosen === ans;
+  btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => { if (b.textContent === ans) b.classList.add('show'); });
+  const fb = document.getElementById('s3fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'The answer is "' + ans + '"';
+  ok ? horOk(2) : gWrong();
+}
+
+/* ══ SECTION 4 ══ */
+let s4Current = [];
+function s4Init() {
+  s4Current = sh(buildS4()).slice(0, 4);
+  document.getElementById('s4-qs').innerHTML = s4Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent" style="font-weight:600">${q.q}</div>
+      <div class="opts-row" id="s4o${i}">
+        <button class="aopt" onclick="s4Ans(this,${i},'Yes, we have.')">Yes, we have.</button>
+        <button class="aopt" onclick="s4Ans(this,${i},&quot;No, we haven't.&quot;)">No, we haven't.</button>
+      </div>
+      <div class="fb" id="s4fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s4Ans(btn, i, chosen) {
+  document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ans = s4Current[i].ans, ok = chosen === ans;
+  btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => { if (b.textContent === ans) b.classList.add('show'); });
+  const fb = document.getElementById('s4fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : ans;
+  ok ? horOk(2) : gWrong();
+}
+
+/* ══ SECTION 5 ══ */
+function s5Init() {
+  s5Scored = {};
+  /* Visual timetable with blank cells */
+  let grid = `<table class="tt-table"><thead><tr><th>Time</th>`;
+  S5.days.forEach(d => grid += `<th>${d}</th>`);
+  grid += '</tr></thead><tbody>';
+  S5.times.forEach((t, ti) => {
+    grid += `<tr><td class="tc">${t}</td>`;
+    S5.days.forEach((_, di) => {
+      if (S5.grid[ti][di] === null) grid += `<td style="background:#f8faff;color:var(--m)">—</td>`;
+      else grid += `<td id="s5c_${ti}_${di}" class="tt-q">?</td>`;
+    });
+    grid += '</tr>';
+  });
+  document.getElementById('s5-grid').innerHTML = grid + '</tbody></table>';
+
+  /* MCQ per cell */
+  const cells = [];
+  S5.times.forEach((t, ti) => S5.days.forEach((d, di) => {
+    const subj = S5.grid[ti][di]; if (!subj) return;
+    const opts = sh([subj, ...sh(ALL_SUBJ.filter(s => s !== subj)).slice(0,3)]);
+    cells.push({ti, di, d, t, subj, opts});
+  }));
+  document.getElementById('s5-qs').innerHTML = '<div style="margin-top:12px">' + cells.map((c, i) => `
+    <div class="q-block">
+      <div class="q-sent">Sam has _____ on <strong>${c.d}</strong> at <strong>${c.t}</strong>.</div>
+      <div class="opts-row" id="s5o${i}">
+        ${c.opts.map(o => `<button class="aopt" onclick="s5Ans(this,${i},${c.ti},${c.di},'${o}','${c.subj}')">${o}</button>`).join('')}
+      </div>
+      <div class="fb" id="s5fb${i}"></div>
+    </div>
+  `).join('') + '</div>';
+}
+function s5Ans(btn, i, ti, di, chosen, correct) {
+  const key = ti+'_'+di; if (s5Scored[key]) return;
+  document.querySelectorAll('#s5o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = chosen === correct;
+  btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s5o'+i+' .aopt').forEach(b => { if (b.textContent === correct) b.classList.add('show'); });
+  const fb = document.getElementById('s5fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'The answer is ' + correct;
+  if (ok) {
+    s5Scored[key] = true;
+    const cell = document.getElementById('s5c_'+ti+'_'+di);
+    if (cell) { cell.textContent = correct; cell.className = 'tt-ok'; }
+    horOk(2);
+  } else gWrong();
+}
+
+/* ══ SECTION 6 ══ */
+let s6State = [];
+function s6Init() {
+  const sel = sh([...S6_POOL]).slice(0, 3);
+  s6State = sel.map(it => ({
+    words: it.words, correct: it.correct,
+    shuffled: sh([...Array(it.words.length).keys()]),
+    placed: [], done: false
+  }));
+  document.getElementById('s6-list').innerHTML = s6State.map((_, i) => `
+    <div class="reorder-block">
+      <div class="label" style="margin-bottom:5px">Words:</div>
+      <div class="word-bank" id="s6b${i}"></div>
+      <div class="label" style="margin:5px 0 4px">Your sentence:</div>
+      <div class="sentence-area" id="s6s${i}"></div>
+      <div class="btn-row" style="margin-top:8px;justify-content:flex-start">
+        <button class="btn btn-dark btn-sm" onclick="s6Check(${i})">Check ✓</button>
+        <button class="btn btn-outline btn-sm" onclick="s6Clear(${i})">Clear</button>
+      </div>
+      <div class="fb" id="s6fb${i}"></div>
+    </div>
+  `).join('');
+  s6State.forEach((_, i) => s6Render(i));
+}
+function s6Render(i) {
+  const it = s6State[i];
+  const bank = document.getElementById('s6b'+i), sent = document.getElementById('s6s'+i);
+  bank.innerHTML = ''; sent.innerHTML = '';
+  if (it.done) { bank.innerHTML = '<span style="color:var(--ok);font-weight:600;font-size:.85rem">✓ ' + it.correct + '</span>'; return; }
+  it.shuffled.forEach(wi => {
+    if (it.placed.includes(wi)) return;
+    const c = document.createElement('span'); c.className = 'word-chip'; c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.push(wi); s6Render(i); };
+    bank.appendChild(c);
+  });
+  it.placed.forEach(wi => {
+    const c = document.createElement('span'); c.className = 'placed-chip'; c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.splice(it.placed.indexOf(wi), 1); s6Render(i); };
+    sent.appendChild(c);
+  });
+}
+function s6Check(i) {
+  const it = s6State[i];
+  const built = it.placed.map(wi => it.words[wi]).join(' ');
+  const ok = built === it.correct;
+  const fb = document.getElementById('s6fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'Correct: "' + it.correct + '"';
+  if (ok) { it.done = true; s6Render(i); horOk(4); } else gWrong();
+}
+function s6Clear(i) {
+  s6State[i].placed = []; s6State[i].done = false;
+  document.getElementById('s6fb'+i).className = 'fb';
+  s6Render(i);
+}
+
+/* ══ SECTION 7 ══ */
+let s7Current = [];
+function s7Init() {
+  s7Current = sh([...S7_POOL]).slice(0, 5);
+  document.getElementById('s7-qs').innerHTML = s7Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">"${q.stmt}"</div>
+      <div class="opts-row" id="s7o${i}">
+        <button class="aopt" onclick="s7Ans(this,${i},true)">True ✓</button>
+        <button class="aopt" onclick="s7Ans(this,${i},false)">False ✗</button>
+      </div>
+      <div class="fb" id="s7fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s7Ans(btn, i, chosen) {
+  document.querySelectorAll('#s7o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = chosen === s7Current[i].ans;
+  btn.classList.add(ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s7fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'It\'s ' + (s7Current[i].ans ? 'True' : 'False') + '!';
+  ok ? horOk(2) : gWrong();
+}
+
+/* ══ Bootstrap ══ */
+window.addEventListener('load', () => {
+  const ttRef = `<div style="overflow-x:auto">${ttHtml(MTT, null)}</div>`;
+  document.getElementById('s3-tt').innerHTML = ttRef;
+  document.getElementById('s7-tt').innerHTML = ttRef;
+  s1Init(); s2Init(); s3Init(); s4Init(); s5Init(); s6Init(); s7Init();
+  gRender();
+});
+</script>
+</body>
+</html>

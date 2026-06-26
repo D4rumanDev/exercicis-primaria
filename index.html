@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exercicis — 4t</title>
+<style>
+:root{--bg:#f0f4ff;--s:#fff;--b:#e2e8f0;--t:#1e293b;--m:#64748b;--a:#1d4ed8;--r:12px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+.layout{display:flex;height:100vh}
+
+/* ── Sidebar ── */
+.sidebar{width:232px;flex-shrink:0;background:var(--s);border-right:1px solid var(--b);display:flex;flex-direction:column;overflow-y:auto;transition:transform .25s}
+.sidebar-hdr{padding:14px 16px 12px;border-bottom:1px solid var(--b)}
+.sidebar-title{font-size:1rem;font-weight:800;color:var(--t);letter-spacing:-.02em}
+.sidebar-sub{font-size:.72rem;color:var(--m);margin-top:2px}
+
+.nav-group{padding:6px 0}
+.nav-sep{height:1px;background:var(--b);margin:4px 0}
+.nav-lbl{font-size:.67rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.08em;padding:8px 16px 3px}
+.nav-item{display:flex;align-items:center;width:100%;text-align:left;padding:7px 16px 7px 22px;border:none;background:none;font-family:inherit;font-size:.84rem;font-weight:500;color:var(--t);cursor:pointer;transition:background .1s,color .1s;line-height:1.35}
+.nav-item:hover{background:var(--bg);color:var(--a)}
+.nav-item.active{background:#dbeafe;color:var(--a);font-weight:700;border-left:3px solid var(--a);padding-left:19px}
+.nav-badge{margin-left:auto;font-size:.62rem;font-weight:700;color:var(--a);background:#dbeafe;border-radius:100px;padding:1px 6px;min-width:20px;text-align:center;line-height:1.6;flex-shrink:0}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:38px;background:var(--bg);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0}
+.tog{display:none;padding:4px 9px;border:1px solid var(--b);border-radius:8px;background:none;cursor:pointer;font-size:1rem;color:var(--m);line-height:1}
+.topbar-title{font-size:.83rem;font-weight:600;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+iframe{flex:1;border:none;width:100%;background:var(--bg)}
+
+/* ── Gam panel ── */
+.gam-panel{padding:10px 16px 14px;border-top:1px solid var(--b)}
+.gam-panel-title{font-size:.67rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.gam-lv{font-size:.8rem;font-weight:700;color:var(--a);margin-bottom:5px}
+.gam-xp-track{height:4px;background:var(--b);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.gam-xp-fill{height:100%;background:var(--a);border-radius:3px;transition:width .5s}
+.gam-stats{display:flex;gap:0;text-align:center}
+.gam-stat{flex:1;font-size:.68rem;color:var(--m);line-height:1.2}
+.gam-stat-n{display:block;font-size:.95rem;font-weight:800;color:var(--t)}
+
+/* ── Overlay (mobile) ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99}
+.overlay.show{display:block}
+
+@media(max-width:600px){
+  .tog{display:block}
+  .sidebar{position:fixed;left:0;top:0;height:100%;z-index:100;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,.15)}
+  .sidebar.open{transform:translateX(0)}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-hdr">
+    <div class="sidebar-title">Exercicis — 4t</div>
+    <div class="sidebar-sub">Exercicis escolars</div>
+  </div>
+
+  <div class="nav-group" data-topic="mates">
+    <div class="nav-lbl">Matemàtiques</div>
+    <button class="nav-item active" data-ekey="suma_portant_v1" onclick="goTo(this,'mates/suma_portant.html','Suma amb portant')">Suma amb portant</button>
+    <button class="nav-item" data-ekey="resta_portant_v1" onclick="goTo(this,'mates/resta_portant.html','Resta amb portant')">Resta amb portant</button>
+    <button class="nav-item" data-ekey="ex_mult_v1" onclick="goTo(this,'mates/multiplicacio.html','Multiplicació')">Multiplicació</button>
+    <button class="nav-item" data-ekey="ex_div_v1" onclick="goTo(this,'mates/divisio.html','Divisió')">Divisió</button>
+    <button class="nav-item" data-ekey="ex_prob_v1" onclick="goTo(this,'mates/problemes.html','Problemes')">Problemes</button>
+    <button class="nav-item" data-ekey="ex_vp_v1" onclick="goTo(this,'mates/valor_posicional.html','Valor posicional')">Valor posicional</button>
+    <button class="nav-item" data-ekey="ex_frac_v1" onclick="goTo(this,'mates/fraccions.html','Fraccions')">Fraccions</button>
+    <button class="nav-item" data-ekey="ex_din_v1" onclick="goTo(this,'mates/diners.html','Diners')">Diners</button>
+    <button class="nav-item" data-ekey="ex_hores_v1" onclick="goTo(this,'mates/hores.html','Hores i Temps')">Hores i Temps</button>
+    <button class="nav-item" data-ekey="ex_long_v1" onclick="goTo(this,'mates/mesures_longitud.html','Mesures de Longitud')">Mesures de Longitud</button>
+    <button class="nav-item" data-ekey="mesures_cap_v1" onclick="goTo(this,'mates/mesures_capacitat.html','Mesures de Capacitat')">Mesures de Capacitat</button>
+    <button class="nav-item" data-ekey="ex_geo_v1" onclick="goTo(this,'mates/geometria.html','Geometria')">Geometria</button>
+    <button class="nav-item" data-ekey="ex_est_v1" onclick="goTo(this,'mates/estadistica.html','Estadística i Sèries')">Estadística i Sèries</button>
+  </div>
+
+  <div class="nav-sep" data-topic="mates"></div>
+
+  <div class="nav-group" data-topic="llengua">
+    <div class="nav-lbl">Llengua</div>
+    <button class="nav-item" data-ekey="ex_cl_v1" onclick="goTo(this,'llengua/comprensio_lectora.html','Comprensió Lectora')">Comprensió Lectora</button>
+    <button class="nav-item" data-ekey="ex_cat_morf_v1" onclick="goTo(this,'llengua/morfologia.html','Morfologia i Ortografia')">Morfologia i Ortografia</button>
+    <button class="nav-item" data-ekey="ex_cat_cword_v1" onclick="goTo(this,'llengua/mots_encreuats.html','Mots Encreuats')">Mots Encreuats</button>
+    <button class="nav-item" data-ekey="ex_cart_v1" onclick="goTo(this,'llengua/cartells.html','Cartells amb Faltes')">Cartells amb Faltes</button>
+    <button class="nav-item" data-ekey="ex_cat_wsearch_v1" onclick="goTo(this,'llengua/sopa_lletres.html','Sopa de Lletres')">Sopa de Lletres</button>
+  </div>
+
+  <div class="nav-sep" data-topic="llengua"></div>
+
+  <div class="nav-group" data-topic="angles">
+    <div class="nav-lbl">Anglès</div>
+    <button class="nav-item" data-ekey="ex_ang_hor_v1" onclick="goTo(this,'angles/horari.html','Timetable &amp; Time')">Timetable &amp; Time</button>
+    <button class="nav-item" data-ekey="ex_ang_prof_v1" onclick="goTo(this,'angles/professions.html','Jobs &amp; Professions')">Jobs &amp; Professions</button>
+    <button class="nav-item" data-ekey="ex_ang_act_v1" onclick="goTo(this,'angles/activitats.html','Hobbies &amp; Likes')">Hobbies &amp; Likes</button>
+    <button class="nav-item" data-ekey="ex_ang_city_v1" onclick="goTo(this,'angles/la_ciutat.html','Town &amp; Places')">Town &amp; Places</button>
+    <button class="nav-item" data-ekey="ex_ang_desc_v1" onclick="goTo(this,'angles/descripcio.html','Physical Description')">Physical Description</button>
+  </div>
+
+  <div id="gam-panel" class="gam-panel">
+    <div class="gam-panel-title">Progrés</div>
+    <div class="gam-lv" id="gam-lv-name">—</div>
+    <div class="gam-xp-track"><div class="gam-xp-fill" id="gam-xp-fill" style="width:0%"></div></div>
+    <div class="gam-stats">
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-xp">0</span>XP</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-ok">0</span>Encerts</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-achs">0</span>Assoliments</div>
+    </div>
+  </div>
+</nav>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="main">
+  <div class="topbar">
+    <button class="tog" onclick="openSidebar()">☰</button>
+    <span class="topbar-title" id="topbar-title">Suma amb portant</span>
+  </div>
+  <iframe id="frame" src="mates/suma_portant.html" title="Exercici"></iframe>
+</div>
+
+</div>
+<script>
+const GAM_KEY='ex_gam_v1';
+const LAST_KEY='ex_last_page';
+const GAM_LVS=[{n:'Principiant',x:0},{n:'Aprenent',x:75},{n:'Estudiant',x:200},{n:'Expert',x:450},{n:'Mestre',x:900}];
+function updateGamPanel(){
+  const g=JSON.parse(localStorage.getItem(GAM_KEY)||'{"xp":0,"ok":0,"streak":0,"achs":[]}');
+  let lv=GAM_LVS[0];for(const v of GAM_LVS)if(g.xp>=v.x)lv=v;
+  let nx=null;for(const v of GAM_LVS)if(g.xp<v.x){nx=v;break;}
+  const pct=nx?Math.min(100,Math.round((g.xp-lv.x)/(nx.x-lv.x)*100)):100;
+  document.getElementById('gam-lv-name').textContent=lv.n;
+  document.getElementById('gam-xp-fill').style.width=pct+'%';
+  document.getElementById('gam-xp').textContent=g.xp;
+  document.getElementById('gam-ok').textContent=g.ok||0;
+  document.getElementById('gam-achs').textContent=(g.achs||[]).length;
+}
+document.getElementById('frame').addEventListener('load',function(){
+  updateGamPanel();
+  updateProgress();
+  try{this.contentWindow.scrollTo(0,0);}catch(e){}
+});
+updateGamPanel();
+updateProgress();
+applyTopicFilter();
+restoreLastPage();
+
+function applyTopicFilter(){
+  const params=new URLSearchParams(location.search);
+  const raw=params.get('topics');
+  if(!raw)return;
+  const allowed=raw.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);
+  document.querySelectorAll('[data-topic]').forEach(el=>{
+    el.style.display=allowed.includes(el.dataset.topic)?'':'none';
+  });
+  // Activate first visible nav-item
+  const first=document.querySelector('.nav-group:not([style*="none"]) .nav-item');
+  if(first){
+    const src=first.getAttribute('onclick').match(/'([^']+\.html)'/);
+    const ttl=first.getAttribute('onclick').match(/'[^']+\.html','([^']+)'/);
+    if(src&&ttl)goTo(first,src[1],ttl[1]);
+  }
+}
+function updateProgress(){
+  document.querySelectorAll('.nav-item[data-ekey]').forEach(btn=>{
+    const key=btn.dataset.ekey;
+    let n=0;
+    try{const d=JSON.parse(localStorage.getItem(key));if(d&&d.ok)n=d.ok;}catch{}
+    let badge=btn.querySelector('.nav-badge');
+    if(n>0){
+      if(!badge){badge=document.createElement('span');badge.className='nav-badge';btn.appendChild(badge);}
+      badge.textContent=n;
+    }else if(badge){badge.remove();}
+  });
+}
+function goTo(btn, src, title) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('frame').src = src;
+  document.getElementById('topbar-title').textContent = title;
+  localStorage.setItem(LAST_KEY, JSON.stringify({src, title}));
+  closeSidebar();
+}
+function restoreLastPage(){
+  if(new URLSearchParams(location.search).get('topics'))return;
+  try{
+    const s=JSON.parse(localStorage.getItem(LAST_KEY));
+    if(!s)return;
+    const btn=[...document.querySelectorAll('.nav-item')].find(b=>{
+      const m=b.getAttribute('onclick').match(/'([^']+\.html)'/);
+      return m&&m[1]===s.src;
+    });
+    if(btn)goTo(btn,s.src,s.title);
+  }catch{}
+}
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+</script>
+</body>
+</html>

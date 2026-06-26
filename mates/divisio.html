@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Divisió</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.page{max-width:720px;margin:0 auto;padding:12px 14px 60px}
+.muted{color:var(--m);font-size:.88rem}
+/* MCQ options */
+.opts-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.aopt{padding:10px 22px;border:2px solid var(--b);border-radius:var(--r);background:#fff;cursor:pointer;font-size:1.2rem;font-weight:700;transition:all .15s;font-family:inherit;min-width:64px;text-align:center}
+.aopt:hover:not(:disabled){border-color:var(--a);color:var(--a);background:#eff6ff}
+.aopt.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
+.aopt.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko);pointer-events:none}
+.aopt.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
+.aopt:disabled{opacity:.6;pointer-events:none}
+/* Question display */
+.div-q{font-size:2.2rem;font-weight:900;font-family:'Courier New',monospace;text-align:center;margin:14px 0 8px;color:var(--t)}
+.div-q .op{color:var(--a)}
+/* Visual groups */
+.groups-wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0 4px}
+.grp-box{border-radius:10px;padding:8px;display:flex;flex-wrap:wrap;border-width:2px;border-style:solid}
+.grp-dot{border-radius:50%;flex-shrink:0}
+/* ── Input shared ── */
+.cx-inp{height:54px;text-align:center;font-size:1.9rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:8px;color:var(--a);background:var(--bg);outline:none;transition:border-color .15s;padding:0 6px;min-width:76px}
+.cx-inp:focus{border-color:var(--a);background:#eff6ff}
+.cx-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.cx-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+/* ── Divisor caixa — compartit blocs 3, 4, 5 ── */
+.dv-caixa{font-size:2.2rem;font-weight:900;font-family:'Courier New',monospace;color:var(--a);text-align:center;padding:4px 16px;border-bottom:3px solid var(--t)}
+/* ── Caixa: auto columns sized by content ── */
+.ceq-wrap{display:flex;justify-content:center;margin:20px 0 8px}
+.ceq{display:inline-grid;grid-template-columns:auto auto}
+/* Row 1: dividend | divisor */
+.ceq-dvd{
+  font-size:2.2rem;font-weight:900;font-family:'Courier New',monospace;
+  text-align:right;padding:4px 16px 4px 8px;
+  border-right:3px solid var(--t);
+  color:var(--t);
+}
+.ceq-div{padding:4px 20px}
+.ceq .cx-inp{width:90px;font-size:2.2rem;height:52px}
+/* Row 2: subtraction (left) | quotient (right) — NO borders */
+.ceq-sub{
+  display:flex;flex-direction:column;align-items:flex-end;
+  padding:6px 10px 4px 4px;
+  font-family:'Courier New',monospace;font-size:2.2rem;font-weight:900;
+  align-self:start;
+}
+.ceq-sub-row{display:flex;align-items:center;justify-content:flex-end;padding:1px 0;min-width:80px}
+.ceq-minus{color:var(--a);margin-right:6px;flex-shrink:0}
+.ceq-sub-line{height:3px;background:#475569;margin:5px 0;border-radius:1px;width:100%}
+.ceq-quo{display:flex;align-items:flex-start;justify-content:center;padding:4px 16px;align-self:start}
+/* Resta label row (Sec 3) */
+.ceq-resta{text-align:center;font-size:1rem;font-weight:600;margin:4px 0;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--m)}
+/* Sec 5: Divisió Llarga — grid per columnes */
+.ldiv-wrap{display:flex;justify-content:center;margin:20px 0 8px}
+.ldiv{display:flex;align-items:flex-start}
+.ldg-area{position:relative;font-family:'Courier New',monospace;font-weight:900;margin-left:30px}
+.ldg-row{display:flex;align-items:center;position:relative;margin-bottom:6px}
+.ldg-digit{width:50px;height:52px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--t)}
+.ldg-empty{width:50px;height:52px;flex-shrink:0}
+.ldg-inp{height:52px;font-size:2.2rem;font-family:'Courier New',monospace;font-weight:900;border:3px solid var(--b);border-radius:6px;background:var(--bg);color:var(--a);outline:none;transition:border-color .15s;text-align:center;padding:0 8px;min-width:0;flex-shrink:0}
+.ldg-inp:focus{border-color:var(--a);background:#eff6ff}
+.ldg-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ldg-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ldg-bd{width:50px;height:52px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--m);background:#f1f5f9;border:3px solid var(--b);border-radius:6px;flex-shrink:0}
+.ldg-bd.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ldg-bd.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ldg-minus{position:absolute;left:-22px;font-size:2.2rem;color:var(--a);font-weight:900;line-height:52px}
+.ldg-hline{height:3px;background:#475569;border-radius:1px;margin:6px 0}
+.ldiv-right{display:flex;flex-direction:column;align-items:center;min-width:90px}
+.ldiv-div{border-left:3px solid var(--t);width:100%}
+.ldiv-quo-row{display:flex;gap:6px;justify-content:center;padding:4px 10px}
+.ldiv-quo-row .cx-inp{width:50px}
+.ldiv-quo-step{display:flex;flex-direction:column;align-items:center;gap:3px}
+.ldiv-step-lbl{font-size:.65rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.05em;opacity:.6}
+.info-box{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:.85rem;line-height:1.7;color:var(--t)}
+.info-box strong{color:var(--a)}
+/* Sec 6 Problemes */
+.mt4{margin-top:16px}
+.btn-outline{background:transparent;color:var(--t);border:1.5px solid var(--b)}
+.btn-sm{padding:7px 14px;font-size:.82rem}
+.popt:disabled{pointer-events:none}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr">
+  <div>
+    <h1>Divisió</h1>
+    <div class="muted">Conjunts · Taules · Exacta · Amb resta</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<!-- Sec 1 -->
+<div class="card">
+  <h2><span class="num">1</span> Conjunts Visuals</h2>
+  <p style="font-size:.88rem;color:var(--m);margin-bottom:4px">Compta quants grups hi ha i tria la resposta:</p>
+  <div class="groups-wrap" id="vis-groups"></div>
+  <div class="div-q" id="vis-q"></div>
+  <div class="opts-row" id="vis-opts"></div>
+  <div class="fb" id="vis-fb"></div>
+  <div class="btn-row">
+    <button class="btn btn-outline btn-sm" id="vis-next" onclick="nextVis()">Següent →</button>
+  </div>
+</div>
+
+<!-- Sec 2 -->
+<div class="card">
+  <h2><span class="num">2</span> Taules de Divisió</h2>
+  <div class="diff-row" id="tab-modes">
+    <button class="dbtn active" data-t="auto" onclick="setTab('auto')">Auto</button>
+    <button class="dbtn" data-t="2" onclick="setTab(2)">÷2</button>
+    <button class="dbtn" data-t="3" onclick="setTab(3)">÷3</button>
+    <button class="dbtn" data-t="4" onclick="setTab(4)">÷4</button>
+    <button class="dbtn" data-t="5" onclick="setTab(5)">÷5</button>
+    <button class="dbtn" data-t="6" onclick="setTab(6)">÷6</button>
+    <button class="dbtn" data-t="7" onclick="setTab(7)">÷7</button>
+    <button class="dbtn" data-t="8" onclick="setTab(8)">÷8</button>
+    <button class="dbtn" data-t="9" onclick="setTab(9)">÷9</button>
+  </div>
+  <div class="div-q" id="tab-q"></div>
+  <div class="opts-row" id="tab-opts"></div>
+  <div class="fb" id="tab-fb"></div>
+  <div class="btn-row">
+    <button class="btn btn-outline btn-sm" id="tab-next" onclick="nextTab()">Següent →</button>
+  </div>
+</div>
+
+<!-- Sec 3 -->
+<div class="card">
+  <h2><span class="num">3</span> Divisió Exacta</h2>
+  <div class="diff-row" id="ex-modes">
+    <button class="dbtn active" data-e="auto" onclick="setEx('auto')">Auto</button>
+    <button class="dbtn" data-e="2" onclick="setEx(2)">÷2</button>
+    <button class="dbtn" data-e="3" onclick="setEx(3)">÷3</button>
+    <button class="dbtn" data-e="4" onclick="setEx(4)">÷4</button>
+    <button class="dbtn" data-e="5" onclick="setEx(5)">÷5</button>
+    <button class="dbtn" data-e="6" onclick="setEx(6)">÷6</button>
+    <button class="dbtn" data-e="7" onclick="setEx(7)">÷7</button>
+    <button class="dbtn" data-e="8" onclick="setEx(8)">÷8</button>
+    <button class="dbtn" data-e="9" onclick="setEx(9)">÷9</button>
+  </div>
+  <div class="ceq-wrap">
+    <div class="ceq">
+      <div class="ceq-dvd" id="ex-dvd"></div>
+      <div class="dv-caixa ceq-div" id="ex-div"></div>
+      <div></div>
+      <div class="ceq-quo">
+        <input class="cx-inp" id="ex-quo-inp" type="text" inputmode="numeric" autocomplete="off" placeholder="?">
+      </div>
+    </div>
+  </div>
+  <div class="ceq-resta" id="ex-resta-row" style="visibility:hidden">
+    Resta: <strong style="color:var(--ok)">0</strong>
+  </div>
+  <div class="fb" id="ex-fb"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="ex-check" onclick="checkEx()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="ex-next" onclick="nextEx()">Següent →</button>
+  </div>
+</div>
+
+<!-- Sec 4 -->
+<div class="card">
+  <h2><span class="num">4</span> Divisió amb Resta</h2>
+  <p style="font-size:.88rem;color:var(--m);margin-bottom:4px">Escriu el quocient i calcula la resta:</p>
+  <div class="ceq-wrap">
+    <div class="ceq">
+      <!-- Row 1: dividend | divisor -->
+      <div class="ceq-dvd" id="rest-dvd"></div>
+      <div class="dv-caixa ceq-div" id="rest-div"></div>
+      <!-- Row 2: subtraction area | quotient input -->
+      <div class="ceq-sub">
+        <div class="ceq-sub-row">
+          <span class="ceq-minus">−</span>
+          <span id="rest-sub-prod" style="color:var(--m)">·</span>
+        </div>
+        <div class="ceq-sub-line"></div>
+        <div class="ceq-sub-row">
+          <input class="cx-inp" id="rest-r-inp" type="text" inputmode="numeric"
+            autocomplete="off" placeholder="?" style="min-width:70px;height:50px;font-size:1.8rem">
+        </div>
+      </div>
+      <div class="ceq-quo">
+        <input class="cx-inp" id="rest-quo-inp" type="text" inputmode="numeric" autocomplete="off" placeholder="?">
+      </div>
+    </div>
+  </div>
+  <div class="fb" id="rest-fb"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="rest-check" onclick="checkRest()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="rest-next" onclick="nextRest()">Següent →</button>
+  </div>
+</div>
+
+<!-- Sec 5 -->
+<div class="card">
+  <h2><span class="num">5</span> Divisió Llarga</h2>
+  <div class="info-box" style="font-size:.83rem">
+    Divideix els <strong>primers dígits</strong> entre el divisor → escriu la <strong>1a xifra</strong> del quocient.<br>
+    Multiplica, resta i <strong>baixa el següent dígit</strong> → torna a dividir → escriu la <strong>2a xifra</strong>.<br>
+    <span style="font-family:'Courier New',monospace;font-size:.85rem">Ex: 75 ÷ 4 → 7÷4=<strong>1</strong>, 1×4=4, 7−4=3, baixa 5 → 35÷4=<strong>8</strong>, 8×4=32, 35−32=<strong>3</strong></span>
+  </div>
+  <p style="font-size:.88rem;color:var(--m);margin-bottom:4px">Omple tots els camps: quocient, productes, restes intermèdies i resta final:</p>
+  <div class="ldiv-wrap">
+    <div class="ldiv">
+      <div class="ldg-area" id="r2-grid">
+        <div class="ldg-row" id="r2-dvd-row"></div>
+        <div class="ldg-row" id="r2-p1-row" style="visibility:hidden"><span class="ldg-minus">−</span></div>
+        <div class="ldg-hline" id="r2-hline1" style="visibility:hidden"></div>
+        <div class="ldg-row" id="r2-int-row" style="visibility:hidden"></div>
+        <div class="ldg-row" id="r2-p2-row" style="visibility:hidden"><span class="ldg-minus">−</span></div>
+        <div class="ldg-hline" id="r2-hline2" style="visibility:hidden"></div>
+        <div class="ldg-row" id="r2-rem-row" style="visibility:hidden"></div>
+      </div>
+      <div class="ldiv-right">
+        <div class="dv-caixa ldiv-div" id="r2-div"></div>
+        <div class="ldiv-quo-row">
+          <div class="ldiv-quo-step">
+            <span class="ldiv-step-lbl">1a</span>
+            <input class="cx-inp" id="r2-q1" type="text" inputmode="numeric" maxlength="1" autocomplete="off" placeholder="?">
+          </div>
+          <div class="ldiv-quo-step" id="r2-q2-wrap" style="visibility:hidden">
+            <span class="ldiv-step-lbl">2a</span>
+            <input class="cx-inp" id="r2-q2" type="text" inputmode="numeric" maxlength="1" autocomplete="off" placeholder="?">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fb" id="r2-fb"></div>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" id="r2-check" onclick="checkR2()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="r2-next" onclick="nextR2()">Següent →</button>
+  </div>
+</div>
+
+<!-- 6: PROBLEMES -->
+<div class="card">
+  <h2><span class="num">6</span> Problemes</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
+  </div>
+</div>
+
+<script src="problemes.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY='ex_div_v1';
+
+GAM_ACHS=[
+  {id:'first',s:'🌟',n:'Primer Encert',d:'Primera resposta correcta'},
+  {id:'s3',s:'🔥',n:'Ratxa x3',d:'3 encerts seguits'},
+  {id:'s5',s:'⚡',n:'Ratxa x5',d:'5 encerts seguits'},
+  {id:'s10',s:'💥',n:'Ratxa x10',d:'10 encerts seguits'},
+  {id:'div-vis',s:'👁',n:'Visió de Conjunts',d:'5 problemes de conjunts correctes'},
+  {id:'div-tab',s:'📊',n:'Totes les Taules',d:'Almenys 1 encert a cada taula (÷2–÷9)'},
+  {id:'div-mast',s:'🎯',n:'Mestra de la Divisió',d:'Almenys 5 encerts a cada taula (÷2–÷9)'},
+  {id:'div-ex',s:'🔢',n:'Divisora Exacta',d:'5 divisions exactes correctes'},
+  {id:'div-rest',s:'➗',n:'Mestra de la Resta',d:'5 divisions amb resta correctes'},
+  {id:'div-prob',s:'📝',n:'Resolvedora de Problemes',d:'5 problemes de context correctes'},
+  {id:'ok50',s:'🥉',n:'50 Encerts',d:'50 respostes correctes'},
+  {id:'ok200',s:'🥈',n:'200 Encerts',d:'200 respostes correctes'},
+];
+function gResetExtra(){
+  [KEY_VIS,KEY_TAB,KEY_EX,KEY_REST,KEY_R2,KEY_PROB].forEach(k=>localStorage.removeItem(k));
+  location.reload();
+}
+function gStatsExtra(){
+  const sv=loadVis(),st=loadTab(),se=loadEx(),sr=loadRest();
+  const totVis=(sv.c||0)+(sv.e||0),pVis=totVis?Math.round((sv.c||0)/totVis*100):0;
+  const totRest=(sr.c||0)+(sr.e||0),pRest=totRest?Math.round((sr.c||0)/totRest*100):0;
+  const tabH=[2,3,4,5,6,7,8,9].map(function(n){
+    const s=st['t'+n]||{c:0,e:0},tot=s.c+s.e,p=tot?Math.round(s.c/tot*100):null;
+    return '<div class="stat-cell"><div class="stat-label">÷'+n+'</div>'
+      +'<div class="stat-nums"><span class="sc">✓'+s.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+s.e+'</span></div>'
+      +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+      +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div></div>';
+  }).join('');
+  const exH=[2,3,4,5,6,7,8,9].map(function(n){
+    const s=se['t'+n]||{c:0,e:0},tot=s.c+s.e,p=tot?Math.round(s.c/tot*100):null;
+    return '<div class="stat-cell"><div class="stat-label">÷'+n+'</div>'
+      +'<div class="stat-nums"><span class="sc">✓'+s.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+s.e+'</span></div>'
+      +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
+      +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div></div>';
+  }).join('');
+  return '<div class="section-lbl">Conjunts visuals</div>'
+    +'<div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">'
+    +'<div class="stat-cell"><div class="stat-label">ENCERTS</div>'
+    +'<div class="stat-nums"><span class="sc">✓'+(sv.c||0)+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+(sv.e||0)+'</span></div>'
+    +'<div class="stat-pct">'+(totVis?pVis+'%':'—')+'</div>'
+    +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+pVis+'%"></div></div></div></div>'
+    +'<div class="section-lbl mt3">Taules de divisió</div>'
+    +'<div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">'+tabH+'</div>'
+    +'<div class="section-lbl mt3">Divisió exacta</div>'
+    +'<div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">'+exH+'</div>'
+    +'<div class="section-lbl mt3">Divisió amb resta</div>'
+    +'<div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">'
+    +'<div class="stat-cell"><div class="stat-label">ENCERTS</div>'
+    +'<div class="stat-nums"><span class="sc">✓'+(sr.c||0)+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+(sr.e||0)+'</span></div>'
+    +'<div class="stat-pct">'+(totRest?pRest+'%':'—')+'</div>'
+    +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+pRest+'%"></div></div></div></div>';
+}
+
+// ── Sec 1: Conjunts Visuals ──────────────────────────────────────────────────
+const KEY_VIS='ex_div1_v1';
+const GRP_COLORS=[
+  {bg:'#dbeafe',dot:'#3b82f6',bd:'#93c5fd'},{bg:'#dcfce7',dot:'#22c55e',bd:'#86efac'},
+  {bg:'#fef9c3',dot:'#ca8a04',bd:'#fde047'},{bg:'#fce7f3',dot:'#ec4899',bd:'#f9a8d4'},
+  {bg:'#ede9fe',dot:'#8b5cf6',bd:'#c4b5fd'},{bg:'#ffedd5',dot:'#f97316',bd:'#fdba74'},
+  {bg:'#ccfbf1',dot:'#14b8a6',bd:'#5eead4'},
+];
+let visAnswered=false,visDivisor,visQuotient;
+function loadVis(){try{return Object.assign({c:0,e:0},JSON.parse(localStorage.getItem(KEY_VIS)||'{}'));}catch{return{c:0,e:0};}}
+function saveVis(s){localStorage.setItem(KEY_VIS,JSON.stringify(s));}
+function dotLayout(d){
+  if(d<=3)return{cols:d,sz:20,gap:4};
+  if(d===4)return{cols:2,sz:20,gap:4};
+  return{cols:3,sz:18,gap:3};
+}
+function buildGroups(divisor,quotient){
+  const c=GRP_COLORS[Math.floor(Math.random()*GRP_COLORS.length)];
+  const{cols,sz,gap}=dotLayout(divisor);
+  const w=cols*sz+(cols-1)*gap+20;
+  let h='';
+  for(let g=0;g<quotient;g++){
+    h+=`<div class="grp-box" style="background:${c.bg};border-color:${c.bd};gap:${gap}px;width:${w}px">`;
+    for(let d=0;d<divisor;d++) h+=`<div class="grp-dot" style="width:${sz}px;height:${sz}px;background:${c.dot}"></div>`;
+    h+='</div>';
+  }
+  return h;
+}
+function nextVis(){
+  visAnswered=false;
+  visDivisor=2+Math.floor(Math.random()*5);
+  visQuotient=2+Math.floor(Math.random()*5);
+  const dividend=visDivisor*visQuotient;
+  document.getElementById('vis-groups').innerHTML=buildGroups(visDivisor,visQuotient);
+  document.getElementById('vis-q').innerHTML=`<span class="op">${dividend}</span> ÷ <span class="op">${visDivisor}</span> = ?`;
+  const wrongs=new Set();
+  [-2,-1,1,2].forEach(d=>{const v=visQuotient+d;if(v>=1&&v<=12)wrongs.add(v);});
+  if(visDivisor!==visQuotient&&wrongs.size<3)wrongs.add(visDivisor);
+  for(let v=1;wrongs.size<3;v++){if(v!==visQuotient&&!wrongs.has(v))wrongs.add(v);}
+  const opts=sh([visQuotient,...sh([...wrongs]).slice(0,3)]);
+  document.getElementById('vis-opts').innerHTML=opts.map(o=>`<button class="aopt" onclick="ansVis(event,${o})">${o}</button>`).join('');
+  document.getElementById('vis-fb').textContent='';
+  document.getElementById('vis-fb').className='fb';
+}
+function ansVis(ev,chosen){
+  if(visAnswered)return;
+  visAnswered=true;
+  document.querySelectorAll('#vis-opts .aopt').forEach(b=>b.disabled=true);
+  const s=loadVis();
+  if(chosen===visQuotient){
+    ev.target.classList.add('ok');
+    document.getElementById('vis-fb').textContent='✓ Correcte! Hi ha '+visQuotient+' grups de '+visDivisor+'.';
+    document.getElementById('vis-fb').className='fb ok';
+    s.c++;saveVis(s);
+    gCorrect(3,tryA=>tryA('div-vis',s.c>=5));
+  }else{
+    ev.target.classList.add('ko');
+    document.querySelectorAll('#vis-opts .aopt').forEach(b=>{if(+b.textContent===visQuotient)b.classList.add('show');});
+    document.getElementById('vis-fb').textContent='✗ La resposta era '+visQuotient+'.';
+    document.getElementById('vis-fb').className='fb ko';
+    s.e++;saveVis(s);gWrong();
+  }
+}
+
+// ── Sec 2: Taules de Divisió ─────────────────────────────────────────────────
+const KEY_TAB='ex_div2_v1';
+let tabAnswered=false,tabDivisor,tabFactor,tabMode='auto';
+function defTab(){const d={total:0};for(let t=2;t<=9;t++)d['t'+t]={c:0,e:0};return d;}
+function loadTab(){try{return Object.assign(defTab(),JSON.parse(localStorage.getItem(KEY_TAB)||'{}'));}catch{return defTab();}}
+function saveTab(s){localStorage.setItem(KEY_TAB,JSON.stringify(s));}
+function pickTable(stats,mode){
+  if(mode!=='auto')return+mode;
+  const tables=[2,3,4,5,6,7,8,9];
+  const w=tables.map(t=>{const st=stats['t'+t]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
+  const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
+  for(let i=0;i<tables.length;i++){r-=w[i];if(r<=0)return tables[i];}
+  return 9;
+}
+function setTab(t){
+  tabMode=t;
+  document.querySelectorAll('#tab-modes .dbtn').forEach(b=>b.classList.toggle('active',b.dataset.t===String(t)));
+  nextTab();
+}
+function nextTab(){
+  tabAnswered=false;
+  tabDivisor=pickTable(loadTab(),tabMode);
+  tabFactor=1+Math.floor(Math.random()*10);
+  const dividend=tabDivisor*tabFactor;
+  document.getElementById('tab-q').innerHTML=`<span class="op">${dividend}</span> ÷ <span class="op">${tabDivisor}</span> = ?`;
+  const wrongs=new Set();
+  [-3,-2,-1,1,2,3].forEach(d=>{const v=tabFactor+d;if(v>=1&&v<=10)wrongs.add(v);});
+  const opts=sh([tabFactor,...sh([...wrongs]).slice(0,3)]);
+  document.getElementById('tab-opts').innerHTML=opts.map(o=>`<button class="aopt" onclick="ansTab(event,${o})">${o}</button>`).join('');
+  document.getElementById('tab-fb').textContent='';
+  document.getElementById('tab-fb').className='fb';
+}
+function ansTab(ev,chosen){
+  if(tabAnswered)return;
+  tabAnswered=true;
+  document.querySelectorAll('#tab-opts .aopt').forEach(b=>b.disabled=true);
+  const s=loadTab();s.total++;
+  if(chosen===tabFactor){
+    ev.target.classList.add('ok');
+    document.getElementById('tab-fb').textContent='✓ Molt bé!';
+    document.getElementById('tab-fb').className='fb ok';
+    s['t'+tabDivisor].c++;saveTab(s);
+    gCorrect(2,tryA=>{
+      tryA('div-tab',[2,3,4,5,6,7,8,9].every(t=>(s['t'+t]||{c:0}).c>=1));
+      tryA('div-mast',[2,3,4,5,6,7,8,9].every(t=>(s['t'+t]||{c:0}).c>=5));
+    });
+  }else{
+    ev.target.classList.add('ko');
+    document.querySelectorAll('#tab-opts .aopt').forEach(b=>{if(+b.textContent===tabFactor)b.classList.add('show');});
+    document.getElementById('tab-fb').textContent='✗ Era '+tabDivisor+' × '+tabFactor+' = '+(tabDivisor*tabFactor);
+    document.getElementById('tab-fb').className='fb ko';
+    s['t'+tabDivisor].e++;saveTab(s);gWrong();
+  }
+}
+
+// ── Sec 3: Divisió Exacta ────────────────────────────────────────────────────
+const KEY_EX='ex_div3_v1';
+let exAnswered=false,exCounted=false,exDivisor,exQuotient,exMode='auto';
+function defEx(){const d={total:0};for(let t=2;t<=9;t++)d['t'+t]={c:0,e:0};return d;}
+function loadEx(){try{return Object.assign(defEx(),JSON.parse(localStorage.getItem(KEY_EX)||'{}'));}catch{return defEx();}}
+function saveEx(s){localStorage.setItem(KEY_EX,JSON.stringify(s));}
+function setEx(m){
+  exMode=m;
+  document.querySelectorAll('#ex-modes .dbtn').forEach(b=>b.classList.toggle('active',b.dataset.e===String(m)));
+  nextEx();
+}
+function nextEx(){
+  exAnswered=false;exCounted=false;
+  exDivisor=pickTable(loadEx(),exMode);
+  exQuotient=3+Math.floor(Math.random()*17);
+  document.getElementById('ex-dvd').textContent=exDivisor*exQuotient;
+  document.getElementById('ex-div').textContent=exDivisor;
+  const inp=document.getElementById('ex-quo-inp');
+  inp.value='';inp.className='cx-inp';
+  document.getElementById('ex-resta-row').style.visibility='hidden';
+  document.getElementById('ex-fb').textContent='';document.getElementById('ex-fb').className='fb';
+  document.getElementById('ex-check').style.display='';
+  setTimeout(()=>inp.focus({preventScroll:true}),30);
+}
+function checkEx(){
+  if(exAnswered)return;
+  const inp=document.getElementById('ex-quo-inp');
+  const fb=document.getElementById('ex-fb');
+  const val=parseInt(inp.value);
+  if(isNaN(val)||inp.value.trim()===''){fb.textContent='Escriu el quocient!';fb.className='fb ko';return;}
+  const dvd=exDivisor*exQuotient;
+  if(val===exQuotient){
+    exAnswered=true;
+    inp.className='cx-inp ok';
+    fb.textContent='✓ Correcte! '+dvd+' ÷ '+exDivisor+' = '+exQuotient;
+    fb.className='fb ok';
+    document.getElementById('ex-resta-row').style.visibility='visible';
+    if(!exCounted){
+      const s=loadEx();s.total++;s['t'+exDivisor].c++;saveEx(s);
+      gCorrect(4,tryA=>{
+        const tc=[2,3,4,5,6,7,8,9].reduce((a,t)=>a+(s['t'+t]||{c:0}).c,0);
+        tryA('div-ex',tc>=5);
+      });
+      exCounted=true;
+    }
+    document.getElementById('ex-check').style.display='none';
+  }else{
+    inp.className='cx-inp ko';
+    fb.textContent='✗ Revisa la resposta.';
+    fb.className='fb ko';
+    if(!exCounted){
+      const s=loadEx();s.total++;s['t'+exDivisor].e++;saveEx(s);gWrong();exCounted=true;
+    }
+  }
+}
+document.getElementById('ex-quo-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkEx();});
+
+// ── Sec 4: Divisió amb Resta ─────────────────────────────────────────────────
+const KEY_REST='ex_div4_v1';
+let restAnswered=false,restCounted=false,restDivisor,restQuotient,restRemainder;
+function loadRest(){try{return Object.assign({c:0,e:0},JSON.parse(localStorage.getItem(KEY_REST)||'{}'));}catch{return{c:0,e:0};}}
+function saveRest(s){localStorage.setItem(KEY_REST,JSON.stringify(s));}
+function nextRest(){
+  restAnswered=false;restCounted=false;
+  restDivisor=2+Math.floor(Math.random()*8);
+  restQuotient=3+Math.floor(Math.random()*10);
+  restRemainder=1+Math.floor(Math.random()*(restDivisor-1));
+  const dvd=restDivisor*restQuotient+restRemainder;
+  document.getElementById('rest-dvd').textContent=dvd;
+  document.getElementById('rest-div').textContent=restDivisor;
+  const prod=document.getElementById('rest-sub-prod');
+  prod.textContent='·';prod.style.color='var(--m)';
+  const qi=document.getElementById('rest-quo-inp');
+  const ri=document.getElementById('rest-r-inp');
+  qi.value='';qi.className='cx-inp';
+  ri.value='';ri.className='cx-inp';
+  document.getElementById('rest-fb').textContent='';document.getElementById('rest-fb').className='fb';
+  document.getElementById('rest-check').style.display='';
+  setTimeout(()=>qi.focus({preventScroll:true}),30);
+}
+document.getElementById('rest-quo-inp').addEventListener('input',function(){
+  if(restAnswered)return;
+  const q=parseInt(this.value);
+  const el=document.getElementById('rest-sub-prod');
+  el.textContent=(!isNaN(q)&&q>0)?restDivisor*q:'·';
+  el.style.color='var(--m)';
+});
+function checkRest(){
+  if(restAnswered)return;
+  const qi=document.getElementById('rest-quo-inp');
+  const ri=document.getElementById('rest-r-inp');
+  const fb=document.getElementById('rest-fb');
+  const qv=parseInt(qi.value),rv=parseInt(ri.value);
+  if(isNaN(qv)||qi.value.trim()===''||isNaN(rv)||ri.value.trim()===''){
+    fb.textContent='Omple el quocient i la resta!';fb.className='fb ko';return;
+  }
+  const dvd=restDivisor*restQuotient+restRemainder;
+  const qOk=qv===restQuotient,rOk=rv===restRemainder;
+  qi.className='cx-inp '+(qOk?'ok':'ko');
+  ri.className='cx-inp '+(rOk?'ok':'ko');
+  const prod=document.getElementById('rest-sub-prod');
+  prod.textContent=restDivisor*restQuotient;
+  prod.style.color=qOk?'var(--ok)':'var(--ko)';
+  if(qOk&&rOk){
+    restAnswered=true;
+    fb.textContent='✓ Correcte! '+dvd+' = '+restDivisor+' × '+restQuotient+' + '+restRemainder;
+    fb.className='fb ok';
+    if(!restCounted){
+      const s=loadRest();s.c++;saveRest(s);
+      gCorrect(5,tryA=>tryA('div-rest',s.c>=5));restCounted=true;
+    }
+    document.getElementById('rest-check').style.display='none';
+  }else{
+    let msg='✗';
+    if(!qOk)msg+=' Quocient: '+restQuotient+'.';
+    if(!rOk)msg+=' Resta: '+restRemainder+'.';
+    fb.textContent=msg;fb.className='fb ko';
+    if(!restCounted){
+      const s=loadRest();s.e++;saveRest(s);gWrong();restCounted=true;
+    }
+  }
+}
+document.getElementById('rest-quo-inp').addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();document.getElementById('rest-r-inp').focus();}
+});
+document.getElementById('rest-r-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkRest();});
+
+// ── Sec 5: Divisió Llarga ─────────────────────────────────────────────────────
+const KEY_R2='ex_divr2_v1';
+const LDG_COL=50; // px per columna del grid
+let r2Answered=false,r2Divisor,r2Q1,r2Q2,r2Remainder,r2Dvd,r2Partial1,r2P1c,r2IntRem,r2P2c;
+function loadR2(){try{return Object.assign({c:0,e:0},JSON.parse(localStorage.getItem(KEY_R2)||'{}'));}catch{return{c:0,e:0};}}
+function saveR2(s){localStorage.setItem(KEY_R2,JSON.stringify(s));}
+function r2Show(...ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.style.visibility='visible';});}
+function r2MkInp(id,extra){
+  const el=document.createElement('input');
+  el.id=id;el.className='cx-inp ldg-inp';el.type='text';
+  el.inputMode='numeric';el.autocomplete='off';el.placeholder='?';
+  Object.assign(el,extra||{});
+  return el;
+}
+function r2MkEmpty(){const sp=document.createElement('span');sp.className='ldg-empty';return sp;}
+
+function nextR2(){
+  r2Answered=false;
+  r2Divisor=Math.floor(Math.random()*8)+2;
+  r2Q1=Math.floor(Math.random()*5)+1;
+  r2Q2=Math.floor(Math.random()*9)+1;
+  r2Remainder=Math.floor(Math.random()*(r2Divisor-1))+1;
+  r2Dvd=r2Divisor*(r2Q1*10+r2Q2)+r2Remainder;
+  const s=r2Dvd.toString();
+  const N=s.length;
+  let pLen=1;
+  r2Partial1=parseInt(s[0]);
+  while(r2Partial1<r2Divisor&&pLen<s.length-1){pLen++;r2Partial1=parseInt(s.substring(0,pLen));}
+  r2P1c=r2Divisor*r2Q1;
+  r2IntRem=r2Partial1-r2P1c;
+  r2P2c=r2Divisor*r2Q2;
+
+  // Amplada total del grid
+  const grid=document.getElementById('r2-grid');
+  grid.style.width=(N*LDG_COL)+'px';
+
+  // Fila 1: dígits del dividend
+  const dvdRow=document.getElementById('r2-dvd-row');
+  dvdRow.innerHTML=s.split('').map(d=>`<span class="ldg-digit">${d}</span>`).join('');
+
+  // Fila 2: primer producte  [−(abs)] [inp × pLen cols] [empty × (N-pLen)]
+  const p1Row=document.getElementById('r2-p1-row');
+  Array.from(p1Row.children).forEach(c=>{if(!c.classList.contains('ldg-minus'))c.remove();});
+  const p1Inp=r2MkInp('r2-p1-inp');
+  p1Inp.style.width=(pLen*LDG_COL)+'px';
+  p1Row.appendChild(p1Inp);
+  for(let i=pLen;i<N;i++)p1Row.appendChild(r2MkEmpty());
+
+  // Fila 4: resta intermèdia + dígit baixat  [empty × (pLen-1)] [int-inp] [bd]
+  const intRow=document.getElementById('r2-int-row');
+  intRow.innerHTML='';
+  for(let i=0;i<pLen-1;i++)intRow.appendChild(r2MkEmpty());
+  const intInp=r2MkInp('r2-int-inp',{maxLength:1});
+  intInp.style.width=LDG_COL+'px';
+  intRow.appendChild(intInp);
+  const bdEl=document.createElement('span');
+  bdEl.id='r2-bd';bdEl.className='ldg-bd';bdEl.textContent=s[pLen];
+  bdEl.style.visibility='hidden';
+  intRow.appendChild(bdEl);
+
+  // Fila 5: segon producte  [−(abs)] [empty × (pLen-1)] [inp × 2 cols]
+  const p2Row=document.getElementById('r2-p2-row');
+  Array.from(p2Row.children).forEach(c=>{if(!c.classList.contains('ldg-minus'))c.remove();});
+  for(let i=0;i<pLen-1;i++)p2Row.appendChild(r2MkEmpty());
+  const p2Inp=r2MkInp('r2-p2-inp');
+  p2Inp.style.width=(2*LDG_COL)+'px';
+  p2Inp.style.textAlign='right';
+  p2Inp.style.paddingRight='12px';
+  p2Row.appendChild(p2Inp);
+
+  // Fila 7: resta final  [empty × (N-1)] [inp × 1 col]
+  const remRow=document.getElementById('r2-rem-row');
+  remRow.innerHTML='';
+  for(let i=0;i<N-1;i++)remRow.appendChild(r2MkEmpty());
+  const rInp=r2MkInp('r2-r-inp');
+  rInp.style.width=LDG_COL+'px';
+  remRow.appendChild(rInp);
+
+  document.getElementById('r2-div').textContent=r2Divisor;
+  ['r2-p1-row','r2-hline1','r2-int-row','r2-p2-row','r2-hline2','r2-rem-row'].forEach(id=>document.getElementById(id).style.visibility='hidden');
+  const q1i=document.getElementById('r2-q1');
+  q1i.value='';q1i.className='cx-inp';
+  document.getElementById('r2-q2-wrap').style.visibility='hidden';
+  document.getElementById('r2-q2').value='';document.getElementById('r2-q2').className='cx-inp';
+  document.getElementById('r2-fb').textContent='';document.getElementById('r2-fb').className='fb';
+  document.getElementById('r2-check').style.display='';
+
+  // Listeners en elements dinàmics (recreats cada vegada)
+  p1Inp.addEventListener('input',function(){
+    if(!r2Answered&&this.value.trim()!=='')r2Show('r2-hline1','r2-int-row');
+  });
+  p1Inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();r2Show('r2-hline1','r2-int-row');document.getElementById('r2-int-inp').focus();}
+  });
+  intInp.addEventListener('input',function(){
+    if(!r2Answered&&this.value.trim()!=='')r2Show('r2-bd');
+    if(!r2Answered&&this.value.length===1){r2Show('r2-q2-wrap');document.getElementById('r2-q2').focus();}
+  });
+  intInp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();r2Show('r2-bd','r2-q2-wrap');document.getElementById('r2-q2').focus();}
+  });
+  p2Inp.addEventListener('input',function(){
+    if(!r2Answered&&this.value.trim()!=='')r2Show('r2-hline2','r2-rem-row');
+  });
+  p2Inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();r2Show('r2-hline2','r2-rem-row');document.getElementById('r2-r-inp').focus();}
+  });
+  rInp.addEventListener('keydown',e=>{if(e.key==='Enter')checkR2();});
+
+  setTimeout(()=>q1i.focus({preventScroll:true}),30);
+}
+function checkR2(){
+  if(r2Answered)return;
+  const q1i=document.getElementById('r2-q1'),p1i=document.getElementById('r2-p1-inp'),
+        inI=document.getElementById('r2-int-inp'),q2i=document.getElementById('r2-q2'),
+        p2i=document.getElementById('r2-p2-inp'),ri=document.getElementById('r2-r-inp');
+  const fb=document.getElementById('r2-fb');
+  if([q1i,p1i,inI,q2i,p2i,ri].some(el=>el.value.trim()===''))
+    {fb.textContent='Omple tots els camps!';fb.className='fb ko';return;}
+  const q1v=parseInt(q1i.value),p1v=parseInt(p1i.value),inV=parseInt(inI.value),
+        q2v=parseInt(q2i.value),p2v=parseInt(p2i.value),rv=parseInt(ri.value);
+  const q1Ok=q1v===r2Q1,p1Ok=p1v===r2P1c,inOk=inV===r2IntRem,
+        q2Ok=q2v===r2Q2,p2Ok=p2v===r2P2c,rOk=rv===r2Remainder;
+  q1i.className='cx-inp '+(q1Ok?'ok':'ko');
+  p1i.className='cx-inp ldg-inp '+(p1Ok?'ok':'ko');
+  inI.className='cx-inp ldg-inp '+(inOk?'ok':'ko');
+  document.getElementById('r2-bd').className='ldg-bd '+(inOk?'ok':'ko');
+  q2i.className='cx-inp '+(q2Ok?'ok':'ko');
+  p2i.className='cx-inp ldg-inp '+(p2Ok?'ok':'ko');
+  ri.className='cx-inp ldg-inp '+(rOk?'ok':'ko');
+  const quot=r2Q1*10+r2Q2;
+  if(q1Ok&&p1Ok&&inOk&&q2Ok&&p2Ok&&rOk){
+    r2Answered=true;
+    fb.textContent='✓ Correcte! '+r2Dvd+' = '+r2Divisor+' × '+quot+' + '+r2Remainder;
+    fb.className='fb ok';
+    const s=loadR2();s.c++;saveR2(s);
+    gCorrect(6,tryA=>{});
+    document.getElementById('r2-check').style.display='none';
+  }else{
+    let msg='✗';
+    if(!q1Ok)msg+=' 1a xifra: '+r2Q1+'.';
+    if(!p1Ok)msg+=' 1r producte: '+r2P1c+'.';
+    if(!inOk)msg+=' Resta intermèdia: '+r2IntRem+'.';
+    if(!q2Ok)msg+=' 2a xifra: '+r2Q2+'.';
+    if(!p2Ok)msg+=' 2n producte: '+r2P2c+'.';
+    if(!rOk)msg+=' Resta: '+r2Remainder+'.';
+    fb.textContent=msg;fb.className='fb ko';
+    const s=loadR2();s.e++;saveR2(s);gWrong();
+  }
+}
+// Listeners en elements estàtics (r2-q1, r2-q2 no es recreen)
+document.getElementById('r2-q1').addEventListener('input',function(){
+  if(!r2Answered&&this.value.length===1){r2Show('r2-p1-row');document.getElementById('r2-p1-inp').focus();}
+});
+document.getElementById('r2-q1').addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();r2Show('r2-p1-row');document.getElementById('r2-p1-inp').focus();}
+});
+document.getElementById('r2-q2').addEventListener('input',function(){
+  if(!r2Answered&&this.value.length===1){r2Show('r2-p2-row');document.getElementById('r2-p2-inp').focus();}
+});
+document.getElementById('r2-q2').addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();r2Show('r2-p2-row');document.getElementById('r2-p2-inp').focus();}
+});
+
+// ── Sec 6: Problemes ─────────────────────────────────────────────────────────
+const KEY_PROB='ex_div5_v1';
+function loadProb(){try{return Object.assign({c:0,e:0},JSON.parse(localStorage.getItem(KEY_PROB)||'{}'));}catch{return{c:0,e:0};}}
+function saveProb(s){localStorage.setItem(KEY_PROB,JSON.stringify(s));}
+const PROB_POOL=getProbs('divisio');
+function nextProblemes(){
+  renderProbs(PROB_POOL,'prob-list',3,null,
+    (qi,fb)=>{fb.className='fb ok';fb.textContent='✓ Molt bé!';const s=loadProb();s.c++;saveProb(s);gCorrect(4,tryA=>tryA('div-prob',s.c>=5));},
+    (qi,fb)=>{fb.className='fb ko';fb.textContent='✗ La resposta correcta era '+PROB_POOL[qi].ans;const s=loadProb();s.e++;saveProb(s);gWrong();}
+  );
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+nextVis();nextTab();nextEx();nextRest();nextR2();nextProblemes();gRender();
+</script>
+</div>
+</body>
+</html>

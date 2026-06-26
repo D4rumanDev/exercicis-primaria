@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesures de longitud — 4t</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── CSS ESPECÍFIC ── */
+.info-box{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:.85rem;line-height:1.7;color:var(--t)}
+.info-box strong{color:var(--a)}
+.geo-inp{width:90px;padding:8px;border:2px solid var(--b);border-radius:8px;font-size:1.3rem;font-weight:800;text-align:center;outline:none;font-family:inherit}
+.geo-inp:focus{border-color:var(--a)}
+.geo-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.geo-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.inp-row{display:flex;align-items:center;gap:8px;justify-content:center;margin:10px 0}
+.inp-unit{font-size:1.1rem;font-weight:700;color:var(--m)}
+.mes-vis{font-size:1.3rem;font-weight:800;color:var(--a);text-align:center;padding:14px;background:var(--bg);border-radius:var(--r);margin-bottom:12px;line-height:1.5}
+
+/* ── Regle SVG ── */
+.ruler-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.ruler-wrap{background:var(--bg);border-radius:var(--r);padding:10px 6px 6px;margin-bottom:8px;overflow:hidden}
+.unit-badge{font-size:.8rem;font-weight:700;color:var(--m);padding:4px 13px;border:1.5px solid var(--b);border-radius:100px;background:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.unit-badge:hover{border-color:var(--a);color:var(--a)}
+.unit-badge.on{background:var(--a);color:#fff;border-color:var(--a)}
+
+/* ── Taula de conversió ── */
+.conv-tbl{width:100%;border-collapse:collapse;margin:8px 0 4px}
+.conv-tbl th{background:var(--a);color:#fff;padding:8px 6px;text-align:center;font-size:.8rem;font-weight:700}
+.conv-tbl th:first-child{text-align:left;padding-left:10px}
+.conv-tbl td{padding:8px 6px;text-align:center;border:1px solid var(--b);font-size:.88rem}
+.conv-tbl .row-lbl{font-weight:700;color:var(--t);background:var(--bg);text-align:left;padding-left:10px;white-space:nowrap;font-size:.9rem}
+.conv-tbl .diag{background:#f1f5f9;color:#cbd5e1;font-size:1.1rem}
+.tbl-inp{width:68px;padding:5px 3px;border:2px solid var(--b);border-radius:6px;font-size:.92rem;font-weight:800;text-align:center;font-family:inherit;outline:none;transition:border-color .15s}
+.tbl-inp:focus{border-color:var(--a)}
+.tbl-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.tbl-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.tbl-inp:disabled{pointer-events:none}
+.var-row{display:flex;align-items:center;gap:8px;background:var(--bg);padding:8px 12px;border-radius:8px;margin-bottom:6px}
+.var-from{font-weight:700;font-size:.92rem;min-width:84px;color:var(--t)}
+.var-eq{color:var(--m);font-weight:700;font-size:.95rem}
+.var-unit{font-size:.88rem;color:var(--m);font-weight:700}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Mesures de longitud</h1>
+    <div class="muted">mm · cm · m · km — conversions i problemes</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- ═══════════ SECCIÓ 1: QUINA UNITAT? ═══════════ -->
+<div class="card">
+  <h2><span class="num">1</span> Quina unitat?</h2>
+  <div class="card-sub">Tria la unitat de mesura adequada per a cada objecte o distància.</div>
+  <div id="sec1-vis"></div>
+  <div id="sec1-opts" class="opts-row"></div>
+  <div id="sec1-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextSec1()">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SECCIÓ 2: CONVERTEIX ═══════════ -->
+<div class="card">
+  <h2><span class="num">2</span> Converteix</h2>
+  <div class="info-box" style="font-size:.82rem">
+    <strong>Taula de conversió:</strong><br>
+    1 cm = <strong>10</strong> mm &nbsp;·&nbsp; 1 m = <strong>100</strong> cm &nbsp;·&nbsp; 1 km = <strong>1000</strong> m<br>
+    <span style="color:var(--m)">Unitat més petita → <strong>multiplica</strong> &nbsp;·&nbsp; Unitat més gran → <strong>divideix</strong></span>
+  </div>
+  <div class="card-sub">Escriu el resultat de la conversió i prem Comprova.</div>
+  <div id="sec2-vis"></div>
+  <div id="sec2-inp"></div>
+  <div id="sec2-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt3">
+    <button class="btn btn-dark btn-sm" id="conv-btn" onclick="checkConv()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="conv-next-btn" onclick="nextSec2()" style="display:none">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SECCIÓ 3: QUIN ÉS MÉS GRAN? ═══════════ -->
+<div class="card">
+  <h2><span class="num">3</span> Quin és més gran?</h2>
+  <div class="card-sub">Compara les dues mesures i tria la més gran.</div>
+  <div id="sec3-vis"></div>
+  <div id="sec3-opts" class="opts-row"></div>
+  <div id="sec3-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextSec3()">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SECCIÓ 4: SUMA I RESTA ═══════════ -->
+<div class="card">
+  <h2><span class="num">4</span> Suma i resta</h2>
+  <div class="card-sub">Calcula el resultat. Prem Comprova quan tinguis la resposta.</div>
+  <div id="sec4-vis"></div>
+  <div id="sec4-inp"></div>
+  <div id="sec4-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt3">
+    <button class="btn btn-dark btn-sm" id="calc-btn" onclick="checkCalc()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="calc-next-btn" onclick="nextSec4()" style="display:none">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SECCIÓ 5: MESURA AMB EL REGLE ═══════════ -->
+<div class="card">
+  <h2><span class="num">5</span> Mesura amb el regle</h2>
+  <div class="card-sub">Llegeix el regle i escriu la mesura de l'objecte. Canvia l'escala per practicar en mm.</div>
+  <div class="ruler-ctrl">
+    <span style="font-size:.78rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Escala:</span>
+    <button class="unit-badge on" id="badge-cm" onclick="setRulerUnit('cm')">cm</button>
+    <button class="unit-badge"    id="badge-mm" onclick="setRulerUnit('mm')">mm</button>
+  </div>
+  <div class="ruler-wrap">
+    <div id="sec6-ruler"></div>
+  </div>
+  <div id="sec6-q" class="q-top" style="text-align:center;margin-top:4px"></div>
+  <div id="sec6-ans"></div>
+  <div id="sec6-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt3">
+    <button class="btn btn-dark btn-sm" id="ruler-btn" onclick="checkSec6()">Comprova</button>
+    <button class="btn btn-outline btn-sm" id="ruler-next-btn" onclick="nextSec6()" style="display:none">Següent →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SECCIÓ 6: TAULA DE CONVERSIÓ ═══════════ -->
+<div class="card">
+  <h2><span class="num">6</span> Taula de conversió</h2>
+  <div class="card-sub">Omple les caselles buides amb el valor correcte. Prem Comprova tot per validar.</div>
+  <div id="sec7-content"></div>
+  <div id="sec7-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt3">
+    <button class="btn btn-dark btn-sm" onclick="checkSec7()">Comprova tot</button>
+    <button class="btn btn-outline btn-sm" onclick="nextSec7()">Nova taula →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SECCIÓ 7: PROBLEMES ═══════════ -->
+<div class="card">
+  <h2><span class="num">7</span> Problemes</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="problemes.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_long_v1';
+
+
+GAM_ACHS = [
+  {id:'first',     s:'🌟', n:'Primer Encert',    d:'Primera resposta correcta'},
+  {id:'s3',        s:'🔥', n:'Ratxa x3',          d:'3 encerts seguits'},
+  {id:'s5',        s:'⚡', n:'Ratxa x5',          d:'5 encerts seguits'},
+  {id:'s10',       s:'💥', n:'Ratxa x10',         d:'10 encerts seguits'},
+  {id:'mesurador', s:'📏', n:'Mesurador Nat',      d:'5 unitats identificades'},
+  {id:'conversor', s:'🔄', n:'Conversor Expert',   d:'5 conversions correctes'},
+  {id:'topograf',  s:'📐', n:'Topògraf',           d:'5 objectes mesurats al regle'},
+  {id:'ok50',      s:'🥉', n:'50 Encerts',         d:'50 respostes correctes'},
+  {id:'ok200',     s:'🥈', n:'200 Encerts',        d:'200 respostes correctes'}
+];
+
+function gExtraAchs(g,tryA){
+  const e=eLoad();
+  tryA('mesurador',(e.unit||0)>=5);
+  tryA('conversor',(e.conv||0)>=5);
+  tryA('topograf',(e.ruler||0)>=5);
+}
+
+// ════════════════════════════════════════════════════════════
+// SECCIÓ 1 — QUINA UNITAT?
+// ════════════════════════════════════════════════════════════
+const UNIT_POOL = [
+  {obj:"El gruix d'una moneda",           ans:"mm"},
+  {obj:"L'amplada d'un dit",              ans:"cm"},
+  {obj:"La llargada d'un llapis",          ans:"cm"},
+  {obj:"L'alçada d'una porta",            ans:"m"},
+  {obj:"La distància entre dues ciutats",  ans:"km"},
+  {obj:"El gruix d'un full de paper",     ans:"mm"},
+  {obj:"L'amplada d'una taula",           ans:"cm"},
+  {obj:"L'altura d'un edifici de pisos",  ans:"m"},
+  {obj:"El diàmetre d'un botó",           ans:"mm"},
+  {obj:"La llargada d'una piscina",       ans:"m"},
+  {obj:"La distància d'una marató",       ans:"km"},
+  {obj:"L'alçada d'una cadira",           ans:"cm"},
+  {obj:"El llarg d'un camp de futbol",    ans:"m"},
+  {obj:"L'amplada d'una ungla",           ans:"mm"},
+  {obj:"La distància Terra-Lluna",        ans:"km"},
+  {obj:"La llargada d'un cotxe",          ans:"m"},
+  {obj:"El gruix d'una targeta de crèdit",ans:"mm"},
+  {obj:"L'alçada d'una muntanya",         ans:"m"},
+  {obj:"La llargada d'una formiga",       ans:"mm"},
+  {obj:"L'amplada d'una finestra",        ans:"cm"},
+];
+
+function nextSec1(){
+  const item=pick(UNIT_POOL);
+  document.getElementById('sec1-vis').innerHTML=
+    `<div class="mes-vis">${item.obj}</div>`;
+  document.getElementById('sec1-fb').textContent='';
+  renderOpts('sec1-opts', sh(['mm','cm','m','km']), item.ans,
+    ()=>{ setFb('sec1-fb',true,pick(OK));  gCorrect(5,'unit'); },
+    ()=>{ setFb('sec1-fb',false,pick(KO)); gWrong(); }
+  );
+}
+
+// ════════════════════════════════════════════════════════════
+// SECCIÓ 2 — CONVERTEIX
+// ════════════════════════════════════════════════════════════
+function genConv(){
+  const type=ri(0,5);
+  let val, fromU, toU, ans;
+  switch(type){
+    case 0: val=ri(1,9);      fromU='cm'; toU='mm'; ans=val*10;    break;
+    case 1: val=ri(1,9)*10;   fromU='mm'; toU='cm'; ans=val/10;    break;
+    case 2: val=ri(1,9);      fromU='m';  toU='cm'; ans=val*100;   break;
+    case 3: val=ri(1,9)*100;  fromU='cm'; toU='m';  ans=val/100;   break;
+    case 4: val=ri(1,9);      fromU='km'; toU='m';  ans=val*1000;  break;
+    case 5: val=ri(1,9)*1000; fromU='m';  toU='km'; ans=val/1000;  break;
+  }
+  return {val, fromU, toU, ans};
+}
+
+let _convAns, _convLocked=false, _convTimer=null;
+function nextSec2(){
+  if(_convTimer){clearTimeout(_convTimer);_convTimer=null;}
+  const nxt=document.getElementById('conv-next-btn');if(nxt)nxt.style.display='none';
+  _convLocked=false;
+  const q=genConv();
+  _convAns=q.ans;
+  document.getElementById('sec2-vis').innerHTML=
+    `<div class="mes-vis"><span style="color:var(--t)">${q.val} ${q.fromU}</span> = <span style="color:var(--m)">? ${q.toU}</span></div>`;
+  document.getElementById('sec2-inp').innerHTML=
+    `<div class="inp-row"><input class="geo-inp" id="conv-inp" type="number" min="0" placeholder="?" style="width:110px" onkeydown="if(event.key==='Enter')checkConv()"><span class="inp-unit">${q.toU}</span></div>`;
+  document.getElementById('sec2-fb').textContent='';
+  const btn=document.getElementById('conv-btn');
+  btn.textContent='Comprova'; btn.disabled=false;
+  setTimeout(()=>document.getElementById('conv-inp')?.focus({preventScroll:true}),50);
+}
+
+function checkConv(){
+  if(_convLocked) return;
+  const inp=document.getElementById('conv-inp');
+  if(!inp||inp.value.trim()==='') return;
+  _convLocked=true;
+  inp.disabled=true;
+  document.getElementById('conv-btn').disabled=true;
+  const nxtC=document.getElementById('conv-next-btn');if(nxtC)nxtC.style.display='';
+  const val=Number(inp.value);
+  if(val===_convAns){
+    inp.classList.add('ok');
+    setFb('sec2-fb',true,pick(OK));
+    gCorrect(8,'conv');
+  } else {
+    inp.classList.add('ko');
+    setFb('sec2-fb',false,pick(KO)+' (Era: '+_convAns+')');
+    gWrong();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// SECCIÓ 3 — QUIN ÉS MÉS GRAN?
+// ════════════════════════════════════════════════════════════
+function genCmp(){
+  const type=ri(0,2);
+  let s1, s2, bigger;
+  if(type===0){
+    const cmV=ri(2,8), mmV=ri(1,cmV*10-1);
+    s1=`${mmV} mm`; s2=`${cmV} cm`;
+    bigger=cmV*10>mmV?s2:s1;
+  } else if(type===1){
+    const mV=ri(2,5), cmV=ri(1,mV*100-1);
+    s1=`${cmV} cm`; s2=`${mV} m`;
+    bigger=mV*100>cmV?s2:s1;
+  } else {
+    const kmV=ri(2,5), mV=ri(1,kmV*1000-1);
+    s1=`${mV} m`; s2=`${kmV} km`;
+    bigger=kmV*1000>mV?s2:s1;
+  }
+  return {s1, s2, bigger};
+}
+
+function nextSec3(){
+  const q=genCmp();
+  document.getElementById('sec3-vis').innerHTML=
+    `<div class="mes-vis">${q.s1} <span style="font-size:1rem;font-weight:400;color:var(--m)"> o </span> ${q.s2}</div>`;
+  document.getElementById('sec3-fb').textContent='';
+  renderOpts('sec3-opts', sh([q.s1, q.s2]), q.bigger,
+    ()=>{ setFb('sec3-fb',true,pick(OK));  gCorrect(7,'cmp'); },
+    ()=>{ setFb('sec3-fb',false,pick(KO)); gWrong(); }
+  );
+}
+
+// ════════════════════════════════════════════════════════════
+// SECCIÓ 4 — SUMA I RESTA
+// ════════════════════════════════════════════════════════════
+function genCalc(){
+  const type=ri(0,5);
+  let text, ans, unit;
+  switch(type){
+    case 0:{ const a=ri(10,89), b=ri(10,99-a);  text=`${a} cm + ${b} cm`; ans=a+b; unit='cm'; break; }
+    case 1:{ const a=ri(40,99), b=ri(10,a-5);   text=`${a} cm − ${b} cm`; ans=a-b; unit='cm'; break; }
+    case 2:{ const a=ri(100,899), b=ri(10,999-a);text=`${a} m + ${b} m`;  ans=a+b; unit='m';  break; }
+    case 3:{ const a=ri(200,999), b=ri(10,a-10); text=`${a} m − ${b} m`;  ans=a-b; unit='m';  break; }
+    case 4:{ const a=ri(10,89),  b=ri(10,99-a);  text=`${a} mm + ${b} mm`;ans=a+b; unit='mm'; break; }
+    case 5:{ const a=ri(2,9),    b=ri(1,a-1);    text=`${a} km − ${b} km`;ans=a-b; unit='km'; break; }
+  }
+  return {text, ans, unit};
+}
+
+let _calcAns, _calcUnit, _calcLocked=false, _calcTimer=null;
+function nextSec4(){
+  if(_calcTimer){clearTimeout(_calcTimer);_calcTimer=null;}
+  const nxt=document.getElementById('calc-next-btn');if(nxt)nxt.style.display='none';
+  _calcLocked=false;
+  const q=genCalc();
+  _calcAns=q.ans; _calcUnit=q.unit;
+  document.getElementById('sec4-vis').innerHTML=
+    `<div class="mes-vis">${q.text} = ?</div>`;
+  document.getElementById('sec4-inp').innerHTML=
+    `<div class="inp-row"><input class="geo-inp" id="calc-inp" type="number" min="0" placeholder="?" style="width:110px" onkeydown="if(event.key==='Enter')checkCalc()"><span class="inp-unit">${q.unit}</span></div>`;
+  document.getElementById('sec4-fb').textContent='';
+  const btn=document.getElementById('calc-btn');
+  btn.textContent='Comprova'; btn.disabled=false;
+  setTimeout(()=>document.getElementById('calc-inp')?.focus({preventScroll:true}),50);
+}
+
+function checkCalc(){
+  if(_calcLocked) return;
+  const inp=document.getElementById('calc-inp');
+  if(!inp||inp.value.trim()==='') return;
+  _calcLocked=true;
+  inp.disabled=true;
+  document.getElementById('calc-btn').disabled=true;
+  const nxtC=document.getElementById('calc-next-btn');if(nxtC)nxtC.style.display='';
+  const val=Number(inp.value);
+  if(val===_calcAns){
+    inp.classList.add('ok');
+    setFb('sec4-fb',true,pick(OK));
+    gCorrect(8,'calc');
+  } else {
+    inp.classList.add('ko');
+    setFb('sec4-fb',false,pick(KO)+' (Era: '+_calcAns+' '+_calcUnit+')');
+    gWrong();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// SECCIÓ 5 — PROBLEMES
+// ════════════════════════════════════════════════════════════
+const PROB_POOL=getProbs('longitud');
+
+function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,5);}
+
+// ════════════════════════════════════════════════════════════
+// SECCIÓ 6 — MESURA AMB EL REGLE
+// ════════════════════════════════════════════════════════════
+const R_PX_CM = 28;   // pixels per cm en el viewBox
+const R_CMS   = 15;   // cm que mostra el regle
+const R_X0    = 12;   // marge esquerre per a l'etiqueta "0"
+const R_OBJ_H = 20;   // alçada de cada barra objecte
+const R_OBJ_G = 5;    // gap entre barres (compare mode)
+
+function buildRulerSVG(objs, unit){
+  const R_W = R_CMS * R_PX_CM;                  // amplada útil del regle
+  const SVG_W = R_X0 + R_W + 22;               // amplada total del viewBox
+
+  // Calcula posició Y de cada objecte
+  const objYs = [];
+  let cy = 6;
+  for(const o of objs){ objYs.push(cy); cy += R_OBJ_H + R_OBJ_G; }
+  const lastBot = cy - R_OBJ_G;                // part inferior del darrer objecte
+
+  // El regle comença prou baix per deixar espai a les etiquetes
+  const RY = lastBot + 14;                      // y superior del regle
+  const RH = 26;                                // alçada del cos del regle
+  const SH = RY + RH + 8;                      // alçada total del SVG
+
+  const COLS = ['#1d4ed8','#16a34a','#dc2626','#7c3aed'];
+
+  // Línies guia (es dibuixen primer, per sota del regle)
+  let guides = '';
+  for(let i = 0; i < objs.length; i++){
+    const o = objs[i];
+    const ex = R_X0 + (o.start + o.len) * R_PX_CM;
+    const oy = objYs[i];
+    const col = o.color || COLS[i % COLS.length];
+    guides += `<line x1="${ex}" y1="${oy + R_OBJ_H}" x2="${ex}" y2="${RY}" `
+            + `stroke="${col}" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.45"/>`;
+  }
+
+  // Marques del regle
+  let ticks = '';
+  for(let mm = 0; mm <= R_CMS * 10; mm++){
+    const x = R_X0 + mm * R_PX_CM / 10;
+    let h, sw;
+    if(mm % 10 === 0){ h = RH; sw = 1.5; }
+    else if(mm % 5 === 0){ h = 10; sw = 0.8; }
+    else { h = 4; sw = 0.5; }
+    ticks += `<line x1="${x}" y1="${RY}" x2="${x}" y2="${RY+h}" stroke="#78350f" stroke-width="${sw}"/>`;
+    if(mm % 10 === 0){
+      const lbl = unit === 'mm' ? mm : mm / 10;
+      ticks += `<text x="${x}" y="${RY-3}" text-anchor="middle" `
+             + `font-size="8.5" fill="#78350f" font-weight="600" `
+             + `font-family="'Segoe UI',sans-serif">${lbl}</text>`;
+    }
+  }
+  // Etiqueta de la unitat al final del regle
+  ticks += `<text x="${R_X0 + R_W + 4}" y="${RY + RH/2 + 4}" `
+          + `font-size="9" fill="#92400e" font-weight="700" `
+          + `font-family="'Segoe UI',sans-serif">${unit}</text>`;
+
+  // Barres dels objectes (es dibuixen al damunt del regle)
+  let bars = '';
+  for(let i = 0; i < objs.length; i++){
+    const o = objs[i];
+    const x = R_X0 + o.start * R_PX_CM;
+    const w = o.len * R_PX_CM;
+    const oy = objYs[i];
+    const col = o.color || COLS[i % COLS.length];
+    bars += `<rect x="${x}" y="${oy}" width="${w}" height="${R_OBJ_H}" rx="3" fill="${col}" opacity="0.9"/>`;
+    if(o.label)
+      bars += `<text x="${x + w/2}" y="${oy + 13}" text-anchor="middle" `
+            + `font-size="10" fill="white" font-weight="700" `
+            + `font-family="'Segoe UI',sans-serif">${o.label}</text>`;
+  }
+
+  return `<svg viewBox="0 0 ${SVG_W} ${SH}" style="width:100%;height:auto;display:block" `
+       + `preserveAspectRatio="xMinYMin meet">`
+       + guides
+       + `<rect x="${R_X0}" y="${RY}" width="${R_W}" height="${RH}" `
+       + `fill="#fef3c7" stroke="#92400e" stroke-width="1.5" rx="1"/>`
+       + ticks + bars
+       + `</svg>`;
+}
+
+let _rulerUnit   = 'cm';
+let _rulerMode   = 'measure';   // 'measure' | 'compare'
+let _rulerObjs   = [];
+let _rulerAns    = null;        // cm value (measure mode)
+let _rulerBigger = null;        // 'A' | 'B' (compare mode)
+let _rulerLocked = false;
+let _sec6Ctr     = 0;
+let _sec6Timer   = null;
+
+function setRulerUnit(unit){
+  _rulerUnit = unit;
+  document.getElementById('badge-cm').classList.toggle('on', unit === 'cm');
+  document.getElementById('badge-mm').classList.toggle('on', unit === 'mm');
+  document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, unit);
+
+  // En mode mesura, si encara no s'ha respost, reconstruïm l'input amb la nova unitat
+  if(_rulerMode === 'measure' && !_rulerLocked){
+    document.getElementById('sec6-q').textContent = `Quant mesura l'objecte? (en ${unit})`;
+    document.getElementById('sec6-ans').innerHTML =
+      `<div class="inp-row">`
+      + `<input class="geo-inp" id="ruler-inp" type="number" min="0" placeholder="?" `
+      + `style="width:100px" onkeydown="if(event.key==='Enter')checkSec6()">`
+      + `<span class="inp-unit">${unit}</span></div>`;
+    document.getElementById('sec6-fb').textContent = '';
+    document.getElementById('ruler-btn').disabled = false;
+    setTimeout(()=>document.getElementById('ruler-inp')?.focus({preventScroll:true}), 50);
+  }
+}
+
+function nextSec6(){
+  if(_sec6Timer){clearTimeout(_sec6Timer);_sec6Timer=null;}
+  const nxtR=document.getElementById('ruler-next-btn');if(nxtR)nxtR.style.display='none';
+  _rulerLocked = false;
+  _rulerUnit   = 'cm';
+  _sec6Ctr++;
+
+  document.getElementById('badge-cm').classList.add('on');
+  document.getElementById('badge-mm').classList.remove('on');
+  document.getElementById('sec6-fb').textContent = '';
+
+  if(_sec6Ctr % 4 === 0){
+    // ── Compare mode: 2 objectes ──
+    _rulerMode = 'compare';
+    let aLen = ri(2, 12), bLen;
+    do { bLen = ri(2, 12); } while(bLen === aLen);
+    _rulerBigger = aLen > bLen ? 'A' : 'B';
+    _rulerObjs = [
+      {start:0, len:aLen, color:'#1d4ed8', label:'A'},
+      {start:0, len:bLen, color:'#16a34a', label:'B'}
+    ];
+    document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, _rulerUnit);
+    document.getElementById('sec6-q').textContent = 'Quin objecte és més llarg?';
+    document.getElementById('ruler-btn').style.display = 'none';
+    const nxtRcmp=document.getElementById('ruler-next-btn');
+    renderOpts('sec6-ans', sh(['Objecte A','Objecte B']), `Objecte ${_rulerBigger}`,
+      ()=>{ setFb('sec6-fb',true,pick(OK));  gCorrect(7,'ruler_cmp'); if(nxtRcmp)nxtRcmp.style.display=''; },
+      ()=>{ setFb('sec6-fb',false,pick(KO)); gWrong(); if(nxtRcmp)nxtRcmp.style.display=''; }
+    );
+  } else {
+    // ── Measure mode: 1 objecte ──
+    _rulerMode = 'measure';
+    _rulerAns  = ri(1, 12);
+    _rulerObjs = [{start:0, len:_rulerAns, color:'#1d4ed8'}];
+    document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, _rulerUnit);
+    document.getElementById('sec6-q').textContent = `Quant mesura l'objecte? (en cm)`;
+    document.getElementById('sec6-ans').innerHTML =
+      `<div class="inp-row">`
+      + `<input class="geo-inp" id="ruler-inp" type="number" min="0" placeholder="?" `
+      + `style="width:100px" onkeydown="if(event.key==='Enter')checkSec6()">`
+      + `<span class="inp-unit">cm</span></div>`;
+    const btn = document.getElementById('ruler-btn');
+    btn.style.display = '';
+    btn.textContent   = 'Comprova';
+    btn.disabled      = false;
+    setTimeout(()=>document.getElementById('ruler-inp')?.focus({preventScroll:true}), 50);
+  }
+}
+
+function checkSec6(){
+  if(_rulerLocked || _rulerMode !== 'measure') return;
+  const inp = document.getElementById('ruler-inp');
+  if(!inp || inp.value.trim() === '') return;
+  _rulerLocked = true;
+  inp.disabled = true;
+  document.getElementById('ruler-btn').disabled = true;
+  const nxtRm=document.getElementById('ruler-next-btn');if(nxtRm)nxtRm.style.display='';
+  const val      = Number(inp.value);
+  const expected = _rulerUnit === 'cm' ? _rulerAns : _rulerAns * 10;
+  if(val === expected){
+    inp.classList.add('ok');
+    setFb('sec6-fb', true, pick(OK));
+    gCorrect(8, 'ruler');
+  } else {
+    inp.classList.add('ko');
+    setFb('sec6-fb', false, pick(KO) + ' (Era: ' + expected + ' ' + _rulerUnit + ')');
+    gWrong();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// SECCIÓ 7 — TAULA DE CONVERSIÓ
+// ════════════════════════════════════════════════════════════
+
+function renderSec7(){
+  // Taula base (sempre la mateixa estructura)
+  const tbl =
+    `<table class="conv-tbl">
+      <thead><tr>
+        <th>Mesura</th><th>= mm</th><th>= cm</th><th>= m</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="row-lbl">1 cm</td>
+          <td><input class="tbl-inp" id="t-cm-mm" data-ans="10"   type="number" min="0" placeholder="?"></td>
+          <td class="diag">—</td>
+          <td class="diag">—</td>
+        </tr>
+        <tr>
+          <td class="row-lbl">1 m</td>
+          <td><input class="tbl-inp" id="t-m-mm"  data-ans="1000" type="number" min="0" placeholder="?"></td>
+          <td><input class="tbl-inp" id="t-m-cm"  data-ans="100"  type="number" min="0" placeholder="?"></td>
+          <td class="diag">—</td>
+        </tr>
+        <tr>
+          <td class="row-lbl">1 km</td>
+          <td class="diag">—</td>
+          <td class="diag">—</td>
+          <td><input class="tbl-inp" id="t-km-m"  data-ans="1000" type="number" min="0" placeholder="?"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="sec7-var"></div>`;
+  document.getElementById('sec7-content').innerHTML = tbl;
+  renderSec7Vars();
+}
+
+function renderSec7Vars(){
+  const mV  = ri(2,9);
+  const kmV = ri(2,9);
+  const mmV = ri(1,9) * 10;   // múltiple de 10 perquè el resultat en cm sigui enter
+  const vars = [
+    {from:`${mV} m`,    toUnit:'cm', ans:mV*100},
+    {from:`${kmV} km`,  toUnit:'m',  ans:kmV*1000},
+    {from:`${mmV} mm`,  toUnit:'cm', ans:mmV/10},
+  ];
+  let html = `<div class="section-lbl" style="margin-top:14px">Practica</div>`;
+  vars.forEach((v,i)=>{
+    html +=
+      `<div class="var-row">`
+      + `<span class="var-from">${v.from}</span>`
+      + `<span class="var-eq">=</span>`
+      + `<input class="tbl-inp" id="tv${i}" data-ans="${v.ans}" `
+      + `type="number" min="0" placeholder="?" style="width:80px">`
+      + `<span class="var-unit">${v.toUnit}</span>`
+      + `</div>`;
+  });
+  document.getElementById('sec7-var').innerHTML = html;
+}
+
+function nextSec7(){
+  // Regenera només la part variable; la taula base conserva l'estat
+  renderSec7Vars();
+  document.getElementById('sec7-fb').textContent = '';
+}
+
+function checkSec7(){
+  const inputs = [...document.querySelectorAll('.tbl-inp')].filter(inp => !inp.disabled);
+  let newOk = 0, hasWrong = 0;
+  inputs.forEach(inp => {
+    if(inp.classList.contains('ok')) return;   // ja validat prèviament
+    if(inp.value.trim() === '') return;         // buit: no puntua
+    const val = Number(inp.value);
+    const ans = Number(inp.dataset.ans);
+    if(val === ans){
+      inp.classList.remove('ko');
+      inp.classList.add('ok');
+      inp.disabled = true;
+      newOk++;
+    } else {
+      inp.classList.add('ko');
+      hasWrong++;
+    }
+  });
+
+  const all   = document.querySelectorAll('.tbl-inp').length;
+  const doneOk= document.querySelectorAll('.tbl-inp.ok').length;
+  const fb    = document.getElementById('sec7-fb');
+
+  if(newOk > 0) gCorrect(newOk * 6, 'conv_tbl');
+  else if(hasWrong > 0) gWrong();
+
+  if(doneOk === all && all > 0){
+    fb.className = 'fb ok';
+    fb.textContent = 'Taula completa! ' + pick(OK);
+  } else if(newOk > 0){
+    fb.className = 'fb ok';
+    fb.textContent = `+${newOk} correcte${newOk>1?'s':''}! En falten ${all - doneOk}.`;
+  } else if(hasWrong > 0){
+    fb.className = 'fb ko';
+    fb.textContent = 'Revisa els valors marcats en vermell.';
+  } else {
+    fb.className = 'fb';
+    fb.textContent = 'Omple les caselles i torna a prémer Comprova tot.';
+  }
+}
+
+// ── INIT ──
+gRender();
+nextSec1();
+nextSec2();
+nextSec3();
+nextSec4();
+nextProblemes();
+nextSec6();
+renderSec7();
+</script>
+</body>
+</html>

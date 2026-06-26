@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Town &amp; Places</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── City map ── */
+.city-map{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}
+.city-block{padding:10px 6px;border-radius:8px;text-align:center;font-size:.78rem;font-weight:700;line-height:1.3;cursor:default;border:2px solid transparent}
+.cb-park    {background:#d1fae5;color:#065f46;border-color:#6ee7b7}
+.cb-school  {background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+.cb-hospital{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.cb-museum  {background:#ede9fe;color:#4c1d95;border-color:#c4b5fd}
+.cb-bank    {background:#fef3c7;color:#78350f;border-color:#fcd34d}
+.cb-cafe    {background:#fce7f3;color:#831843;border-color:#f9a8d4}
+.cb-cinema  {background:#f0fdf4;color:#14532d;border-color:#86efac}
+.cb-zoo     {background:#fff7ed;color:#7c2d12;border-color:#fdba74}
+.cb-library {background:#f0f9ff;color:#0c4a6e;border-color:#7dd3fc}
+.city-block .cb-icon{font-size:1.4rem;display:block;margin-bottom:2px}
+.city-block .cb-name{font-size:.72rem}
+
+/* ── Q blocks ── */
+.q-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b)}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-sent{font-size:.93rem;font-weight:500;margin-bottom:8px;line-height:1.5}
+.blank{color:var(--a);font-weight:800}
+
+/* ── Vocab fill ── */
+.voc-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b)}
+.voc-row:last-child{border-bottom:none}
+.voc-icon{font-size:1.8rem;min-width:2.2rem;text-align:center}
+.voc-input{flex:1;padding:6px 10px;border:2px solid var(--b);border-radius:8px;font-size:.9rem;font-family:inherit}
+.voc-input.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.voc-input.ko{border-color:var(--ko);background:#fff0f0}
+.voc-fb{font-size:.82rem;min-width:90px}
+
+/* ── Word bank (section 1 hint) ── */
+.word-bank-hint{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 12px;padding:8px;
+  background:#f8faff;border-radius:8px;border:1.5px dashed var(--b)}
+.wb-chip{padding:3px 9px;background:#fff;border:1.5px solid var(--a);border-radius:6px;
+  font-size:.8rem;font-weight:600;color:var(--a)}
+
+.done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;
+  border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Town &amp; Places</h1>
+    <div class="muted">Unit 3 · There is/are · Prepositions · Directions</div>
+  </div>
+</div>
+<div id="gam-bar"></div>
+
+<!-- ── 1: Vocabulary ── -->
+<div class="card">
+  <h2><span class="num">1</span> Name the place</h2>
+  <p class="card-sub">Look at each emoji and type the correct place. Use the word bank!</p>
+  <div class="word-bank-hint" id="s1-wb"></div>
+  <div id="s1-list"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s1Init()">New places ▶</button>
+  </div>
+</div>
+
+<!-- ── 2: There's / There isn't ── -->
+<div class="card">
+  <h2><span class="num">2</span> There's / There isn't</h2>
+  <p class="card-sub">Look at the map and decide if the sentences are true or false.</p>
+  <div class="city-map" id="s2-map"></div>
+  <div id="s2-qs" style="margin-top:12px"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s2Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 3: Is there / Are there? ── -->
+<div class="card">
+  <h2><span class="num">3</span> Is there / Are there?</h2>
+  <p class="card-sub">Look at the map above and answer Yes or No.</p>
+  <div id="s3-qs"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s3Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 4: Prepositions ── -->
+<div class="card">
+  <h2><span class="num">4</span> Where is it?</h2>
+  <p class="card-sub">Look at the map and choose the correct preposition.</p>
+  <div class="city-map" id="s4-map"></div>
+  <div id="s4-qs" style="margin-top:12px"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s4Init()">New questions ▶</button>
+  </div>
+</div>
+
+<!-- ── 5: Word order ── -->
+<div class="card">
+  <h2><span class="num">5</span> Put the words in order</h2>
+  <p class="card-sub">Click the words to build the correct sentence.</p>
+  <div id="s5-list"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-outline btn-sm" onclick="s5Init()">New sentences ▶</button>
+  </div>
+</div>
+
+<!-- ── 6: True or False (prepositions) ── -->
+<div class="card">
+  <h2><span class="num">6</span> True or False?</h2>
+  <p class="card-sub">Read the sentence and decide if it is true or false about the map.</p>
+  <div class="city-map" id="s6-map"></div>
+  <div id="s6-qs" style="margin-top:12px"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-outline btn-sm" onclick="s6Init()">New questions ▶</button>
+  </div>
+</div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+const ENOK = ["Well done! ⭐","Excellent! 🎉","Great job! 🌟","Perfect! 🏆","Amazing! 💪","Fantastic! 🎊"];
+const ENKO = ["Try again!","Not quite...","Almost there!","Have another go!"];
+
+const EXER_KEY = 'ex_ang_city_v1';
+GAM_ACHS = [...GAM_ACHS,
+  {id:'ang_city1',  s:'🏙️', n:'City Explorer', d:'First town question correct'},
+  {id:'ang_city5',  s:'🗺️', n:'Map Master',    d:'5 town questions correct'},
+  {id:'ang_city20', s:'🏛️', n:'Town Champion', d:'20 town questions correct'},
+];
+
+function cityOk(xp) {
+  const e = eLoad(); e.ok = (e.ok||0) + 1; eSave(e);
+  gCorrect(xp||3, tryA => {
+    tryA('ang_city1',  e.ok >= 1);
+    tryA('ang_city5',  e.ok >= 5);
+    tryA('ang_city20', e.ok >= 20);
+  });
+}
+
+/* ── Places ── */
+const PLACES = [
+  {name:'park',          icon:'🌳', cls:'cb-park'},
+  {name:'school',        icon:'🏫', cls:'cb-school'},
+  {name:'hospital',      icon:'🏥', cls:'cb-hospital'},
+  {name:'museum',        icon:'🏛️', cls:'cb-museum'},
+  {name:'bank',          icon:'🏦', cls:'cb-bank'},
+  {name:'café',          icon:'☕', cls:'cb-cafe'},
+  {name:'cinema',        icon:'🎬', cls:'cb-cinema'},
+  {name:'zoo',           icon:'🦁', cls:'cb-zoo'},
+  {name:'library',       icon:'📚', cls:'cb-library'},
+  {name:'train station', icon:'🚂', cls:'cb-school'},
+  {name:'supermarket',   icon:'🛒', cls:'cb-bank'},
+  {name:'toy shop',      icon:'🧸', cls:'cb-cafe'},
+];
+
+/* Fixed 3×3 map grid used for sections 2, 3, 4, 6 */
+/* Layout: [row0col0, row0col1, row0col2, row1col0, ...] */
+const MAP_PLACES = [
+  {name:'park',     icon:'🌳', cls:'cb-park'},
+  {name:'bank',     icon:'🏦', cls:'cb-bank'},
+  {name:'hospital', icon:'🏥', cls:'cb-hospital'},
+  {name:'café',     icon:'☕', cls:'cb-cafe'},
+  {name:'museum',   icon:'🏛️', cls:'cb-museum'},
+  {name:'library',  icon:'📚', cls:'cb-library'},
+  {name:'cinema',   icon:'🎬', cls:'cb-cinema'},
+  {name:'school',   icon:'🏫', cls:'cb-school'},
+  {name:'zoo',      icon:'🦁', cls:'cb-zoo'},
+];
+/* Positions: 0=top-left 1=top-mid 2=top-right
+              3=mid-left  4=centre  5=mid-right
+              6=bot-left  7=bot-mid 8=bot-right */
+
+function mapHtml(id) {
+  return '<div class="city-map" id="' + id + '">'
+    + MAP_PLACES.map(p =>
+        `<div class="city-block ${p.cls}"><span class="cb-icon">${p.icon}</span><span class="cb-name">${p.name}</span></div>`
+      ).join('')
+    + '</div>';
+}
+function renderMap(elId) {
+  document.getElementById(elId).innerHTML =
+    MAP_PLACES.map(p =>
+      `<div class="city-block ${p.cls}"><span class="cb-icon">${p.icon}</span><span class="cb-name">${p.name}</span></div>`
+    ).join('');
+}
+
+/* Adjacency facts derived from the fixed map:
+   next to: share an edge (horizontal/vertical neighbours)
+   opposite: across the grid (rows differ by 2 OR cols differ by 2 in straight line)
+   between: has exactly one place between two others in same row/col
+   in front of / behind: subjective — we use fixed definitions below
+*/
+const PREP_FACTS = [
+  /* next to */
+  {a:'park',     prep:'next to',    b:'bank',     ans:true},
+  {a:'bank',     prep:'next to',    b:'hospital', ans:true},
+  {a:'café',     prep:'next to',    b:'museum',   ans:true},
+  {a:'museum',   prep:'next to',    b:'library',  ans:true},
+  {a:'cinema',   prep:'next to',    b:'school',   ans:true},
+  {a:'school',   prep:'next to',    b:'zoo',      ans:true},
+  {a:'park',     prep:'next to',    b:'café',     ans:true},
+  {a:'bank',     prep:'next to',    b:'museum',   ans:true},
+  {a:'hospital', prep:'next to',    b:'library',  ans:true},
+  /* not next to */
+  {a:'park',     prep:'next to',    b:'hospital', ans:false},
+  {a:'cinema',   prep:'next to',    b:'bank',     ans:false},
+  {a:'zoo',      prep:'next to',    b:'café',     ans:false},
+  /* opposite */
+  {a:'park',     prep:'opposite',   b:'cinema',   ans:true},
+  {a:'bank',     prep:'opposite',   b:'school',   ans:true},
+  {a:'hospital', prep:'opposite',   b:'zoo',      ans:true},
+  {a:'park',     prep:'opposite',   b:'hospital', ans:false},
+  {a:'café',     prep:'opposite',   b:'zoo',      ans:false},
+  /* between */
+  {a:'bank',     prep:'between',    b:'the park and the hospital', ans:true},
+  {a:'museum',   prep:'between',    b:'the café and the library',  ans:true},
+  {a:'school',   prep:'between',    b:'the cinema and the zoo',    ans:true},
+  {a:'café',     prep:'between',    b:'the park and the cinema',   ans:true},
+  {a:'bank',     prep:'between',    b:'the café and the library',  ans:false},
+];
+
+/* ══ SECTION 1 ══ — Vocab fill */
+let s1Items = [];
+function s1Init() {
+  s1Items = sh([...PLACES]).slice(0, 6);
+  const wb = document.getElementById('s1-wb');
+  const shuffledNames = sh(s1Items.map(p => p.name));
+  wb.innerHTML = shuffledNames.map(n => `<span class="wb-chip">${n}</span>`).join('');
+  document.getElementById('s1-list').innerHTML = s1Items.map((p, i) => `
+    <div class="voc-row">
+      <span class="voc-icon">${p.icon}</span>
+      <input class="voc-input" id="s1i${i}" placeholder="Type the place…" autocomplete="off">
+      <button class="btn btn-dark btn-sm" onclick="s1Check(${i})">✓</button>
+      <span class="voc-fb" id="s1fb${i}"></span>
+    </div>
+  `).join('');
+}
+function s1Check(i) {
+  const inp = document.getElementById('s1i'+i);
+  if (inp.disabled) return;
+  const val = inp.value.trim().toLowerCase();
+  const ok = val === s1Items[i].name.toLowerCase();
+  inp.className = 'voc-input ' + (ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s1fb'+i);
+  fb.style.color = ok ? 'var(--ok)' : 'var(--ko)';
+  fb.textContent = ok ? pick(ENOK) : s1Items[i].name;
+  if (ok) { inp.disabled = true; cityOk(3); } else gWrong();
+}
+
+/* ══ SECTION 2 ══ — There's / There isn't → T/F */
+let s2Current = [];
+function s2Init() {
+  renderMap('s2-map');
+  const mapNames = MAP_PLACES.map(p => p.name);
+  const notInMap = PLACES.filter(p => !mapNames.includes(p.name));
+  const pool = [];
+  MAP_PLACES.forEach(p => {
+    pool.push({stmt:`There's a ${p.name} in the town.`,     ans:true});
+    pool.push({stmt:`There isn't a ${p.name} in the town.`, ans:false});
+  });
+  notInMap.forEach(p => {
+    pool.push({stmt:`There's a ${p.name} in the town.`,     ans:false});
+    pool.push({stmt:`There isn't a ${p.name} in the town.`, ans:true});
+  });
+  s2Current = sh(pool).slice(0, 5);
+  document.getElementById('s2-qs').innerHTML = s2Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">"${q.stmt}"</div>
+      <div class="opts-row" id="s2o${i}">
+        <button class="aopt" onclick="s2Ans(this,${i},1)">True ✓</button>
+        <button class="aopt" onclick="s2Ans(this,${i},0)">False ✗</button>
+      </div>
+      <div class="fb" id="s2fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s2Ans(btn, i, choice) {
+  document.querySelectorAll('#s2o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s2Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s2fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'It\'s ' + (s2Current[i].ans ? 'True' : 'False') + '!';
+  ok ? cityOk(2) : gWrong();
+}
+
+/* ══ SECTION 3 ══ — Is there / Are there? */
+const S3_POOL = [
+  {q:"Is there a park in the town?",         yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
+  {q:"Is there a hospital in the town?",     yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
+  {q:"Is there a museum in the town?",       yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
+  {q:"Is there a zoo in the town?",          yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
+  {q:"Is there a cinema in the town?",       yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
+  {q:"Is there a supermarket in the town?",  yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
+  {q:"Is there a toy shop in the town?",     yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
+  {q:"Is there a train station in the town?",yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
+  {q:"Are there any shops in the town?",     yes:"Yes, there are.",  no:"No, there aren't.",  ans:false},
+  {q:"Are there any schools in the town?",   yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
+  {q:"Are there any cafés in the town?",     yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
+  {q:"Are there any libraries in the town?", yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
+];
+let s3Current = [];
+function s3Init() {
+  s3Current = sh([...S3_POOL]).slice(0, 4).map(q => ({
+    ...q,
+    yesStr: q.yes,
+    noStr:  q.no,
+  }));
+  document.getElementById('s3-qs').innerHTML = s3Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent" style="font-weight:600">${q.q}</div>
+      <div class="opts-row" id="s3o${i}">
+        <button class="aopt" onclick="s3Ans(this,${i},1)">${q.yesStr}</button>
+        <button class="aopt" onclick="s3Ans(this,${i},0)">${q.noStr}</button>
+      </div>
+      <div class="fb" id="s3fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s3Ans(btn, i, choice) {
+  document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s3Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const correct = s3Current[i].ans ? s3Current[i].yesStr : s3Current[i].noStr;
+  if (!ok) document.querySelectorAll('#s3o'+i+' .aopt').forEach(b => { if (b.textContent === correct) b.classList.add('show'); });
+  const fb = document.getElementById('s3fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : correct;
+  ok ? cityOk(2) : gWrong();
+}
+
+/* ══ SECTION 4 ══ — Prepositions MCQ */
+let s4Current = [];
+function s4Init() {
+  renderMap('s4-map');
+  s4Current = sh([...PREP_FACTS].filter(f => f.ans)).slice(0, 4);
+  const preps = ['next to','opposite','between','in front of','behind'];
+  document.getElementById('s4-qs').innerHTML = s4Current.map((q, i) => {
+    const opts = sh([q.prep, ...sh(preps.filter(p => p !== q.prep)).slice(0,3)]);
+    return `
+    <div class="q-block">
+      <div class="q-sent">The <strong>${q.a}</strong> is <span class="blank">___</span> ${q.b}.</div>
+      <div class="opts-row" id="s4o${i}">
+        ${opts.map((o, j) => `<button class="aopt" onclick="s4Ans(this,${i},${j})">${o}</button>`).join('')}
+      </div>
+      <div class="fb" id="s4fb${i}"></div>
+    </div>`;
+  }).join('');
+}
+function s4Ans(btn, i, j) {
+  document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => b.disabled = true);
+  const chosen = btn.textContent;
+  const ok = chosen === s4Current[i].prep; btn.classList.add(ok ? 'ok' : 'ko');
+  if (!ok) document.querySelectorAll('#s4o'+i+' .aopt').forEach(b => { if (b.textContent === s4Current[i].prep) b.classList.add('show'); });
+  const fb = document.getElementById('s4fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : `The ${s4Current[i].a} is ${s4Current[i].prep} ${s4Current[i].b}.`;
+  ok ? cityOk(3) : gWrong();
+}
+
+/* ══ SECTION 5 ══ — Word order */
+const S5_POOL = [
+  {words:["Is","there","a","park","in","the","town?"],              correct:"Is there a park in the town?"},
+  {words:["There","is","a","museum","next","to","the","bank."],     correct:"There is a museum next to the bank."},
+  {words:["Is","there","a","supermarket","near","here?"],           correct:"Is there a supermarket near here?"},
+  {words:["There","isn't","a","train","station","in","the","town."],correct:"There isn't a train station in the town."},
+  {words:["Are","there","any","shops","in","the","town?"],          correct:"Are there any shops in the town?"},
+  {words:["The","café","is","opposite","the","zoo."],               correct:"The café is opposite the zoo."},
+  {words:["The","bank","is","between","the","park","and","the","hospital."], correct:"The bank is between the park and the hospital."},
+  {words:["There","are","a","lot","of","places","in","the","town."],correct:"There are a lot of places in the town."},
+  {words:["The","cinema","is","next","to","the","school."],         correct:"The cinema is next to the school."},
+  {words:["There","isn't","a","zoo","opposite","the","park."],      correct:"There isn't a zoo opposite the park."},
+];
+let s5State = [];
+function s5Init() {
+  const sel = sh([...S5_POOL]).slice(0, 3);
+  s5State = sel.map(it => ({
+    words:it.words, correct:it.correct,
+    shuffled:sh([...Array(it.words.length).keys()]),
+    placed:[], done:false
+  }));
+  document.getElementById('s5-list').innerHTML = s5State.map((_, i) => `
+    <div style="padding:12px 0;border-bottom:1px solid var(--b)">
+      <div class="label" style="margin-bottom:5px">Words:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#f8faff;border-radius:8px;border:1.5px dashed var(--b);min-height:40px;margin:4px 0" id="s5b${i}"></div>
+      <div class="label" style="margin:5px 0 4px">Your sentence:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-radius:8px;border:2px solid var(--b);min-height:40px;margin:4px 0" id="s5s${i}"></div>
+      <div class="btn-row" style="margin-top:8px;justify-content:flex-start">
+        <button class="btn btn-dark btn-sm" onclick="s5Check(${i})">Check ✓</button>
+        <button class="btn btn-outline btn-sm" onclick="s5Clear(${i})">Clear</button>
+      </div>
+      <div class="fb" id="s5fb${i}"></div>
+    </div>
+  `).join('');
+  s5State.forEach((_, i) => s5Render(i));
+}
+function s5Render(i) {
+  const it = s5State[i];
+  const bank = document.getElementById('s5b'+i), sent = document.getElementById('s5s'+i);
+  bank.innerHTML = ''; sent.innerHTML = '';
+  if (it.done) {
+    bank.innerHTML = `<span style="color:var(--ok);font-weight:600;font-size:.85rem">✓ ${it.correct}</span>`;
+    return;
+  }
+  it.shuffled.forEach(wi => {
+    if (it.placed.includes(wi)) return;
+    const c = document.createElement('span');
+    c.style.cssText = 'padding:5px 10px;background:#fff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;user-select:none';
+    c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.push(wi); s5Render(i); };
+    bank.appendChild(c);
+  });
+  it.placed.forEach(wi => {
+    const c = document.createElement('span');
+    c.style.cssText = 'padding:5px 10px;background:#eff6ff;border:2px solid var(--a);border-radius:8px;font-size:.85rem;font-weight:600;color:var(--a);cursor:pointer;user-select:none';
+    c.textContent = it.words[wi];
+    c.onclick = () => { it.placed.splice(it.placed.indexOf(wi), 1); s5Render(i); };
+    sent.appendChild(c);
+  });
+}
+function s5Check(i) {
+  const it = s5State[i];
+  const built = it.placed.map(wi => it.words[wi]).join(' ');
+  const ok = built === it.correct;
+  const fb = document.getElementById('s5fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'Correct: "' + it.correct + '"';
+  if (ok) { it.done = true; s5Render(i); cityOk(4); } else gWrong();
+}
+function s5Clear(i) {
+  s5State[i].placed = []; s5State[i].done = false;
+  document.getElementById('s5fb'+i).className = 'fb';
+  s5Render(i);
+}
+
+/* ══ SECTION 6 ══ — True/False about map + prepositions */
+let s6Current = [];
+function s6Init() {
+  renderMap('s6-map');
+  const pool = [];
+  PREP_FACTS.forEach(f => {
+    pool.push({
+      stmt: f.ans
+        ? `The ${f.a} is ${f.prep} ${f.b}.`
+        : `The ${f.a} is ${f.prep} ${f.b}.`,
+      ans: f.ans
+    });
+  });
+  s6Current = sh(pool).slice(0, 5);
+  document.getElementById('s6-qs').innerHTML = s6Current.map((q, i) => `
+    <div class="q-block">
+      <div class="q-sent">"${q.stmt}"</div>
+      <div class="opts-row" id="s6o${i}">
+        <button class="aopt" onclick="s6Ans(this,${i},1)">True ✓</button>
+        <button class="aopt" onclick="s6Ans(this,${i},0)">False ✗</button>
+      </div>
+      <div class="fb" id="s6fb${i}"></div>
+    </div>
+  `).join('');
+}
+function s6Ans(btn, i, choice) {
+  document.querySelectorAll('#s6o'+i+' .aopt').forEach(b => b.disabled = true);
+  const ok = (choice === 1) === s6Current[i].ans; btn.classList.add(ok ? 'ok' : 'ko');
+  const fb = document.getElementById('s6fb'+i);
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? pick(ENOK) : 'It\'s ' + (s6Current[i].ans ? 'True' : 'False') + '!';
+  ok ? cityOk(2) : gWrong();
+}
+
+/* ══ Bootstrap ══ */
+window.addEventListener('load', () => {
+  s1Init(); s2Init(); s3Init(); s4Init(); s5Init(); s6Init();
+  gRender();
+});
+</script>
+</body>
+</html>

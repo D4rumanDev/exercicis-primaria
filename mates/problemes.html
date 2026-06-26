@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problemes de context — 4t</title>
+<link rel="stylesheet" href="../shared.css">
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Problemes de context</h1>
+    <div class="muted">Sumes · Multiplicació · Fraccions · Mesures · Dos passos</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- ═══════════ SEC 1: SUMES I RESTES ═══════════ -->
+<div class="card">
+  <h2><span class="num">1</span> Sumes i restes</h2>
+  <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
+  <div id="prob1-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob1-list', POOL1, 3)">Nous problemes →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 2: MULTIPLICACIÓ I DIVISIÓ ═══════════ -->
+<div class="card">
+  <h2><span class="num">2</span> Multiplicació i divisió</h2>
+  <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
+  <div id="prob2-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob2-list', POOL2, 3)">Nous problemes →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 3: FRACCIONS ═══════════ -->
+<div class="card">
+  <h2><span class="num">3</span> Fraccions</h2>
+  <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
+  <div id="prob3-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob3-list', POOL3, 3)">Nous problemes →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 4: MESURES I DINERS ═══════════ -->
+<div class="card">
+  <h2><span class="num">4</span> Mesures i diners</h2>
+  <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
+  <div id="prob4-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob4-list', POOL4, 3)">Nous problemes →</button>
+  </div>
+</div>
+
+<!-- ═══════════ SEC 5: DOS PASSOS ═══════════ -->
+<div class="card">
+  <h2><span class="num">5</span> Problemes de dos passos</h2>
+  <div class="card-sub">Aquests problemes necessiten dues operacions. Pensa bé!</div>
+  <div id="prob5-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob5-list', POOL5, 2)">Nous problemes →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="problemes.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_prob_v1';
+
+
+GAM_ACHS = [
+  {id:'first',   s:'🌟', n:'Primer Encert',    d:'Primera resposta correcta'},
+  {id:'s3',      s:'🔥', n:'Ratxa x3',          d:'3 encerts seguits'},
+  {id:'s5',      s:'⚡', n:'Ratxa x5',          d:'5 encerts seguits'},
+  {id:'s10',     s:'💥', n:'Ratxa x10',         d:'10 encerts seguits'},
+  {id:'prob10',  s:'🧠', n:'Pensador',           d:'10 problemes resolts'},
+  {id:'prob25',  s:'📚', n:'Estudiós',           d:'25 problemes resolts'},
+  {id:'ok50',    s:'🥉', n:'50 Encerts',         d:'50 respostes correctes'},
+  {id:'ok200',   s:'🥈', n:'200 Encerts',        d:'200 respostes correctes'}
+];
+
+function gExtraAchs(g,tryA){
+  const e=eLoad();
+  tryA('prob10',(e.prob||0)>=10);
+  tryA('prob25',(e.prob||0)>=25);
+}
+
+// ════ POOLS ════
+
+const POOL1=getProbs('sumes_restes');
+const POOL2=getProbs('mult_div');
+const POOL3=getProbs('fraccions_contexte');
+const POOL4=getProbs('mesures_diners');
+const POOL5=getProbs('dos_passos');
+
+// ════ RENDERITZAR PROBLEMES ════
+function renderProbs(listId, pool, n){
+  const sel = sh([...pool]).slice(0, n);
+  const list = document.getElementById(listId); list.innerHTML = '';
+  sel.forEach((p, i) => {
+    const uid = listId + i;
+    const div = document.createElement('div'); div.className = 'prob';
+    div.innerHTML = `<div class="prob-t">${p.text}</div>`
+      + `<div class="prob-opts" id="${uid}-opts"></div>`
+      + `<div class="fb mt2" id="${uid}-fb"></div>`;
+    list.appendChild(div);
+    sh([...p.opts]).forEach(o => {
+      const b = document.createElement('button'); b.className = 'popt'; b.textContent = o;
+      b.onclick = () => {
+        div.querySelectorAll('.popt').forEach(x => x.disabled = true);
+        const fb = document.getElementById(`${uid}-fb`);
+        if(o === p.ans){
+          b.classList.add('ok'); fb.className = 'fb ok'; fb.textContent = pick(OK);
+          gCorrect(5, 'prob');
+        } else {
+          b.classList.add('ko');
+          div.querySelectorAll('.popt').forEach(x => { if(x.textContent === p.ans) x.classList.add('show'); });
+          fb.className = 'fb ko'; fb.textContent = '✗ Era: ' + p.ans;
+          gWrong();
+        }
+      };
+      document.getElementById(`${uid}-opts`).appendChild(b);
+    });
+  });
+}
+
+// ── INIT ──
+gRender();
+renderProbs('prob1-list', POOL1, 3);
+renderProbs('prob2-list', POOL2, 3);
+renderProbs('prob3-list', POOL3, 3);
+renderProbs('prob4-list', POOL4, 3);
+renderProbs('prob5-list', POOL5, 2);
+</script>
+</body>
+</html>

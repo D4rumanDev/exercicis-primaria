@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hores i Temps</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* Clocks */
+.clk-svg{width:168px;height:168px;cursor:default}
+.clk-svg-lg{width:210px;height:210px;cursor:grab;touch-action:none}
+.clk-svg-lg:active{cursor:grabbing}
+.clock-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.clock-opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.copt{padding:9px 14px;border:2px solid var(--b);border-radius:var(--r);background:#fff;cursor:pointer;font-size:.88rem;font-weight:600;transition:all .15s;font-family:inherit;line-height:1.3;text-align:center}
+.copt:hover{border-color:var(--a);color:var(--a)}
+.copt.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
+.copt.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko);pointer-events:none}
+.copt.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
+.copt:disabled{pointer-events:none}
+/* Digital display */
+.dig-display{background:#0f172a;color:#4ade80;font-family:'Courier New',monospace;font-size:2.2rem;font-weight:900;padding:10px 24px;border-radius:10px;letter-spacing:.18em;display:inline-block;text-align:center;border:2px solid #334155}
+/* Info boxes */
+.info-box{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:.85rem;line-height:1.7;color:var(--t)}
+.info-box strong{color:var(--a)}
+.chain{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;margin:6px 0 10px}
+.chain-u{background:#fff;border:2px solid var(--a);color:var(--a);padding:5px 12px;border-radius:8px;font-size:.88rem;font-weight:700}
+.chain-op{color:var(--m);font-size:.8rem;font-weight:600}
+.frac-info{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:4px 0 12px}
+.frac-item{text-align:center;background:#fff;border:1.5px solid #bfdbfe;border-radius:var(--r);padding:6px 12px}
+.frac-val{font-size:1.05rem;font-weight:800;color:var(--a)}
+.frac-eq{font-size:.78rem;color:var(--m)}
+/* Conversion table */
+.ctable{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:12px}
+.ctable th{background:var(--a);color:#fff;padding:6px;text-align:center;font-size:.8rem}
+.ctable td{border:1px solid var(--b);padding:5px;text-align:center}
+.ctable tr:nth-child(even) td{background:#f8faff}
+.ctable .hl{font-weight:800;color:var(--a)}
+/* Conversion exercises */
+.conv-list{display:flex;flex-direction:column;gap:10px}
+.conv-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.93rem;font-weight:500}
+.fi{width:70px;padding:5px 6px;border:2px solid var(--b);border-radius:8px;font-size:.93rem;font-weight:700;text-align:center;outline:none;font-family:inherit}
+.fi:focus{border-color:var(--a)}
+.fi.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.fi.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.cu{font-size:.8rem;color:var(--m);font-weight:600}
+/* Operation boxes */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.op-box{background:var(--bg);border-radius:12px;padding:14px 16px;border:1.5px solid var(--b)}
+.op-tbl{border-collapse:collapse;font-family:'Courier New',monospace;font-weight:700;width:100%}
+.op-tbl .sg{font-size:1rem;text-align:center;color:var(--m);width:20px;padding:2px 2px}
+.op-tbl .n{font-size:1rem;text-align:right;min-width:26px;padding:2px 3px}
+.op-tbl .u{font-size:.72rem;color:var(--m);font-weight:400;padding:2px 6px 2px 2px;text-align:left}
+.op-tbl .sep-row td{padding:2px 0}
+.op-tbl .ans-td{text-align:right;padding:4px 3px}
+.ans-inp{width:44px;padding:4px 4px;border:2px solid var(--b);border-radius:7px;font-size:.95rem;font-weight:800;text-align:center;outline:none;font-family:inherit}
+.ans-inp:focus{border-color:var(--a)}
+.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
+.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+/* Interactive clock */
+.i-target{font-size:1rem;font-weight:600;line-height:1.5;text-align:center;margin-bottom:6px}
+.i-hint{font-size:.78rem;color:var(--m);text-align:center;margin-bottom:10px;line-height:1.5}
+.i-hint b{color:#1d4ed8}
+.i-hint span{color:#1e293b}
+.hr-line{height:2px;background:var(--b);margin:4px 0}
+@media(max-width:480px){.two-col{grid-template-columns:1fr}.chain-u{font-size:.8rem}.dig-display{font-size:1.8rem}}
+/* Fraction clocks grid */
+.frac-clk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:8px}
+.frac-clk-item{text-align:center;padding:10px 8px;background:var(--bg);border-radius:var(--r);border:1.5px solid var(--b)}
+.frac-name{font-size:.85rem;font-weight:700;margin-top:6px;line-height:1.3;color:var(--t)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Hores i Temps</h1>
+    <div class="muted">Rellotges · Fraccions · Conversió · Suma i Resta</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: ANALÒGIC -->
+<div class="card">
+  <h2><span class="num">1</span> Llegim el rellotge analògic</h2>
+  <div class="card-sub">Mira el rellotge i tria l'hora correcta.</div>
+  <div class="clock-wrap">
+    <svg id="clk1" class="clk-svg" viewBox="0 0 200 200"></svg>
+    <div id="clk1-opts" class="clock-opts"></div>
+    <div id="clk1-fb" class="fb"></div>
+  </div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextAnalog()">Següent →</button>
+  </div>
+</div>
+
+<!-- 2: DIGITAL -->
+<div class="card">
+  <h2><span class="num">2</span> Rellotge digital (24 h)</h2>
+  <div class="card-sub">Com diries en veu alta aquesta hora?</div>
+  <div style="text-align:center;margin-bottom:14px">
+    <div class="dig-display" id="dig-disp">--:--</div>
+  </div>
+  <div id="dig-opts" class="clock-opts"></div>
+  <div id="dig-fb" class="fb mt3" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextDigital()">Següent →</button>
+  </div>
+</div>
+
+<!-- 3: CONVERSIÓ -->
+<div class="card">
+  <h2><span class="num">3</span> Hores, minuts i segons</h2>
+  <div class="info-box">
+    <div class="chain">
+      <span class="chain-u">1 hora (h)</span>
+      <span class="chain-op">× 60</span>
+      <span class="chain-u">60 minuts (min)</span>
+      <span class="chain-op">× 60</span>
+      <span class="chain-u">3.600 segons (s)</span>
+    </div>
+    <div class="frac-info">
+      <div class="frac-item"><div class="frac-val">¼ h</div><div class="frac-eq">= 15 min</div></div>
+      <div class="frac-item"><div class="frac-val">½ h</div><div class="frac-eq">= 30 min</div></div>
+      <div class="frac-item"><div class="frac-val">¾ h</div><div class="frac-eq">= 45 min</div></div>
+      <div class="frac-item"><div class="frac-val">1 h</div><div class="frac-eq">= 60 min</div></div>
+    </div>
+  </div>
+  <div class="section-lbl">Taula de referència</div>
+  <table class="ctable">
+    <thead><tr><th>Hores (h)</th><th>Minuts (min)</th><th>Segons (s)</th></tr></thead>
+    <tbody id="ctbl-body"></tbody>
+  </table>
+  <div class="sep"></div>
+  <div class="section-lbl">Completa</div>
+  <div class="conv-list" id="conv-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-dark btn-sm" onclick="checkConv()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextConv()">Noves preguntes</button>
+  </div>
+  <div id="conv-fb" class="fb mt3" style="text-align:center"></div>
+</div>
+
+<!-- 4: FRACCIONS DEL TEMPS -->
+<div class="card">
+  <h2><span class="num">4</span> Fraccions del temps</h2>
+  <div class="card-sub">Un quart, mitja hora, tres quarts... Quants minuts són?</div>
+  <div class="section-lbl">Mira el rellotge i escriu els minuts</div>
+  <div id="frac-qa" class="frac-clk-grid"></div>
+  <div class="btn-row mt3">
+    <button class="btn btn-dark btn-sm" onclick="checkFracA()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextFracA()">Noves →</button>
+  </div>
+  <div id="frac-fa" class="fb mt2" style="text-align:center"></div>
+  <div class="sep"></div>
+  <div class="section-lbl">Quants minuts és? Tria el nom</div>
+  <div style="text-align:center;margin-bottom:10px">
+    <div id="frac-b-mins" style="font-size:2rem;font-weight:800;color:var(--a);line-height:1.2"></div>
+    <div style="font-size:.82rem;color:var(--m);margin-top:2px">minuts</div>
+  </div>
+  <div id="frac-b-opts" class="clock-opts"></div>
+  <div id="frac-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt3">
+    <button class="btn btn-outline btn-sm" onclick="nextFracB()">Següent →</button>
+  </div>
+</div>
+
+<!-- 5: SUMA -->
+<div class="card">
+  <h2><span class="num">5</span> Suma d'hores</h2>
+  <div class="info-box" style="font-size:.83rem">
+    Si els minuts sumen <strong>60 o més</strong>, passen 1 hora a la columna de les hores.<br>
+    <span style="font-family:'Courier New',monospace;font-size:.85rem">Ex: 9h 45min + 2h 30min → 11h 75min → <strong>12h 15min</strong></span>
+  </div>
+  <div id="suma-list" class="two-col"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-dark btn-sm" onclick="checkSuma()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextSuma()">Noves sumes</button>
+  </div>
+  <div id="suma-fb" class="fb mt3" style="text-align:center"></div>
+</div>
+
+<!-- 6: RESTA -->
+<div class="card">
+  <h2><span class="num">6</span> Resta d'hores</h2>
+  <div class="info-box" style="font-size:.83rem">
+    Si els minuts de dalt <strong>són menors</strong> que els de baix, agafem 1 hora i sumem <strong>60 minuts</strong>.<br>
+    <span style="font-family:'Courier New',monospace;font-size:.85rem">Ex: 10h 12min − 7h 37min → 9h 72min − 7h 37min → <strong>2h 35min</strong></span>
+  </div>
+  <div id="resta-list" class="two-col"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-dark btn-sm" onclick="checkResta()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextResta()">Noves restes</button>
+  </div>
+  <div id="resta-fb" class="fb mt3" style="text-align:center"></div>
+</div>
+
+<!-- 7: PROBLEMES -->
+<div class="card">
+  <h2><span class="num">7</span> Problemes</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextProblems()">Nous problemes →</button>
+  </div>
+</div>
+
+<!-- 8: DIBUIXA L'HORA -->
+<div class="card">
+  <h2><span class="num">8</span> Dibuixa l'hora</h2>
+  <div class="card-sub">Arrossega les agulles fins a l'hora indicada.</div>
+  <div class="clock-wrap">
+    <div id="i-target" class="i-target"></div>
+    <div class="i-hint">
+      Arrossega <b>l'agulla llarga blava</b> (minuts) · <span>l'agulla curta negra</span> (hores)
+    </div>
+    <svg id="clk7" class="clk-svg-lg" viewBox="0 0 200 200"></svg>
+    <div id="i-fb" class="fb" style="text-align:center"></div>
+  </div>
+  <div class="btn-row mt4">
+    <button class="btn btn-dark btn-sm" onclick="checkInteractive()">Comprova</button>
+    <button class="btn btn-outline btn-sm" onclick="nextInteractive()">Nova hora →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="../shared.js"></script>
+<script>
+// ── GAMIFICACIÓ ──
+const EXER_KEY='ex_hores_v1';
+
+GAM_ACHS=[
+  {id:'first',s:'⭐',n:'Primera Hora!',d:'Primera resposta correcta'},
+  {id:'s3',s:'🔥',n:'Ratxa x3',d:'3 encerts seguits'},
+  {id:'s5',s:'⚡',n:'Ratxa x5',d:'5 encerts seguits'},
+  {id:'rellotge5',s:'🕐',n:'Llegidor de Rellotges',d:'5 rellotges analògics correctes'},
+  {id:'digital5',s:'📟',n:'Hora Digital',d:'5 hores digitals correctes'},
+  {id:'conv10',s:'🔢',n:'Convertidor',d:'10 conversions correctes'},
+  {id:'calcs10',s:'➕',n:'Calculador',d:'10 sumes o restes d\'hores'},
+  {id:'draw5',s:'🎯',n:'Artista del Rellotge',d:'5 rellotges dibuixats correctament'},
+  {id:'frac5',s:'⏰',n:'Mestre dels Quarts',d:"5 fraccions del temps correctes"},
+  {id:'ok25',s:'🥉',n:'25 Encerts',d:'25 respostes correctes'},
+  {id:'ok100',s:'🏆',n:'100 Encerts',d:'100 respostes correctes'}
+];
+
+function gExtraAchs(g, tryA){
+  const e=eLoad();
+  tryA('rellotge5',(e.analog||0)>=5);
+  tryA('digital5',(e.digital||0)>=5);
+  tryA('conv10',(e.conv||0)>=10);
+  tryA('calcs10',(e.suma||0)+(e.resta||0)>=10);
+  tryA('draw5',(e.draw||0)>=5);
+  tryA('frac5',(e.frac||0)>=5);
+  tryA('ok25',g.ok>=25);
+  tryA('ok100',g.ok>=100);
+}
+
+// ── UTILS ──
+function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+function z2(n){return String(n).padStart(2,'0');}
+function td(h,m){return z2(h)+':'+z2(m);}
+const MINS=[0,5,10,15,20,25,30,35,40,45,50,55];
+
+// ── CLOCK SVG FACE ──
+function clockFace(cx,cy,R){
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>`;
+  for(let i=0;i<60;i++){
+    const a=(i*6-90)*Math.PI/180,isH=i%5===0;
+    const r1=R-(isH?8:5),r2=R-(isH?19:12);
+    s+=`<line x1="${(cx+r1*Math.cos(a)).toFixed(1)}" y1="${(cy+r1*Math.sin(a)).toFixed(1)}" x2="${(cx+r2*Math.cos(a)).toFixed(1)}" y2="${(cy+r2*Math.sin(a)).toFixed(1)}" stroke="${isH?'#475569':'#94a3b8'}" stroke-width="${isH?2.5:1.2}"/>`;
+  }
+  ['12','1','2','3','4','5','6','7','8','9','10','11'].forEach((n,i)=>{
+    const a=(i*30-90)*Math.PI/180,nr=R-28;
+    s+=`<text x="${(cx+nr*Math.cos(a)).toFixed(1)}" y="${(cy+nr*Math.sin(a)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="#1e293b" font-family="Segoe UI,sans-serif">${n}</text>`;
+  });
+  return s;
+}
+function drawClock(el,h,m){
+  const cx=100,cy=100,R=90;
+  const hA=((h%12)+m/60)*30-90,mA=m*6-90;
+  const hr=hA*Math.PI/180,mr=mA*Math.PI/180;
+  let s=clockFace(cx,cy,R);
+  s+=`<line x1="${cx}" y1="${cy}" x2="${(cx+52*Math.cos(hr)).toFixed(1)}" y2="${(cy+52*Math.sin(hr)).toFixed(1)}" stroke="#1e293b" stroke-width="5.5" stroke-linecap="round"/>`;
+  s+=`<line x1="${cx}" y1="${cy}" x2="${(cx+70*Math.cos(mr)).toFixed(1)}" y2="${(cy+70*Math.sin(mr)).toFixed(1)}" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="#1e293b"/>`;
+  el.innerHTML=s;
+}
+
+// ── ORAL EXPRESSIONS ──
+const HN=['dotze','una','dues','tres','quatre','cinc','sis','set','vuit','nou','deu','onze','dotze'];
+function art(h){return h===1?'la':'les';}
+function oral(h12,m){
+  const L={0:'en punt',5:'i cinc',10:'i deu',15:'i quart',20:'i vint',25:'i vint-i-cinc',30:'i mitja',35:'menys vint-i-cinc',40:'menys vint',45:'menys quart',50:'menys deu',55:'menys cinc'};
+  if(m<=30)return`${art(h12)} ${HN[h12]} ${L[m]}`;
+  const nh=h12===12?1:h12+1;return`${art(nh)} ${HN[nh]} ${L[m]}`;
+}
+function oral24(h24,m){
+  const h12=h24===0?12:(h24>12?h24-12:h24);
+  const p=h24<12?'del matí':h24===12?'del migdia':h24<21?'de la tarda':'de la nit';
+  return`${oral(h12,m)} ${p}`;
+}
+
+// ── SEC 1: ANALÒGIC ──
+function nextAnalog(){
+  const h=ri(1,12),m=rnd(MINS);
+  drawClock(document.getElementById('clk1'),h,m);
+  const correct=oral(h,m);
+  const wrongs=new Set();
+  while(wrongs.size<2){const w=oral(ri(1,12),rnd(MINS));if(w!==correct)wrongs.add(w);}
+  const d=document.getElementById('clk1-opts');
+  d.innerHTML='';document.getElementById('clk1-fb').textContent='';
+  sh([correct,...wrongs]).forEach(o=>{
+    const b=document.createElement('button');b.className='copt';b.textContent=o;
+    b.onclick=()=>{
+      d.querySelectorAll('.copt').forEach(x=>x.disabled=true);
+      if(o===correct){b.classList.add('ok');setFb('clk1-fb',true,'✓ Correcte!');gCorrect(10,'analog');}
+      else{b.classList.add('ko');d.querySelectorAll('.copt').forEach(x=>{if(x.textContent===correct)x.classList.add('show');});setFb('clk1-fb',false,'✗ Era: '+correct);gWrong();}
+    };
+    d.appendChild(b);
+  });
+}
+
+// ── SEC 2: DIGITAL ──
+const DH=[7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+function nextDigital(){
+  const h=rnd(DH),m=rnd(MINS);
+  document.getElementById('dig-disp').textContent=z2(h)+':'+z2(m);
+  const correct=oral24(h,m);
+  document.getElementById('dig-fb').textContent='';
+  const wrongs=new Set();
+  while(wrongs.size<2){const w=oral24(rnd(DH),rnd(MINS));if(w!==correct)wrongs.add(w);}
+  const d=document.getElementById('dig-opts');d.innerHTML='';
+  sh([correct,...wrongs]).forEach(o=>{
+    const b=document.createElement('button');b.className='copt';b.textContent=o;
+    b.onclick=()=>{
+      d.querySelectorAll('.copt').forEach(x=>x.disabled=true);
+      if(o===correct){b.classList.add('ok');setFb('dig-fb',true,'✓ Correcte!');gCorrect(10,'digital');}
+      else{b.classList.add('ko');d.querySelectorAll('.copt').forEach(x=>{if(x.textContent===correct)x.classList.add('show');});setFb('dig-fb',false,'✗ Era: '+correct);gWrong();}
+    };
+    d.appendChild(b);
+  });
+}
+
+// ── SEC 3: CONVERSIÓ ──
+function buildConvTable(){
+  const rows=[[1,60,3600],[2,120,7200],[3,180,10800],[4,240,14400],[5,300,18000],[6,360,21600],[12,720,43200],[24,1440,86400]];
+  document.getElementById('ctbl-body').innerHTML=rows.map(([h,m,s])=>`<tr><td class="hl">${h}</td><td>${m}</td><td>${s.toLocaleString('ca')}</td></tr>`).join('');
+}
+let convData=[];
+function nextConv(){
+  document.getElementById('conv-fb').textContent='';
+  const hV=sh([1,2,3,4,5,6,8,10,12]),mV=sh([60,120,180,240,300,360]);
+  const hmO=sh([{h:1,m:30},{h:2,m:15},{h:1,m:45},{h:3,m:30},{h:2,m:20},{h:4,m:45}]);
+  const m2hm=sh([75,90,105,135,150,195,125]),sV=sh([1,2,3]);
+  convData=[
+    {type:'h2m',val:hV[0]},{type:'h2m',val:hV[1]},
+    {type:'m2h',val:mV[0]},
+    {type:'hm2m',val:hmO[0]},
+    {type:'m2hm',val:m2hm[0]},
+    {type:'h2s',val:sV[0]}
+  ];
+  const list=document.getElementById('conv-list');list.innerHTML='';
+  convData.forEach((p,i)=>{
+    const row=document.createElement('div');row.className='conv-row';
+    if(p.type==='h2m') row.innerHTML=`<strong>${p.val} h</strong><span class="cu">=</span><input class="fi" id="cv${i}" type="number" min="0" autocomplete="off"><span class="cu">min</span>`;
+    else if(p.type==='m2h') row.innerHTML=`<strong>${p.val} min</strong><span class="cu">=</span><input class="fi" id="cv${i}" type="number" min="0" autocomplete="off"><span class="cu">h</span>`;
+    else if(p.type==='hm2m') row.innerHTML=`<strong>${p.val.h} h ${p.val.m} min</strong><span class="cu">=</span><input class="fi" id="cv${i}" type="number" min="0" autocomplete="off"><span class="cu">min</span>`;
+    else if(p.type==='m2hm') row.innerHTML=`<strong>${p.val} min</strong><span class="cu">=</span><input class="fi" id="cv${i}h" type="number" min="0" placeholder="h" autocomplete="off" style="width:52px"><span class="cu">h</span><input class="fi" id="cv${i}m" type="number" min="0" max="59" placeholder="min" autocomplete="off"><span class="cu">min</span>`;
+    else if(p.type==='h2s') row.innerHTML=`<strong>${p.val} h</strong><span class="cu">=</span><input class="fi" id="cv${i}" type="text" inputmode="numeric" autocomplete="off" style="width:80px"><span class="cu">s</span>`;
+    list.appendChild(row);
+  });
+}
+function checkConv(){
+  let ok=0;
+  convData.forEach((p,i)=>{
+    if(p.type==='m2hm'){
+      const ih=document.getElementById(`cv${i}h`),im=document.getElementById(`cv${i}m`);
+      if(!ih||!im)return;[ih,im].forEach(e=>e.classList.remove('ok','ko'));
+      if(+ih.value===Math.floor(p.val/60)&&+im.value===p.val%60){ih.classList.add('ok');im.classList.add('ok');ok++;}
+      else{ih.classList.add('ko');im.classList.add('ko');}
+    } else {
+      const inp=document.getElementById(`cv${i}`);if(!inp)return;
+      inp.classList.remove('ok','ko');
+      const ans=p.type==='h2m'?p.val*60:p.type==='m2h'?p.val/60:p.type==='hm2m'?p.val.h*60+p.val.m:p.val*3600;
+      const v=+(inp.value.replace(/\./g,''));
+      if(v===ans){inp.classList.add('ok');ok++;}else inp.classList.add('ko');
+    }
+  });
+  const tot=convData.length,fb=document.getElementById('conv-fb');
+  if(ok===tot){fb.className='fb ok';fb.textContent='✓ Perfecte! Tot correcte!';gCorrect(8*ok,'conv');}
+  else{fb.className='fb ko';fb.textContent=`${ok}/${tot} correctes. Revisa les vermelles.`;if(ok>0){gCorrect(6*ok,'conv');}else gWrong();}
+}
+
+// ── SEC 4: FRACCIONS DEL TEMPS ──
+const FRACS_DATA=[
+  {name:"Un quart d'hora",frac:'¼ h',mins:15,pct:.25},
+  {name:'Mitja hora',frac:'½ h',mins:30,pct:.5},
+  {name:"Tres quarts d'hora",frac:'¾ h',mins:45,pct:.75},
+  {name:'Una hora sencera',frac:'1 h',mins:60,pct:1}
+];
+function fracClockSVG(pct){
+  const cx=100,cy=100,R=88;
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>`;
+  if(pct===1){
+    s+=`<circle cx="${cx}" cy="${cy}" r="${R-3}" fill="#bfdbfe" opacity=".65"/>`;
+  } else {
+    const a0=-Math.PI/2,a1=a0+pct*2*Math.PI;
+    const x1=(cx+(R-3)*Math.cos(a0)).toFixed(1),y1=(cy+(R-3)*Math.sin(a0)).toFixed(1);
+    const x2=(cx+(R-3)*Math.cos(a1)).toFixed(1),y2=(cy+(R-3)*Math.sin(a1)).toFixed(1);
+    s+=`<path d="M${cx},${cy} L${x1},${y1} A${R-3},${R-3} 0 ${pct>.5?1:0},1 ${x2},${y2} Z" fill="#bfdbfe" opacity=".65"/>`;
+  }
+  for(let i=0;i<12;i++){
+    const a=(i*30-90)*Math.PI/180;
+    s+=`<line x1="${(cx+(R-4)*Math.cos(a)).toFixed(1)}" y1="${(cy+(R-4)*Math.sin(a)).toFixed(1)}" x2="${(cx+(R-16)*Math.cos(a)).toFixed(1)}" y2="${(cy+(R-16)*Math.sin(a)).toFixed(1)}" stroke="#475569" stroke-width="2.5"/>`;
+  }
+  [{n:'12',a:-90},{n:'3',a:0},{n:'6',a:90},{n:'9',a:180}].forEach(({n,a})=>{
+    const ar=a*Math.PI/180,nr=R-28;
+    s+=`<text x="${(cx+nr*Math.cos(ar)).toFixed(1)}" y="${(cy+nr*Math.sin(ar)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="800" fill="#1e293b" font-family="Segoe UI,sans-serif">${n}</text>`;
+  });
+  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="#1e293b"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#cbd5e1" stroke-width="3"/>`;
+  return `<svg viewBox="0 0 200 200" width="110" height="110">${s}</svg>`;
+}
+let fracAData=[];
+function nextFracA(){
+  fracAData=sh([...FRACS_DATA]);
+  document.getElementById('frac-qa').innerHTML=fracAData.map((f,i)=>`
+    <div class="frac-clk-item">
+      <div style="display:flex;justify-content:center">${fracClockSVG(f.pct)}</div>
+      <div class="frac-name">${f.name}</div>
+      <div style="font-size:.78rem;color:var(--m);text-align:center;margin-top:2px">${f.frac}</div>
+      <div style="display:flex;align-items:center;gap:5px;justify-content:center;margin-top:8px">
+        <span style="font-size:.85rem">Són</span>
+        <input class="fi" id="fra${i}" type="number" min="0" max="60" autocomplete="off">
+        <span class="cu">min</span>
+      </div>
+      <div class="fb" id="frfb${i}" style="text-align:center;margin-top:4px"></div>
+    </div>`).join('');
+  document.getElementById('frac-fa').textContent='';
+}
+function checkFracA(){
+  let ok=0;
+  fracAData.forEach((f,i)=>{
+    const inp=document.getElementById(`fra${i}`),fb=document.getElementById(`frfb${i}`);
+    inp.classList.remove('ok','ko');fb.className='fb';
+    if(+inp.value===f.mins){inp.classList.add('ok');fb.className='fb ok';fb.textContent='✓ '+f.mins+' min';ok++;}
+    else{inp.classList.add('ko');fb.className='fb ko';fb.textContent='✗ '+f.mins+' min';}
+  });
+  const fa=document.getElementById('frac-fa');
+  if(ok===4){fa.className='fb ok';fa.textContent='✓ Perfecte! Saps tots els quarts!';gCorrect(10*ok,'frac');}
+  else{fa.className='fb ko';fa.textContent=`${ok}/4 correctes.`;if(ok>0)gCorrect(8*ok,'frac');else gWrong();}
+}
+let fracBCurrent=null;
+function nextFracB(){
+  fracBCurrent=rnd(FRACS_DATA);
+  document.getElementById('frac-b-mins').textContent=fracBCurrent.mins;
+  document.getElementById('frac-fb').textContent='';
+  const opts=sh(FRACS_DATA.map(x=>x.name));
+  const d=document.getElementById('frac-b-opts');d.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='copt';b.textContent=o;
+    b.onclick=()=>{
+      d.querySelectorAll('.copt').forEach(x=>x.disabled=true);
+      const fb=document.getElementById('frac-fb');
+      if(o===fracBCurrent.name){b.classList.add('ok');fb.className='fb ok';fb.textContent='✓ Correcte!';gCorrect(10,'frac');}
+      else{b.classList.add('ko');d.querySelectorAll('.copt').forEach(x=>{if(x.textContent===fracBCurrent.name)x.classList.add('show');});fb.className='fb ko';fb.textContent='✗ Era: '+fracBCurrent.name;gWrong();}
+    };
+    d.appendChild(b);
+  });
+}
+
+// ── SEC 5 & 6: SUMES / RESTES (alineació per taula) ──
+function renderOps(data,listId,pfx,sign){
+  const list=document.getElementById(listId);list.innerHTML='';
+  data.forEach((d,i)=>{
+    const box=document.createElement('div');box.className='op-box';
+    box.innerHTML=`
+      <table class="op-tbl">
+        <tr><td class="sg"></td><td class="n">${d.h1}</td><td class="u">h</td><td class="n">${z2(d.m1)}</td><td class="u">min</td></tr>
+        <tr><td class="sg">${sign}</td><td class="n">${d.h2}</td><td class="u">h</td><td class="n">${z2(d.m2)}</td><td class="u">min</td></tr>
+        <tr class="sep-row"><td colspan="5"><div class="hr-line"></div></td></tr>
+        <tr>
+          <td class="sg"></td>
+          <td class="ans-td"><input class="ans-inp" id="${pfx}h${i}" type="number" min="0" placeholder="?" autocomplete="off"></td>
+          <td class="u">h</td>
+          <td class="ans-td"><input class="ans-inp" id="${pfx}m${i}" type="number" min="0" max="59" placeholder="?" autocomplete="off"></td>
+          <td class="u">min</td>
+        </tr>
+      </table>`;
+    list.appendChild(box);
+  });
+}
+let sumaData=[],restaData=[];
+function nextSuma(){
+  sumaData=Array.from({length:4},()=>{
+    const h1=ri(1,11),m1=rnd(MINS),h2=ri(0,4),m2=rnd(MINS);
+    const tm=m1+m2,rh=h1+h2+(tm>=60?1:0),rm=tm%60;
+    return{h1,m1,h2,m2,rh,rm};
+  });
+  renderOps(sumaData,'suma-list','su','+');
+  document.getElementById('suma-fb').textContent='';
+}
+function checkSuma(){
+  let ok=0;
+  sumaData.forEach((d,i)=>{
+    const ih=document.getElementById(`suh${i}`),im=document.getElementById(`sum${i}`);
+    [ih,im].forEach(e=>e.classList.remove('ok','ko'));
+    if(+ih.value===d.rh&&+im.value===d.rm){ih.classList.add('ok');im.classList.add('ok');ok++;}
+    else{ih.classList.add('ko');im.classList.add('ko');}
+  });
+  const fb=document.getElementById('suma-fb');
+  if(ok===4){fb.className='fb ok';fb.textContent='✓ Perfecte!';gCorrect(10*ok,'suma');}
+  else{fb.className='fb ko';fb.textContent=`${ok}/4 correctes.`;if(ok>0)gCorrect(8*ok,'suma');else gWrong();}
+}
+function nextResta(){
+  restaData=Array.from({length:4},()=>{
+    const h1=ri(3,12),m1=rnd(MINS),h2=ri(1,h1-1),m2=rnd(MINS);
+    let rh=h1-h2,rm=m1-m2;if(rm<0){rh--;rm+=60;}
+    return{h1,m1,h2,m2,rh,rm};
+  });
+  renderOps(restaData,'resta-list','re','−');
+  document.getElementById('resta-fb').textContent='';
+}
+function checkResta(){
+  let ok=0;
+  restaData.forEach((d,i)=>{
+    const ih=document.getElementById(`reh${i}`),im=document.getElementById(`rem${i}`);
+    [ih,im].forEach(e=>e.classList.remove('ok','ko'));
+    if(+ih.value===d.rh&&+im.value===d.rm){ih.classList.add('ok');im.classList.add('ok');ok++;}
+    else{ih.classList.add('ko');im.classList.add('ko');}
+  });
+  const fb=document.getElementById('resta-fb');
+  if(ok===4){fb.className='fb ok';fb.textContent='✓ Perfecte!';gCorrect(10*ok,'resta');}
+  else{fb.className='fb ko';fb.textContent=`${ok}/4 correctes.`;if(ok>0)gCorrect(8*ok,'resta');else gWrong();}
+}
+
+// ── SEC 6: PROBLEMES ──
+function wrongMin(m){return rnd(MINS.filter(x=>x!==m));}
+const POOL=[
+  ()=>{
+    const h=ri(8,11),m=rnd([0,15,30]),dh=ri(1,3),dm=rnd([0,15,30]);
+    const tm=m+dm,rh=h+dh+(tm>=60?1:0),rm=tm%60;
+    const a=td(rh,rm)+' h',w1=td(rh+1,rm)+' h',w2=td(rh,wrongMin(rm))+' h';
+    return{text:`L'escola comença a les <strong>${td(h,m)} h</strong>. La classe dura <strong>${dh} h${dm?' '+dm+' min':''}</strong>. A quina hora acaba?`,opts:sh([a,w1,w2]),ans:a};
+  },
+  ()=>{
+    const h=ri(7,11),m=rnd([0,15,30]),dh=ri(1,4),dm=rnd([0,15,30,45]);
+    const tm=m+dm,rh=h+dh+(tm>=60?1:0),rm=tm%60;
+    const a=td(rh,rm)+' h',w1=td(rh+1,rm)+' h',w2=td(rh-1,rm)+' h';
+    return{text:`El tren surt a les <strong>${td(h,m)} h</strong>. El viatge dura <strong>${dh} h${dm?' '+dm+' min':''}</strong>. A quina hora arriba?`,opts:sh([a,w1,w2]),ans:a};
+  },
+  ()=>{
+    const rh=ri(13,21),rm=rnd([0,15,30]),dh=ri(1,2),dm=rnd([0,15,30]);
+    let sh2=rh-dh,sm=rm-dm;if(sm<0){sh2--;sm+=60;}
+    const a=td(sh2,sm)+' h',w1=td(sh2-1,sm)+' h',w2=td(sh2,wrongMin(sm))+' h';
+    return{text:`La pel·lícula acaba a les <strong>${td(rh,rm)} h</strong> i dura <strong>${dh} h${dm?' '+dm+' min':''}</strong>. A quina hora ha començat?`,opts:sh([a,w1,w2]),ans:a};
+  },
+  ()=>{
+    const h=ri(8,13),sm2=rnd([0,15,30]),dur=rnd([30,45,60,90,120]);
+    const tm=h*60+sm2+dur,rh=Math.floor(tm/60),rm=tm%60;
+    const a=td(rh,rm)+' h',w1=td(rh+1,rm)+' h',w2=td(rh,wrongMin(rm))+' h';
+    return{text:`La Sara surt de casa a les <strong>${td(h,sm2)} h</strong> i triga <strong>${dur} minuts</strong> fins a l'escola. A quina hora arriba?`,opts:sh([a,w1,w2]),ans:a};
+  },
+  ()=>{
+    const h=ri(15,20),m=rnd([0,30]),dh=ri(1,2),dm=rnd([0,30]);
+    const tm=m+dm,rh=h+dh+(tm>=60?1:0),rm=tm%60;
+    const a=td(rh,rm)+' h',w1=td(rh-1,rm)+' h',w2=td(rh,wrongMin(rm))+' h';
+    return{text:`El partit comença a les <strong>${td(h,m)} h</strong> i dura <strong>${dh} h${dm?' '+dm+' min':''}</strong>. A quina hora acaba?`,opts:sh([a,w1,w2]),ans:a};
+  },
+  ()=>{
+    const h=ri(9,16),m=rnd(MINS),dur=rnd([15,30,45,60,75,90]);
+    const tm=h*60+m+dur,rh=Math.floor(tm/60)%24,rm=tm%60;
+    const a=td(rh,rm)+' h',w1=td((rh+1)%24,rm)+' h',w2=td(rh,wrongMin(rm))+' h';
+    return{text:`Una reunió comença a les <strong>${td(h,m)} h</strong> i dura <strong>${dur} minuts</strong>. A quina hora acaba?`,opts:sh([a,w1,w2]),ans:a};
+  }
+];
+function nextProblems(){
+  const sel=sh([...POOL]).slice(0,3).map(f=>f());
+  const list=document.getElementById('prob-list');list.innerHTML='';
+  sel.forEach((p,i)=>{
+    const div=document.createElement('div');div.className='prob';
+    div.innerHTML=`<div class="prob-t">${p.text}</div><div class="prob-opts" id="po${i}"></div><div class="fb mt2" id="pfb${i}"></div>`;
+    list.appendChild(div);
+    p.opts.forEach(o=>{
+      const b=document.createElement('button');b.className='popt';b.textContent=o;
+      b.onclick=()=>{
+        div.querySelectorAll('.popt').forEach(x=>x.disabled=true);
+        const fb=document.getElementById(`pfb${i}`);
+        if(o===p.ans){b.classList.add('ok');fb.className='fb ok';fb.textContent='✓ Molt bé!';gCorrect(15,'prob');}
+        else{b.classList.add('ko');div.querySelectorAll('.popt').forEach(x=>{if(x.textContent===p.ans)x.classList.add('show');});fb.className='fb ko';fb.textContent='✗ Era: '+p.ans;gWrong();}
+      };
+      document.getElementById(`po${i}`).appendChild(b);
+    });
+  });
+}
+
+// ── SEC 7: RELLOTGE INTERACTIU ──
+let iHAngle=0,iMAngle=0,iMSnapped=0,iDragging=null,iTargetH=3,iTargetM=0;
+
+function drawInteractive(){
+  const el=document.getElementById('clk7');
+  if(!el)return;
+  const cx=100,cy=100,R=90;
+  const hr=(iHAngle-90)*Math.PI/180,mr=(iMAngle-90)*Math.PI/180;
+  let s=clockFace(cx,cy,R);
+  // Hour hand (dark, shorter)
+  const hx=(cx+52*Math.cos(hr)).toFixed(1),hy=(cy+52*Math.sin(hr)).toFixed(1);
+  s+=`<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>`;
+  s+=`<circle cx="${hx}" cy="${hy}" r="8" fill="#1e293b" opacity=".7"/>`;
+  // Minute hand (blue, longer)
+  const mx=(cx+70*Math.cos(mr)).toFixed(1),my=(cy+70*Math.sin(mr)).toFixed(1);
+  s+=`<line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round"/>`;
+  s+=`<circle cx="${mx}" cy="${my}" r="8" fill="#1d4ed8" opacity=".8"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="#1e293b"/>`;
+  el.innerHTML=s;
+}
+
+function iCoords(e){
+  const el=document.getElementById('clk7');
+  const r=el.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  return{x:(t.clientX-r.left)*(200/r.width)-100,y:(t.clientY-r.top)*(200/r.height)-100};
+}
+
+function iAngle(x,y){
+  let a=Math.atan2(y,x)*180/Math.PI+90;
+  return((a%360)+360)%360;
+}
+
+function iDown(e){
+  e.preventDefault();
+  const{x,y}=iCoords(e);
+  const hr=(iHAngle-90)*Math.PI/180,mr=(iMAngle-90)*Math.PI/180;
+  const hx=52*Math.cos(hr),hy=52*Math.sin(hr);
+  const mx=70*Math.cos(mr),my=70*Math.sin(mr);
+  const dH=Math.hypot(x-hx,y-hy),dM=Math.hypot(x-mx,y-my);
+  iDragging=(dH<25&&dH<dM)?'hour':'minute';
+}
+
+function iMove(e){
+  if(!iDragging)return;
+  e.preventDefault();
+  const{x,y}=iCoords(e);
+  const a=iAngle(x,y);
+  if(iDragging==='minute'){
+    iMSnapped=(Math.round(a/30)*5)%60;
+    iMAngle=iMSnapped*6;
+  } else {
+    iHAngle=a;
+  }
+  drawInteractive();
+}
+
+function iUp(){iDragging=null;}
+
+function nextInteractive(){
+  iTargetH=ri(1,12);iTargetM=rnd(MINS);
+  iHAngle=0;iMAngle=0;iMSnapped=0;iDragging=null;
+  drawInteractive();
+  document.getElementById('i-target').innerHTML=
+    `Col·loca les agulles a <strong>${oral(iTargetH,iTargetM)}</strong> <span class="muted">(${z2(iTargetH)}:${z2(iTargetM)})</span>`;
+  document.getElementById('i-fb').textContent='';
+  document.getElementById('i-fb').className='fb';
+}
+
+function checkInteractive(){
+  const expMAngle=iTargetM*6;
+  const expHAngle=((iTargetH%12)+iTargetM/60)*30;
+  const mOk=iMSnapped===iTargetM;
+  const hDiff=Math.abs(iHAngle-expHAngle);
+  const hOk=Math.min(hDiff,360-hDiff)<=16;
+  const fb=document.getElementById('i-fb');
+  if(mOk&&hOk){
+    fb.className='fb ok';fb.textContent='✓ Perfecte! Les agulles estan bé!';
+    gCorrect(20,'draw');
+  } else if(mOk){
+    fb.className='fb ko';fb.textContent='✓ Minuts bé! Però ajusta l\'agulla de les hores.';gWrong();
+  } else if(hOk){
+    fb.className='fb ko';fb.textContent='✓ Hores bé! Però ajusta l\'agulla dels minuts.';gWrong();
+  } else {
+    fb.className='fb ko';fb.textContent=`✗ Ajusta les dues agulles. Era ${oral(iTargetH,iTargetM)}.`;gWrong();
+  }
+}
+
+// ── INIT ──
+const clk7=document.getElementById('clk7');
+clk7.addEventListener('mousedown',iDown);
+clk7.addEventListener('touchstart',iDown,{passive:false});
+document.addEventListener('mousemove',iMove);
+document.addEventListener('touchmove',iMove,{passive:false});
+document.addEventListener('mouseup',iUp);
+document.addEventListener('touchend',iUp);
+
+gRender();
+buildConvTable();
+nextAnalog();nextDigital();nextConv();nextFracA();nextFracB();nextSuma();nextResta();nextProblems();nextInteractive();
+</script>
+</body>
+</html>

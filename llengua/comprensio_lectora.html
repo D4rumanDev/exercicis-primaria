@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Comprensió Lectora</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+#root{padding:16px 14px 60px}
+.tabs{display:flex;border-bottom:1.5px solid var(--b);margin-bottom:20px}
+.tab{padding:8px 16px;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--m);border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:color .1s}
+.tab.on{color:var(--t);border-bottom-color:var(--t)}
+.slist{border:1px solid var(--b);border-radius:var(--r);overflow:hidden;background:var(--s)}
+.srow{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--b);transition:background .1s}
+.srow:last-child{border-bottom:none}
+.srow:hover{background:#eff6ff}
+.srow.next-up{background:#dbeafe}
+.srow-num{font-size:.8rem;color:var(--m);width:18px;flex-shrink:0;text-align:right}
+.srow-title{flex:1;font-size:.93rem;font-weight:500}
+.srow-right{font-size:.8rem;text-align:right;flex-shrink:0}
+.srow-right.done{color:var(--ok);font-weight:700}
+.srow-right.next{color:var(--a);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.story-meta{margin-bottom:16px}
+.story-text{font-family:Georgia,'Times New Roman',serif;font-size:1.05rem;line-height:1.9;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:24px 22px}
+.story-text p{margin-bottom:1.1em;color:var(--t)}
+.story-text p:last-child{margin-bottom:0}
+@media(max-width:480px){.story-text{font-size:.97rem;padding:16px 14px}}
+.qdots{display:flex;gap:4px;margin-bottom:18px}
+.qdot{flex:1;height:3px;background:var(--b);border-radius:2px;transition:background .2s}
+.qdot.answered{background:var(--a)}
+.qdot.correct{background:var(--ok)}
+.qdot.wrong{background:var(--er)}
+.qcard{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.qcard.fill-card{background:#fafaf8}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:var(--r);cursor:pointer;border:1.5px solid transparent;margin-bottom:6px;transition:background .1s,border-color .1s;font-size:.88rem;line-height:1.45;user-select:none}
+.opt:hover{background:var(--bg)}
+.opt.on{border-color:var(--a);background:#eff6ff}
+.opt-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--b);flex-shrink:0;margin-top:2px;transition:border-color .1s,background .1s}
+.opt.on .opt-dot{border-color:var(--a);background:var(--a)}
+.fill-sent{font-family:Georgia,serif;font-size:1rem;line-height:2.4;margin-bottom:16px;color:var(--t)}
+.blank{display:inline-block;min-width:72px;border-bottom:2px solid var(--a);text-align:center;margin:0 3px;padding:0 8px;cursor:pointer;color:var(--a);font-weight:700;border-radius:3px 3px 0 0;transition:background .1s;font-family:inherit;font-size:inherit}
+.blank:hover{background:#eff6ff}
+.blank.empty{color:transparent;position:relative}
+.blank.empty::after{content:'···';color:#94a3b8;position:absolute;left:50%;transform:translateX(-50%)}
+.word-pool{display:flex;flex-wrap:wrap;gap:8px;padding-top:4px}
+.chip{padding:6px 16px;border-radius:20px;border:1.5px solid var(--b);cursor:pointer;font-size:.85rem;background:var(--s);transition:all .1s;user-select:none;min-height:36px;display:inline-flex;align-items:center}
+.chip:hover{border-color:var(--a);color:var(--a)}
+.chip.picked{background:var(--a);color:#fff;border-color:var(--a)}
+.chip.used{opacity:.22;pointer-events:none}
+.tf-row{display:flex;gap:10px;margin-top:4px}
+.tf-btn{flex:1;padding:11px 16px;border-radius:var(--r);border:1.5px solid var(--b);cursor:pointer;text-align:center;font-size:.88rem;font-weight:600;transition:all .1s;background:var(--s);font-family:inherit;user-select:none}
+.tf-btn:hover{border-color:var(--a)}
+.tf-btn.on{border-color:var(--a);background:#eff6ff;color:var(--a)}
+.score-hero{text-align:center;padding:28px 16px 20px;border-bottom:1px solid var(--b);margin-bottom:20px}
+.score-big{font-size:3.8rem;font-weight:900;letter-spacing:-.04em;line-height:1}
+.score-denom{font-size:1.6rem;color:var(--m);font-weight:400}
+.score-msg{color:var(--m);margin-top:6px;font-size:.95rem}
+.xp-gain{display:inline-block;margin-top:14px;font-size:1.15rem;font-weight:800;color:var(--a)}
+.xp-bonus{font-size:.82rem;font-weight:600;color:var(--a);opacity:.7;margin-left:6px}
+.rev-item{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--b)}
+.rev-item:last-child{border-bottom:none}
+.rev-icon{font-size:.9rem;font-weight:900;flex-shrink:0;width:18px;margin-top:1px}
+.rev-icon.ok{color:var(--ok)}
+.rev-icon.err{color:var(--er)}
+.rev-body{flex:1;min-width:0}
+.rev-q{font-size:.88rem;font-weight:600;margin-bottom:4px}
+.rev-ans-ok{font-size:.83rem;color:var(--ok)}
+.rev-ans-err{font-size:.83rem;color:var(--er)}
+.rev-exp{font-size:.8rem;color:var(--m);margin-top:5px;font-style:italic;line-height:1.5}
+.ach-new{font-size:.7rem;font-weight:800;color:var(--a);text-transform:uppercase;letter-spacing:.06em;margin-left:auto;flex-shrink:0}
+.ach-flash{background:#eff6ff;border:1.5px solid var(--a);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.ach-flash .ach-sym{background:#dbeafe;border-color:var(--a);color:var(--a)}
+.ach-flash-text .name{font-size:.9rem;font-weight:700}
+.ach-flash-text .desc{font-size:.78rem;color:var(--m)}
+@media(max-width:420px){.score-big{font-size:3rem}.xp-gain{font-size:1rem}.row-btns{flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="root" class="page"></div>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY='ex_cl_v1';
+// ── STORIES ───────────────────────────────────────────────────────────────────
+const STORIES=[
+{id:0,title:'En Patufet',
+text:`<p>Hi havia una vegada una parella que desitjava tenir fills, però els anys passaven i continuaven sols. Un dia, una fada va sentir les seves pregàries i els va concedir el desig: els va néixer un nen. El problema era que el nen era tan petit que cabia dins d'una closca de nou. El van posar al damunt d'una col, li van donar menjar amb una agulla de cosir i el van anomenar Patufet.</p>
+<p>Tot i la seva mida minúscula, Patufet era llest com un llamp i no tenia por de res. Un dia, la mare volia enviar el dinar al pare que treballava al camp, però no sabia com fer-ho. Patufet es va oferir a portar-ho ell mateix. La mare dubtava, perquè temia que algú pogués trepitjar-lo sense voler, però finalment va acceptar. Patufet va agafar el cistell i va sortir de casa molt content.</p>
+<p>El camí al camp era llarg. Quan Patufet caminava per la vora de la carretera, va passar una vaca que no el va veure i el va empassar d'una llengua. Es va trobar dins de l'estómac de la vaca, tot fosc i una mica humit, però no es va espantar. Va començar a cridar i a fer soroll fins que la vaca va mugir tan fort que el pagès es va acostar a mirar-la.</p>
+<p>El veterinari que va venir va examinar l'animal i va trobar Patufet sa i estalvi. De tornada a casa, Patufet va explicar l'aventura a la mare i al pare entre rialles. La mare el va abraçar amb molt de compte, sense apretar massa perquè no es fes mal. Des de llavors, Patufet sortia sempre amb una caputxa de color vermell perquè la gent el pogués veure de lluny, i va continuar vivint mil aventures amb la mateixa alegria i valentia que el feien especial.</p>`,
+questions:[
+{type:'c',q:'Com va arribar Patufet al món?',opts:['Una fada va transformar el desig dels seus pares en realitat','El van trobar sota una col','El va portar una cigonya','El van comprar al mercat'],ans:0,exp:'El text diu que una fada va sentir les pregàries de la parella i els va concedir el desig d\'un fill.'},
+{type:'c',q:'Per quin motiu la mare tenia por que Patufet sortís sol?',opts:['Perquè feia molt de fred','Perquè el camí era llarg','Perquè algú podria trepitjar-lo sense voler','Perquè el pare estava molt lluny'],ans:2,exp:'La mare dubtava perquè, com que era tan petit, temia que algú el trepitgés sense voler.'},
+{type:'c',q:'Quin encàrrec va acceptar fer Patufet?',opts:['Buscar una fada al bosc','Portar el dinar al seu pare al camp','Comprar pa al mercat','Anar a buscar la vaca al prat'],ans:1,exp:'La mare volia enviar el dinar al camp i Patufet es va oferir a portar-lo ell sol.'},
+{type:'c',q:'Com va reaccionar Patufet quan es va trobar dins de la vaca?',opts:['Va plorar i va perdre l\'esperança','Va quedar-se quiet esperant ajuda','Va cridar i fer soroll fins que el van trobar','Va intentar sortir mossegant'],ans:2,exp:'Patufet no es va espantar: va cridar i fer soroll fins que la vaca va mugir tan fort que el pagès s\'hi va acostar.'},
+{type:'c',q:'Quina característica principal té Patufet?',opts:['És molt gran i fort','És trist i solitari','És petit però llest i valent','És ric i poderós'],ans:2,exp:'Malgrat la seva mida minúscula, Patufet no té por de res i és molt intel·ligent.'},
+{type:'c',q:'Quina lliçó principal transmet aquest conte?',opts:['Que no s\'ha de sortir mai de casa','Que la mida física no determina la valentia ni la intel·ligència','Que les vaques són animals perillosos','Que cal obeir sempre els pares'],ans:1,exp:'Patufet demostra que ser petit no impedeix ser valent, llest i útil per a la família.'},
+{type:'c',q:'Qué hauria passat probablement si Patufet no hagués cridat dins de la vaca?',opts:['La vaca l\'hauria escopit sola','Hauria sortit quan la vaca begués','Ningú no l\'hauria trobat i hauria quedat atrapat','Hauria sortit per la cua'],ans:2,exp:'Si no hagués cridat, el pagès no hauria sospitat res i el veterinari no l\'hauria trobat.'},
+{type:'c',q:'Per qué Patufet va començar a portar una caputxa vermella?',opts:['Perquè li agradava molt el color vermell','Perquè la mare li havia fet de regal','Perquè la gent el pogués veure de lluny','Perquè feia molt de fred'],ans:2,exp:'La caputxa vermella servia perquè la gent el pogués veure de lluny i evitar accidents.'},
+{type:'f',t:'Patufet cabia dins d\'una {0} de nou.',blanks:['closca'],pool:['closca','gerra','caixa','pedra','bossa','pell'],exp:'El text diu que el nen era tan petit que cabia dins d\'una closca de nou.'},
+{type:'f',t:'La {0} va empassar Patufet d\'una llengua sense voler.',blanks:['vaca'],pool:['vaca','burra','cabra','guineu','ovella','cerva'],exp:'Una vaca que passava per la carretera el va empassar sense veure\'l.'},
+{type:'f',t:'Per sortir de la panxa, Patufet va {0} fins que el van trobar.',blanks:['cridar'],pool:['cridar','plorar','esperar','dormir','cantar','saltar'],exp:'Patufet va cridar i fer soroll fins que la vaca va mugir i el pagès va anar a mirar.'},
+{type:'f',t:'Des de llavors, Patufet portava una caputxa {0} perquè la gent el pogués veure de lluny.',blanks:['vermella'],pool:['vermella','blava','groga','negra','blanca','verda'],exp:'La caputxa vermella era per ser visible de lluny i evitar que ningú el trepitgés.'},
+{type:'v',q:'Patufet cabia dins d\'una caixa de fusta.',ans:false,exp:'El text diu que cabia dins d\'una closca de nou, no d\'una caixa de fusta.'},
+{type:'v',q:'La mare va acabar acceptant que Patufet portés el dinar al camp.',ans:true,exp:'Tot i dubtar al principi, la mare va acabar acceptant la proposta de Patufet.'},
+{type:'v',q:'Quan va ser dins de la vaca, Patufet es va espantar i va plorar molt.',ans:false,exp:'El text diu que Patufet no es va espantar; va cridar i fer soroll fins que el van trobar.'},
+{type:'v',q:'Després de l\'aventura, Patufet va deixar de sortir de casa.',ans:false,exp:'Patufet va continuar vivint aventures; simplement va afegir la caputxa vermella per ser visible.'}
+]},
+
+{id:1,title:'La llegenda de Sant Jordi',
+text:`<p>Fa molts anys, en una contrada de Capadòcia, hi havia un llac on vivia un drac terrorífic. L'animal escampava un alè tan verinós que emmetzinava l'aire de tota la rodalia. La gent del poble havia construït una muralla ben alta per intentar protegir-se, però la bèstia continuava amenaçant. El rei va decidir que cada dia sacrificarien un habitant del poble per tal de calmar el drac.</p>
+<p>El sistema per escollir les víctimes era un sorteig en el qual participava tothom: rics i pobres, joves i vells. Un dia fatídic, la papereta va caure sobre la filla del rei, la princesa Elisenda. El monarca va implorar als habitants que perdonessin la seva filla, però el poble li va recordar que les seves pròpies lleis deien que ningú no n'era exempt. Amb el cor trencat, el rei va acompanyar la princesa fins a la vora del llac.</p>
+<p>En aquell precís moment, va aparèixer un cavaller amb armadura blanca muntat en un bell cavall blanc. Es deia Jordi i era un soldat romà que viatjava per aquelles terres. Quan va veure la princesa plorant a la riba del llac, li va preguntar qué li passava. Ella li va explicar el que estava a punt de succeir i li va demanar que marxés de pressa per no posar-se en perill.</p>
+<p>Però Jordi no va fugir. Quan el drac va sortir de l'aigua amb les fauces obertes, el cavaller va agafar la llança i el va atacar amb tota la seva força. Després d'un combat violent, Jordi va vèncer el drac. La sang de la bèstia, en tocar el terra, es va transformar en un roser ple de flors vermelles. Jordi en va collir una i la va oferir a la princesa com a símbol de victòria i esperança.</p>
+<p>La notícia es va escampar per tot el regne. Des de llavors, cada any el vint-i-tres d'abril, els catalans celebren el dia de Sant Jordi. És tradició que els homes regaling roses a les dones que estimen, i les dones regalen llibres als homes, barrejant l'amor, el coneixement i el record d'aquell cavaller valent.</p>`,
+questions:[
+{type:'c',q:'On vivia el drac del conte?',opts:['En una cova de les muntanyes','En un llac de Capadòcia','En un bosc encantat','En el soterrani del castell del rei'],ans:1,exp:'El text diu clarament que el drac vivia en un llac de Capadòcia.'},
+{type:'c',q:'Com escollien la víctima que s\'havia de sacrificar?',opts:['Sempre era el més jove del poble','El rei decidia a qui li tocava','Mitjançant un sorteig on participava tothom','S\'apuntaven voluntaris'],ans:2,exp:'El text descriu un sorteig en el qual participaven tots els habitants, rics i pobres.'},
+{type:'c',q:'Per qué el rei no va poder salvar la seva filla?',opts:['Perquè no tenia prou poder','Perquè les seves pròpies lleis no exemptaven ningú','Perquè la princesa no volia que la salvés','Perquè el drac ja l\'havia triat'],ans:1,exp:'El poble li va recordar que les seves lleis establien que ningú no n\'era exempt, ni la família reial.'},
+{type:'c',q:'Qué va fer la princesa quan va veure arribar Jordi?',opts:['Li va demanar que la salvés','Li va demanar que marxés per no posar-se en perill','Es va amagar darrere d\'una roca','Va cridar els soldats del rei'],ans:1,exp:'La princesa va intentar protegir Jordi demanant-li que marxés i no s\'arrisqués per ella.'},
+{type:'c',q:'Quina qualitat principal demostra Sant Jordi?',opts:['La riquesa i el poder','La valentia i l\'altruisme','La intel·ligència i l\'astúcia','La velocitat i l\'agilitat'],ans:1,exp:'Jordi podria haver marxat, però va decidir quedar-se i arriscar la vida per salvar una desconeguda.'},
+{type:'c',q:'Si Jordi hagués fugit quan la princesa li ho va demanar, qué hauria passat?',opts:['Un altre cavaller hauria vingut','El drac s\'hauria calmat sol','La princesa hauria mort sacrificada','El rei hauria enviat els seus soldats'],ans:2,exp:'Ningú més estava disposat a lluitar contra el drac, de manera que la princesa hauria estat sacrificada.'},
+{type:'c',q:'Quin valor simbolitzen els llibres que es regalen per Sant Jordi?',opts:['L\'amistat entre veïns','El coneixement i la cultura','La força física','La memòria del drac vençut'],ans:1,exp:'El text associa els llibres amb el coneixement en la frase "barrejant l\'amor, el coneixement i el record".'},
+{type:'c',q:'Per qué el poble no podia negar-se a presentar la princesa al drac?',opts:['Perquè tenien por del rei','Perquè les lleis eren iguals per a tothom','Perquè la princesa ho havia demanat','Perquè el drac havia amenaçat destruir el poble'],ans:1,exp:'Les pròpies lleis del rei establien que el sorteig era universal i ningú no n\'estava exempt.'},
+{type:'f',t:'El drac emmetzinava l\'aire amb el seu alè {0} i vivia en un {1}.',blanks:['verinós','llac'],pool:['verinós','llac','roig','bosc','mortal','riu'],exp:'El drac tenia un alè verinós i vivia en un llac de Capadòcia.'},
+{type:'f',t:'La víctima del sacrifici s\'escollia per un {0} en el qual tothom hi participava.',blanks:['sorteig'],pool:['sorteig','combat','judici','concurs','joc','vot'],exp:'El sistema per escollir la víctima era un sorteig universal.'},
+{type:'f',t:'Jordi va combatre el drac amb la seva {0}.',blanks:['llança'],pool:['llança','espasa','força','armadura','pedra','escut'],exp:'Jordi va agafar la llança i va atacar el drac amb tota la seva força.'},
+{type:'f',t:'La sang del drac es va convertir en un {0} ple de flors {1}.',blanks:['roser','vermelles'],pool:['roser','vermelles','arbre','blanques','jardí','grogues'],exp:'La sang del drac en tocar el terra es va transformar en un roser de flors vermelles.'},
+{type:'v',q:'El sorteig per al sacrifici exemptava la família reial.',ans:false,exp:'Les pròpies lleis del rei establien que ningú no n\'era exempt, ni la família reial.'},
+{type:'v',q:'Jordi era un soldat romà que passava per aquelles terres per casualitat.',ans:true,exp:'El text el descriu com un soldat romà que viatjava per aquelles terres quan va trobar la princesa.'},
+{type:'v',q:'La sang del drac es va transformar en un llac de color vermell.',ans:false,exp:'La sang es va transformar en un roser ple de flors vermelles, no en cap llac.'},
+{type:'v',q:'Per Sant Jordi, les dones regalen roses i els homes regalen llibres.',ans:false,exp:'Al revés: els homes regalen roses a les dones, i les dones regalen llibres als homes.'}
+]},
+
+{id:2,title:'Les tres taronges de l\'amor',
+text:`<p>Hi havia una vegada un príncep que vivia sol al seu gran palau. El rei, el seu pare, volia que trobés una esposa, però el príncep no s'havia enamorat de cap de les noies que havia conegut a la cort. Un dia, un vell savi li va dir que el seu destí estava lligat a les tres taronges de l'amor, que es guardaven en un jardí màgic al final del món, protegit per una bruixa terrible.</p>
+<p>El príncep va emprendre el viatge sense por. Va caminar durant mesos, creuant boscos espessos, rius caudalosos i deserts de sorra. Quan finalment va arribar al jardí, la bruixa li va sortir a l'encontre i li va proposar un tracte: si podia respondre tres endevinalles, podria agafar les taronges. El príncep va acceptar el repte i, amb enginy i sort, va respondre correctament les tres preguntes.</p>
+<p>Amb les tres taronges a la motxilla, el príncep va emprendre el camí de tornada. En arribar a un lloc sec i polsós, li va entrar molta set i va obrir la primera taronja. De dins va sortir una noia molt bonica que li va dir: «Tinc molta set, dóna'm d'aigua!» Però el príncep no tenia prou aigua i la noia va desaparèixer. Va obrir la segona taronja i va passar exactament el mateix.</p>
+<p>Angoixat, va decidir esperar a arribar a la vora d'un riu per obrir la tercera taronja. Quan la va obrir a la riba, va sortir una noia bellíssima amb els cabells daurats. El príncep li va donar d'aigua de seguida i la noia va quedar-se. Es van mirar als ulls i tots dos van sentir que s'estimaven. El príncep la va portar al palau, on el rei la va rebre amb alegria. Es van casar en una gran festa i van viure feliços molts anys, recordant sempre que l'amor veritable havia requerit un llarg i difícil viatge.</p>`,
+questions:[
+{type:'c',q:'Per qué el príncep no s\'havia casat?',opts:['Perquè preferia viatjar sol','Perquè no s\'havia enamorat de cap noia de la cort','Perquè el rei no li ho permetia','Perquè era molt tímid'],ans:1,exp:'El príncep no s\'havia enamorat de cap de les noies que havia conegut a la cort.'},
+{type:'c',q:'Qui li va explicar al príncep el secret de les tres taronges?',opts:['El rei, el seu pare','Un vell savi','Una fada del bosc','La bruixa del jardí'],ans:1,exp:'Un vell savi li va dir que el seu destí estava lligat a les tres taronges de l\'amor.'},
+{type:'c',q:'Quin tracte li va proposar la bruixa?',opts:['Que lluitessin','Que treballés per ella','Respondre tres endevinalles per poder agafar les taronges','Que li portés un regal'],ans:2,exp:'La bruixa li va proposar que si responia correctament tres endevinalles podria agafar les taronges.'},
+{type:'c',q:'Per qué van desaparèixer les noies de les dues primeres taronges?',opts:['Perquè el príncep no les va trobar boniques','Perquè no hi havia prou aigua per donar-los','Perquè la bruixa les va embruixar de nou','Perquè el príncep no era sincer'],ans:1,exp:'Les noies demanaven aigua però el príncep no en tenia prou, i per això van desaparèixer.'},
+{type:'c',q:'Per qué el príncep va esperar al riu per obrir la tercera taronja?',opts:['Tenia por de tornar a fallar i volia tenir aigua a mà','Perquè la tercera era la més gran','La bruixa li havia dit que ho fes així','Perquè volia descansar primer'],ans:0,exp:'Havent après dels dos primers errors, va voler assegurar-se de tenir aigua disponible.'},
+{type:'c',q:'Quina qualitat va demostrar el príncep en respondre les endevinalles?',opts:['Força física','Enginy i astúcia','Riquesa','Màgia'],ans:1,exp:'El text diu que va respondre les endevinalles "amb enginy i sort", destacant la seva astúcia.'},
+{type:'c',q:'Quina lliçó es pot extreure d\'aquest conte?',opts:['Que cal desconfiar dels vells savis','Que l\'amor veritable requereix esforç i paciència','Que les bruixes sempre enganyen','Que les taronges porten sort'],ans:1,exp:'El príncep va haver de fer un viatge molt dur i superar proves per trobar l\'amor.'},
+{type:'c',q:'Per qué el jardí de les taronges estava "al final del món"?',opts:['Perquè era difícil de trobar al mapa','Per simbolitzar que l\'amor veritable requereix un gran esforç','Perquè la bruixa volia viure lluny de tot','Per demostrar que el príncep era valent'],ans:1,exp:'La distància extrema simbolitza que l\'amor no s\'aconsegueix fàcilment sinó amb esforç i determinació.'},
+{type:'f',t:'Les taronges estaven en un jardí {0} protegit per una {1}.',blanks:['màgic','bruixa'],pool:['màgic','bruixa','gran','fada','llunyà','reina'],exp:'El jardí era màgic i estava protegit per una bruixa terrible.'},
+{type:'f',t:'La bruixa va proposar al príncep respondre tres {0}.',blanks:['endevinalles'],pool:['endevinalles','proves','preguntes','combats','dilemes','riddles'],exp:'La bruixa li va proposar un tracte: respondre tres endevinalles.'},
+{type:'f',t:'De dins de cada taronja sortia una noia que demanava {0}.',blanks:['aigua'],pool:['aigua','menjar','ajuda','or','llum','pa'],exp:'Les noies que sortien de les taronges tenien set i demanaven aigua.'},
+{type:'f',t:'El príncep va esperar la vora del {0} per obrir la {1} taronja.',blanks:['riu','tercera'],pool:['riu','tercera','llac','primera','bosc','segona'],exp:'Va esperar al riu per tenir aigua disponible i va obrir la tercera i última taronja.'},
+{type:'v',q:'Va ser el rei qui va dir al príncep on eren les tres taronges.',ans:false,exp:'Va ser un vell savi, no el rei, qui va revelar al príncep el secret de les taronges.'},
+{type:'v',q:'El príncep va obrir la primera taronja en un lloc sec on no tenia aigua.',ans:true,exp:'El text diu que va obrir la primera taronja en un lloc sec i polsós on no tenia prou aigua.'},
+{type:'v',q:'De cada taronja en sortia una noia que demanava alguna cosa de menjar.',ans:false,exp:'Les noies no demanaven menjar, sinó aigua, perquè tenien molta set.'},
+{type:'v',q:'El rei va rebre la noia de la tercera taronja amb alegria.',ans:true,exp:'El text diu que el rei la va rebre amb alegria quan el príncep la va portar al palau.'}
+]},
+
+{id:3,title:'La Ventafocs',
+text:`<p>Hi havia una vegada una noia que vivia amb el seu pare, la seva madrastra i les seves dues germanastres. La noia era bona i treballadora, però la madrastra la feia treballar de sol a sol: netejar la casa, cuinar, rentar la roba i tenir-ho tot en ordre. Quan s'asseia davant del foc per descansar, la cendra li embrutava la roba, i per això tothom la cridava la Ventafocs.</p>
+<p>Un dia, el rei va anunciar un gran ball al palau per trobar esposa per al príncep. Totes les noies del regne hi eren convidades. Les germanastres es van posar els vestits més bonics i van sortir cap al palau, però la Ventafocs no hi podia anar perquè no tenia cap vestit adequat. Quan es va quedar sola a casa, es va posar a plorar de tristesa.</p>
+<p>De sobte, va aparèixer la seva padrina fada. La fada va transformar una carabassa en un cotxe daurat, sis ratolins en sis cavalls blancs i el vestit esparracat de la Ventafocs en un magnífic vestit de seda blau cel. Finalment, li va donar unes sabates de vidre. Però la fada li va advertir: «Has de tornar a casa abans de les dotze de la nit. Quan el rellotge toqui les dotze, tot el que he creat desapareixerà.»</p>
+<p>Al ball, la Ventafocs va ser la noia més admirada. El príncep no va deixar de ballar amb ella en tota la nit. Però quan el rellotge va començar a tocar les dotze, la Ventafocs va córrer cap a la sortida i en la pressa va perdre una sabata de vidre a l'escala. El príncep la va recollir i va jurar que es casaria amb la noia a qui li cabés aquella sabata.</p>
+<p>L'endemà, el príncep va recórrer tot el regne. Quan la van provar a la Ventafocs, li va entrar perfectament. El príncep la va reconèixer i la va demanar en casament. La Ventafocs va perdonar les seves germanastres i es va casar amb el príncep. Va deixar enrere les cendres del foc i va viure feliç per sempre.</p>`,
+questions:[
+{type:'c',q:'Per qué la protagonista s\'anomenava la Ventafocs?',opts:['Perquè li agradava molt el foc','Quan s\'asseia davant del foc, la cendra li embrutava la roba','Perquè vivia en una llar plena de cendra','Perquè la madrastra li havia posat aquest nom'],ans:1,exp:'El text explica que quan es desviava davant del foc, la cendra li embrutava la roba.'},
+{type:'c',q:'Per qué la Ventafocs no podia anar al ball?',opts:['La madrastra li havia prohibit','No tenia cap vestit adequat','Estava malalta aquell dia','No havia rebut la invitació'],ans:1,exp:'La Ventafocs no tenia cap vestit adequat per anar al ball.'},
+{type:'c',q:'Quina advertència va fer la fada?',opts:['Que no parlés amb el príncep','Que no s\'allunyés de les germanastres','Que havia de tornar a casa abans de les dotze','Que no mengés res al ball'],ans:2,exp:'La fada va advertir que tot el que havia creat desapareixeria quan el rellotge marqués les dotze.'},
+{type:'c',q:'Com va trobar el príncep la Ventafocs l\'endemà?',opts:['La va reconèixer pel vestit blau','Va preguntar porta per porta','La sabata de vidre li entrava perfectament','La fada li va dir on vivia'],ans:2,exp:'El príncep va provar la sabata a totes les noies del regne i la Ventafocs era l\'única a qui li entrava.'},
+{type:'c',q:'Qué demostra el fet que la Ventafocs perdonés les seves germanastres?',opts:['Que tenia por d\'elles','Que era una persona bondadosa','Que les estimava molt','Que el príncep li ho havia demanat'],ans:1,exp:'Perdonar qui t\'ha tractat malament demostra una gran bondat de caràcter.'},
+{type:'c',q:'Quina lliçó principal transmet la història?',opts:['Que cal tenir una fada padrina per ser feliç','Que la bondat i la paciència acaben sent recompensades','Que és important tenir bons vestits','Que no s\'ha de confiar mai en la família'],ans:1,exp:'Malgrat els maltractaments, la Ventafocs manté la seva bondat i al final la seva virtut és recompensada.'},
+{type:'c',q:'Si la Ventafocs no hagués perdut la sabata, com l\'hauria pogut trobar el príncep?',opts:['No hauria pogut trobar-la mai','Hauria enviat criats a buscar la noia del ball','Hauria organitzat un altre ball','La fada l\'hauria ajudat'],ans:0,exp:'Sense la sabata com a pista única, el príncep no tenia cap manera de saber qui era la misteriosa noia.'},
+{type:'c',q:'Quin contrast important presenta el conte?',opts:['La Ventafocs és més rica però menys bella','La Ventafocs és bondadosa; les germanastres, egoistes','La Ventafocs és més intel·ligent però menys amable','Totes es comporten igual'],ans:1,exp:'Tot el conte contrasta la bondat i la humilitat de la Ventafocs amb l\'egoisme de les germanastres.'},
+{type:'f',t:'La {0} feia treballar la Ventafocs de sol a sol.',blanks:['madrastra'],pool:['madrastra','germanastra','veïna','àvia','tieta','reina'],exp:'La madrastra era qui la feia treballar constantment.'},
+{type:'f',t:'La fada va transformar una {0} en un cotxe daurat.',blanks:['carabassa'],pool:['carabassa','pedra','flor','roca','poma','carbassa'],exp:'La fada va transformar una carabassa en un cotxe daurat.'},
+{type:'f',t:'La Ventafocs havia de tornar a casa abans de les {0} de la nit.',blanks:['dotze'],pool:['dotze','deu','onze','nou','vuit','una'],exp:'La fada va advertir que havia de tornar abans de les dotze.'},
+{type:'f',t:'El príncep va reconèixer la Ventafocs perquè la {0} de vidre li entrava {1}.',blanks:['sabata','perfectament'],pool:['sabata','perfectament','corona','malament','roba','forçosament'],exp:'La sabata de vidre li entrava perfectament, cosa que va permetre al príncep reconèixer-la.'},
+{type:'v',q:'La fada va transformar sis ratolins en sis cavalls blancs.',ans:true,exp:'El text diu exactament que la fada va transformar sis ratolins en sis cavalls blancs.'},
+{type:'v',q:'La Ventafocs havia de tornar a casa abans de les onze de la nit.',ans:false,exp:'La fada va advertir que havia de tornar abans de les dotze de la nit, no les onze.'},
+{type:'v',q:'El príncep va trobar la Ventafocs gràcies a la sabata de vidre.',ans:true,exp:'El príncep va provar la sabata a totes les noies i la Ventafocs era l\'única a qui li entrava.'},
+{type:'v',q:'Al final la Ventafocs es va venjar de les seves germanastres.',ans:false,exp:'La Ventafocs les va perdonar, no les va venjar; el text diu que «va perdonar les seves germanastres».'}
+]},
+
+{id:4,title:'La llebre i la tortuga',
+text:`<p>En un prat verd i assolellat, vivien molts animals que convivien tranquil·lament. Entre tots ells, hi havia una llebre molt ràpida que se'n vantava constantment. Cada dia repetia als altres: «Sóc el més ràpid de tots vosaltres! Ningú no pot guanyar-me en una cursa!» Els animals s'havien cansat d'escoltar les seves fanfarronades, però no deien res. Un dia, una tortuga que l'havia escoltat durant massa temps va alçar la veu.</p>
+<p>«Molt bé, llebre», va dir la tortuga amb tranquil·litat. «Jo t'accepto el repte. Farem una cursa fins a aquell roure gran que es veu al final del prat.» Tots els animals van quedar sorpresos, perquè sabien que la tortuga era molt lenta. La llebre es va posar a riure tant que gairebé queia a terra. «D'acord», va acceptar entre riallades. La guineu va fer de jutge i va donar la sortida.</p>
+<p>La llebre va sortir disparada i en pocs moments ja havia deixat la tortuga molt enrere. Quan es va girar i va veure que la tortuga a penes havia recorregut uns metres, va decidir descansar una estona sota un arbre. «Tinc tant de temps que em puc permetre una becaina», va pensar. I la llebre va quedar-se adormida. Mentrestant, la tortuga continuava avançant pas a pas, amb constància i sense aturar-se ni un moment.</p>
+<p>Quan la llebre es va despertar, el sol ja havia baixat molt. Va mirar cap al roure i va veure la tortuga a punt d'arribar. Va córrer amb totes les seves forces, però era massa tard: la tortuga ja havia creuat la línia d'arribada. Tots els animals van aplaudir i celebrar la victòria. La llebre estava avergonyida. La tortuga se li va acostar i li va dir amablement: «La constància i l'esforç constant vencen la velocitat i l'arrogància.»</p>`,
+questions:[
+{type:'c',q:'De qué es vantava la llebre?',opts:['D\'ésser la més intel·ligent','D\'ésser la més ràpida de tots','De tenir la cua més llarga','D\'ésser la més bonica del prat'],ans:1,exp:'La llebre repetia constantment que era la més ràpida i que ningú no podia guanyar-la.'},
+{type:'c',q:'Qui va proposar fer la cursa?',opts:['La guineu','La llebre','La tortuga','El corb'],ans:2,exp:'Va ser la tortuga qui, cansada de les fanfarronades, va acceptar el repte i va proposar la cursa.'},
+{type:'c',q:'Per qué la llebre va decidir dormir durant la cursa?',opts:['Perquè estava molt cansada','Perquè creia tenir temps de sobra','Perquè volia deixar guanyar la tortuga','Perquè la guineu li ho havia dit'],ans:1,exp:'La llebre creia que tenia tant d\'avantatge que es podia permetre una becaina.'},
+{type:'c',q:'Qué feia la tortuga mentre la llebre dormia?',opts:['Esperava que la llebre es despertés','Pedia ajuda als altres animals','Continuava avançant pas a pas sense parar','S\'amagava per sorprendre la llebre'],ans:2,exp:'La tortuga no s\'aturava mai: continuava avançant amb constància.'},
+{type:'c',q:'Quina qualitat va ser decisiva per a la victòria de la tortuga?',opts:['La velocitat','La sort','La perseverança i la constància','La intel·ligència superior'],ans:2,exp:'La tortuga no va parar ni un moment; la seva constància va ser la clau de la victòria.'},
+{type:'c',q:'Si la llebre no s\'hagués adormit, quin hauria estat el resultat?',opts:['La tortuga hauria guanyat igualment','La llebre hauria guanyat amb molta diferència','Hauria sigut un empat','La cursa s\'hauria suspès'],ans:1,exp:'Si la llebre hagués corregut sense parar, la seva velocitat natural li hauria donat una victòria clara.'},
+{type:'c',q:'Quin defecte principal va causar la derrota de la llebre?',opts:['La peresa','L\'arrogància i l\'excés de confiança','La por','La cobdícia'],ans:1,exp:'L\'arrogància va fer que la llebre subestimés la tortuga i fes una pausa que li va costar la victòria.'},
+{type:'c',q:'Quina lliçó va transmetre la tortuga a la llebre?',opts:['Que la velocitat és innecessaria','Que la constància i l\'esforç vencen l\'arrogància','Que cal descansar per guanyar','Que les aparences enganyen'],ans:1,exp:'La tortuga li va dir exactament: "La constància i l\'esforç constant vencen la velocitat i l\'arrogància".'},
+{type:'f',t:'La {0} es vantava de ser l\'animal més ràpid del {1}.',blanks:['llebre','prat'],pool:['llebre','prat','tortuga','bosc','guineu','camp'],exp:'La llebre es vantava de ser la més ràpida del prat.'},
+{type:'f',t:'La {0} va fer de jutge de la cursa.',blanks:['guineu'],pool:['guineu','tortuga','llebre','corb','llop','lleó'],exp:'La guineu va fer de jutge i va donar la sortida de la cursa.'},
+{type:'f',t:'La llebre es va quedar {0} sota un arbre mentre la tortuga avançava.',blanks:['adormida'],pool:['adormida','asseguda','menjant','jugant','cantant','descansant'],exp:'La llebre va quedar-se adormida sota un arbre pensant que tenia temps de sobra.'},
+{type:'f',t:'La tortuga va guanyar gràcies a la seva {0}, avançant sense aturar-se mai.',blanks:['constància'],pool:['constància','velocitat','astúcia','mida','sort','força'],exp:'La constància de la tortuga, avançant pas a pas sense parar, va ser la clau de la victòria.'},
+{type:'v',q:'Va ser la llebre qui va proposar la cursa a la tortuga.',ans:false,exp:'Va ser la tortuga qui va proposar el repte, cansada de les fanfarronades de la llebre.'},
+{type:'v',q:'La llebre va perdre la cursa perquè era massa lenta.',ans:false,exp:'La llebre era molt ràpida però va perdre per arrogància: es va adormir sota un arbre.'},
+{type:'v',q:'La guineu va fer de jutge de la cursa.',ans:true,exp:'El text diu que «la guineu va fer de jutge i va donar la sortida».'},
+{type:'v',q:'La llebre estava molt contenta quan va saber que havia perdut la cursa.',ans:false,exp:'El text diu que «la llebre estava avergonyida» quan va descobrir que havia perdut.'}
+]},
+
+{id:5,title:'El llop i els set cabrits',
+text:`<p>Hi havia una cabra que vivia amb els seus set fills en una caseta al mig del bosc. Un dia, la mare va haver de sortir a buscar menjar i va advertir als cabrits: «Tingueu molta cura! El llop és astut i intentarà entrar a casa. No obriu la porta a ningú que no sigui jo. Em coneixereu per la meva veu suau i la meva pota blanca.» Els cabrits van prometre que serien prudents.</p>
+<p>Poc després, el llop va arribar a la porta i va trucar imitant la veu de la mare. Però la seva veu era massa greu i els cabrits li van dir: «Tu no ets la nostra mare!» El llop va marxar i va menjar mel per suavitzar-se la veu. Quan va tornar, els cabrits van veure la seva pota negra per sota de la porta: «La nostra mare té la pota blanca! No t'obrim!»</p>
+<p>El llop va anar a la fleca i va embrutar la seva pota de farina blanca. Llavors va tornar i va trucar per tercera vegada. Ara la seva veu era suau i la seva pota semblava blanca. Els cabrits es van confondre i van obrir la porta. El llop va entrar corrents i va empassar-se sis dels set cabrits. El més petit es va amagar dins del rellotge de paret i el llop no el va trobar. Cansat i sadoll, el llop va sortir al bosc i es va adormir.</p>
+<p>Quan la mare va tornar i va trobar la casa buida, el cabrit petit li va explicar tot. Van anar a buscar el llop adormit al bosc. Amb unes tisores, la mare li va obrir la panxa i en van sortir els sis cabrits sans i estalvis. Van omplir la panxa del llop de pedres i el van cosir. Quan el llop es va despertar i va anar al pou a beure, el pes de les pedres el va fer caure i va morir. La família va tornar a casa unida i va viure tranquil·lament.</p>`,
+questions:[
+{type:'c',q:'Per qué va sortir de casa la mare cabra?',opts:['Per visitar uns amics','Per buscar menjar','Per anar al mercat','Per explorar el bosc'],ans:1,exp:'La mare va haver de sortir a buscar menjar per a la família.'},
+{type:'c',q:'Com podrien reconèixer els cabrits la seva mare?',opts:['Pel color del seu pelatge','Pel so del cascavell','Per la veu suau i la pota blanca','Pel pas i l\'alçada'],ans:2,exp:'La mare els va dir que la reconeixerien per la veu suau i la pota blanca.'},
+{type:'c',q:'Per qué el llop va menjar mel?',opts:['Perquè tenia molta gana','Per suavitzar-se la veu i enganyar els cabrits','Per omplir la panxa antes d\'entrar','Perquè li agradava molt'],ans:1,exp:'Els cabrits el van rebutjar perquè la seva veu era massa greu, i llavors va menjar mel per suavitzar-la.'},
+{type:'c',q:'On es va amagar el cabrit petit?',opts:['Sota el llit','Al celler','Dins del rellotge de paret','Al jardí darrere un arbust'],ans:2,exp:'El cabrit petit es va amagar dins del rellotge de paret i el llop no el va trobar.'},
+{type:'c',q:'Com van alliberar els sis cabrits de la panxa del llop?',opts:['Van esperar que els escopís','Van obrir la panxa del llop adormit amb unes tisores','Van fer tant de soroll que el llop va vomitar','Van trucar a un veterinari'],ans:1,exp:'Mentre el llop dormia, la mare li va obrir la panxa amb unes tisores.'},
+{type:'c',q:'Per qué el llop va caure al pou?',opts:['Perquè no veia bé','Perquè els cabrits el van empènyer','Perquè el pes de les pedres el va fer caure','Perquè el pou estava mal tapat'],ans:2,exp:'Li van omplir la panxa de pedres i quan va anar al pou a beure, el pes el va fer caure.'},
+{type:'c',q:'Per qué el llop va aconseguir enganyar els cabrits a la tercera vegada?',opts:['Havia après a parlar com una cabra','Va aconseguir imitar tant la veu com l\'aspecte de la pota','Els cabrits estaven dormint','La mare havia tornat de veritat'],ans:1,exp:'La tercera vegada tenia la veu suavitzada per la mel i la pota emblanquida per la farina.'},
+{type:'c',q:'Quina lliçó principal transmet aquest conte?',opts:['Que cal desconfiar sempre de tothom','Que el mal acaba rebent el seu càstig i l\'astúcia no sempre guanya','Que és millor no obrir mai la porta','Que les mares sempre tornen quan les necessiten'],ans:1,exp:'El llop va enganyar els cabrits, però al final va rebre el seu càstig.'},
+{type:'f',t:'El llop va menjar {0} per suavitzar-se la veu i semblar la mare.',blanks:['mel'],pool:['mel','sucre','llet','sal','pa','oli'],exp:'El llop va menjar mel per suavitzar-se la veu greu.'},
+{type:'f',t:'El llop va embrutar la pota de {0} a la {1} per fer-la semblar blanca.',blanks:['farina','fleca'],pool:['farina','fleca','pintura','casa','neu','mercat'],exp:'El llop va anar a la fleca i va embrutar la pota de farina blanca.'},
+{type:'f',t:'El cabrit petit es va amagar dins del {0} de paret.',blanks:['rellotge'],pool:['rellotge','armari','celler','llit','forn','calaix'],exp:'El cabrit petit es va amagar dins del rellotge de paret i va sobreviure.'},
+{type:'f',t:'Van omplir la panxa del llop de {0} per fer-lo caure al pou.',blanks:['pedres'],pool:['pedres','fang','terra','troncs','ferro','sorra'],exp:'Van omplir la panxa del llop de pedres i el van cosir; el pes el va fer caure al pou.'},
+{type:'v',q:'El llop va aconseguir enganyar els cabrits al primer intent.',ans:false,exp:'El llop va fallar dues vegades (veu massa greu, pota negra) i va enganyar-los al tercer intent.'},
+{type:'v',q:'El llop va embrutar la pota de farina a la fleca per fer-la semblar blanca.',ans:true,exp:'El text diu que el llop va anar a la fleca i va embrutar la seva pota de farina blanca.'},
+{type:'v',q:'Tots els set cabrits van ser engolits pel llop.',ans:false,exp:'El cabrit petit es va amagar dins del rellotge de paret i el llop no el va trobar.'},
+{type:'v',q:'El llop va morir quan va caure al pou amb la panxa plena de pedres.',ans:true,exp:'El pes de les pedres el va fer caure al pou i va morir.'}
+]},
+
+{id:6,title:'Els músics de Bremen',
+text:`<p>Hi havia una vegada un ase vell que havia treballat tota la vida per al seu amo. Ara que estava vell i ja no podia portar tanta càrrega, l'amo volia desfer-se'n. L'ase va escapar-se i va decidir anar a la ciutat de Bremen per convertir-se en músic. Pel camí va trobar un gos vell que havia estat caçador però que ara no podia córrer. El gos també volia ser músic i tots dos van continuar junts el viatge.</p>
+<p>Aviat van trobar un gat vell assegut al mig del camí amb cara de tristesa. La seva mestressa el volia eliminar perquè ja no atrapava ratolins. Com que tenia una veu molt bona per miolar, el gat es va unir al grup. Més tard, van trobar un gall que havia après que l'amo el volia sacrificar per fer sopa. El gall també es va unir al grup de futurs músics.</p>
+<p>Quan va fer fosc, el grup va trobar una caseta al bosc. A través de la finestra van veure uns lladres que sopaven. Com que tenien molta gana, van decidir fer-los fora. L'ase es va col·locar davant de la finestra; el gos, damunt de l'ase; el gat, damunt del gos; i el gall, damunt del gat. Aleshores van fer la seva «música»: l'ase va rebuenar, el gos va bordar, el gat va miolar i el gall va cantar tots alhora.</p>
+<p>El soroll era terrorífic. Els lladres, espantats, van fugir corrents pensant que hi havia un monstre. Els quatre animals van entrar i van sopar tot el que van trobar. Després van apagar les llums i van dormir cadascú al seu lloc preferit: l'ase al jardí, el gos darrere la porta, el gat davant del foc i el gall dalt de tot de la casa.</p>
+<p>A mitjanit, un dels lladres va tornar a comprovar si la casa estava buida. Quan va entrar a les fosques, el gat li va esgarrapar la cara, el gos li va mossegar la cama, l'ase li va donar una coça i el gall va cridar des del sostre. El lladre va fugir aterrit. Mai més no van tornar. Els quatre animals van quedar-se a viure a la caseta i, tot i que no van arribar mai a Bremen, van ser molt feliços.</p>`,
+questions:[
+{type:'c',q:'Per qué va marxar l\'ase de casa del seu amo?',opts:['Perquè volia ser músic des de sempre','Perquè l\'amo el volia eliminar per ser vell','Perquè s\'avorria al poble','Perquè el gos el va convèncer'],ans:1,exp:'L\'amo volia desfer-se de l\'ase perquè estava vell i ja no podia treballar com abans.'},
+{type:'c',q:'Quin era el destí que tenien en ment els quatre animals?',opts:['Trobar un bosc tranquil','Anar a la ciutat de Bremen per ser músics','Buscar nous amos','Viatjar pel món'],ans:1,exp:'Tots quatre animals es dirigien a Bremen amb la idea de convertir-se en músics.'},
+{type:'c',q:'Per qué el gall s\'havia escapat?',opts:['Perquè l\'amo era cruel','Havia après que l\'amo el volia sacrificar per fer sopa','Perquè volia viatjar','Perquè s\'havia barallat amb les gallines'],ans:1,exp:'El gall havia descobert que l\'amo el volia matar per cuinar-lo.'},
+{type:'c',q:'En quin ordre es van col·locar els animals a la finestra?',opts:['Gos-ase-gat-gall','Ase-gos-gat-gall','Gat-gos-ase-gall','Gall-gat-gos-ase'],ans:1,exp:'L\'ase era el més gran i es va posar primer; el gos, damunt; el gat, damunt del gos; el gall, al cim.'},
+{type:'c',q:'On va dormir el gat?',opts:['Al jardí','Darrere la porta','Davant del foc','Dalt del sostre'],ans:2,exp:'El gat va dormir davant del foc, que és on li agrada estar als gats.'},
+{type:'c',q:'Per qué els lladres no van tornar mai més?',opts:['Perquè la policia els va atrapar','Pensaven que hi havia un monstre horrible a la caseta','Perquè la caseta no valia res','Es van instal·lar en un altre poble'],ans:1,exp:'El lladre que va tornar va explicar que hi havia un monstre i ningú no va voler tornar.'},
+{type:'c',q:'Al final, els animals van arribar a Bremen?',opts:['Sí, i es van convertir en músics famosos','No, es van quedar feliços a la caseta del bosc','No, van tornar amb els seus amos','Sí, però no van trobar feina'],ans:1,exp:'El text diu que "tot i que no van arribar mai a Bremen, van ser molt feliços".'},
+{type:'c',q:'Quin valor comparteixen els quatre animals?',opts:['La força física','La valentia per buscar una nova vida malgrat les dificultats','La intel·ligència superior','La riquesa'],ans:1,exp:'Tots quatre van tenir el coratge de marxar i buscar un futur millor quan els seus amos els rebutjaven.'},
+{type:'f',t:'El {0} va escapar-se i va decidir anar a la ciutat de {1} per ser músic.',blanks:['ase','Bremen'],pool:['ase','Bremen','gos','Roma','gat','París'],exp:'L\'ase va ser el primer a escapar i va decidir anar a Bremen per ser músic.'},
+{type:'f',t:'Per espantar els lladres, els animals van fer tots alhora un gran {0}.',blanks:['soroll'],pool:['soroll','crit','incendi','salt','atac','show'],exp:'Tots quatre van fer els seus sons alhora, creant un soroll tan terrorífic que els lladres van fugir.'},
+{type:'f',t:'El gat va dormir davant del {0} perquè li agradava la calor.',blanks:['foc'],pool:['foc','llar','portal','finestra','forn','porta'],exp:'El gat va triar dormir davant del foc per estar calent.'},
+{type:'f',t:'El lladre que va tornar va dir que hi havia un {0} horrible a la caseta.',blanks:['monstre'],pool:['monstre','fantasma','ós','gegant','bruixa','drac'],exp:'El lladre aterrit va dir als seus companys que hi havia un monstre, i cap va gosar tornar.'},
+{type:'v',q:'L\'ase volia ser músic a la ciutat de París.',ans:false,exp:'L\'ase volia ser músic a Bremen, no a París.'},
+{type:'v',q:'Els lladres van fugir perquè pensaven que hi havia un monstre a la caseta.',ans:true,exp:'El soroll terrorífic dels quatre animals va fer pensar als lladres que hi havia un monstre.'},
+{type:'v',q:'Al final, els quatre animals van arribar a Bremen i es van fer famosos.',ans:false,exp:'El text diu que «tot i que no van arribar mai a Bremen, van ser molt feliços» a la caseta del bosc.'},
+{type:'v',q:'El gat va dormir darrere la porta de la caseta.',ans:false,exp:'El gat va dormir davant del foc; el gos era qui dormia darrere la porta.'}
+]},
+
+{id:7,title:'En Polzet',
+text:`<p>En un país llunyà vivien un llenyataire i la seva dona amb els seus set fills. El gran es deia Polzet i era tan petit com un polze. Els pares eren molt pobres i un any de mala collita no tenien prou menjar. El llenyataire va decidir abandonar els nens al bosc. Polzet, que dormia menys profundament que els seus germans, ho va sentir tot i va fer un pla.</p>
+<p>A l'endemà, quan els pares els van dur al bosc, Polzet havia omplert les butxaques de pedretes blanques. Mentre caminaven, anava deixant caure les pedres per marcar el camí. Quan els pares els van deixar sols i va fer fosc, Polzet va guiar els seus germans seguint les pedres que brillaven a la llum de la lluna, i tots van tornar a casa.</p>
+<p>Però la sort no va durar. L'any següent la pobresa va tornar i els pares van prendre la mateixa decisió. Aquesta vegada, Polzet no va poder agafar pedretes perquè la porta estava tancada amb clau, de manera que va guardar engrunes de pa a les butxaques. Malauradament, els ocells del bosc se les van menjar totes. Quan va fer fosc, Polzet i els seus germans es van perdre al bosc i van arribar a un castell fosc on vivia un ogre.</p>
+<p>Al castell, la dona de l'ogre els va amagar i els va donar de sopar. A mitjanit, mentre l'ogre dormia, Polzet va robar les seves botes màgiques, les quals permetien caminar set llegues en un sol pas. Amb aquestes botes va anar a palau, on el rei li va pagar molt bé per dur missatges urgents. Polzet va tornar a casa carregat de diners i tota la família va poder viure feliçment.</p>`,
+questions:[
+{type:'c',q:'Per qué els pares van decidir abandonar els fills al bosc?',opts:['Perquè eren massa desobedients','Eren massa pobres per alimentar-los','Perquè el bosc era un lloc segur','Era una tradició del poble'],ans:1,exp:'El llenyataire era molt pobre i no tenia prou menjar per alimentar els set fills.'},
+{type:'c',q:'Per qué Polzet es va assabentar del pla dels seus pares?',opts:['Va llegir una carta','Un germà li ho va explicar','Dormia menys profundament que els altres i ho va sentir','Ho va endevinar'],ans:2,exp:'El text diu que Polzet dormia menys profundament que els seus germans i per això va sentir la conversa.'},
+{type:'c',q:'Per qué les engrunes de pa no van funcionar?',opts:['Perquè la pluja les va esborrar','Els ocells del bosc se les van menjar','Eren massa petites per veure-les','El vent les va escampar'],ans:1,exp:'Els ocells del bosc van menjar les engrunes de pa i la pista va desaparèixer.'},
+{type:'c',q:'Qui va protegir els nens dins del castell de l\'ogre?',opts:['L\'ogre','La dona de l\'ogre','Un mag que hi vivia','Les criades del castell'],ans:1,exp:'La dona de l\'ogre els va amagar i els va donar de sopar, protegint-los del seu marit.'},
+{type:'c',q:'Com va aconseguir Polzet diners per a la família?',opts:['Treballant als camps del rei','Venent les botes de l\'ogre','Portant missatges al palau del rei amb les botes màgiques','Tornant a robar a l\'ogre'],ans:2,exp:'Amb les botes que feien set llegues en un pas, Polzet podia portar missatges molt ràpidament i el rei li pagava bé.'},
+{type:'c',q:'Quina qualitat és la més important que demostra Polzet?',opts:['La força física','La velocitat','La intel·ligència i la capacitat de preveure els problemes','La valentia en batalla'],ans:2,exp:'Polzet és sempre el que pensa primer: prepara les pedretes, busca una alternativa amb el pa i aprofita les botes.'},
+{type:'c',q:'Si els ocells no s\'haguessin menjat les engrunes, qué hauria passat?',opts:['Haurien anat al castell igualment','Haurien trobat el camí a casa i probablement no haurien conegut l\'ogre','El pare els hauria abandonat en un altre bosc','Polzet hauria buscat una altra manera'],ans:1,exp:'Si la pista de pa hagués funcionat, haurien tornat a casa com la primera vegada.'},
+{type:'c',q:'Quin és el contrast principal entre Polzet i els seus germans?',opts:['Polzet és molt més gran que els altres','Polzet és el més petit però el més intel·ligent i previsor','Polzet sap màgia i els altres no','Polzet és el més valent físicament'],ans:1,exp:'Tot i ser el més petit físicament, Polzet supera els seus germans en intel·ligència i capacitat de planificar.'},
+{type:'f',t:'Polzet va omplir les butxaques de {0} blanques per marcar el camí al bosc.',blanks:['pedretes'],pool:['pedretes','monedes','molles','botons','flors','fulles'],exp:'Polzet va deixar caure pedretes blanques que brillaven amb la lluna i marcaven el camí de tornada.'},
+{type:'f',t:'La segona vegada, els {0} del bosc es van menjar les engrunes de {1}.',blanks:['ocells','pa'],pool:['ocells','pa','rates','arròs','formigues','farina'],exp:'Els ocells van menjar les engrunes de pa i la pista va desaparèixer.'},
+{type:'f',t:'A la caseta del bosc vivia un {0} que volia menjar-se els nens.',blanks:['ogre'],pool:['ogre','gegant','llop','drac','mag','bruixot'],exp:'Al castell fosc del bosc vivia un ogre que tenia intenció de menjar-se els nens.'},
+{type:'f',t:'Amb les {0} màgiques, Polzet podia caminar set {1} en un sol pas.',blanks:['botes','llegues'],pool:['botes','llegues','guants','passes','mitges','metres'],exp:'Les botes màgiques de l\'ogre permetien caminar set llegues en un sol pas.'},
+{type:'v',q:'La primera vegada, Polzet va marcar el camí amb engrunes de pa.',ans:false,exp:'La primera vegada va fer servir pedretes blanques; les engrunes de pa van ser el segon intent.'},
+{type:'v',q:'Els ocells del bosc van menjar les engrunes de pa que Polzet havia deixat.',ans:true,exp:'El text diu que «els ocells del bosc se les van menjar totes», fent desaparèixer la pista.'},
+{type:'v',q:'La dona de l\'ogre va ajudar els nens amagar-los i donar-los de sopar.',ans:true,exp:'La dona de l\'ogre els va amagar i els va donar de sopar mentre el marit no hi era.'},
+{type:'v',q:'Polzet va vendre les botes màgiques al mercat per aconseguir diners.',ans:false,exp:'Polzet va usar les botes per portar missatges al rei, que el pagava molt bé per la rapidesa.'}
+]},
+
+{id:8,title:'La princesa i el pèsol',
+text:`<p>Hi havia una vegada un príncep que volia trobar una princesa de veritat per casar-s'hi. Va viatjar per molts regnes i va conèixer moltes noies que deien ser princeses, però sempre hi havia alguna cosa que no acabava de quadrar. Finalment, desanimat, va tornar al seu palau sense haver trobat ningú.</p>
+<p>Una nit de tempesta, algú va trucar a la porta del palau. Era una noia completament mulla per la pluja que afirmava ser una princesa. El rei i la reina van obrir la porta. La noia tenia el cabell enganxat a la cara i el vestit xop, però parlava amb molta elegància i dignitat. La reina la va mirar amb atenció i va decidir sotmetre-la a una prova secreta.</p>
+<p>Sense dir res a ningú, la reina va anar a la cambra de les visites i va col·locar un petit pèsol sota vint matalassos. Aquella nit, la noia va dormir damunt d'aquella pila enorme. Al matí, quan li van preguntar com havia dormit, la noia va respondre: «Ho sento molt, però no he pogut dormir gairebé gens. Tenia alguna cosa sota el matalàs que em feia molt de mal i tinc el cos ple de cardenals.» Tothom es va quedar molt sorprès.</p>
+<p>Només una princesa de veritat podria sentir un pèsol a través de vint matalassos, perquè les princeses autèntiques tenien una sensibilitat molt especial. El príncep estava encantat i va demanar la mà de la noia aquell mateix matí. Es van casar aviat i van ser molt feliços. El petit pèsol va ser guardat en un museu, on es pot veure encara avui.</p>`,
+questions:[
+{type:'c',q:'Qué buscava el príncep en el seu viatge?',opts:['Aventures per terres llunyanes','Una princesa de veritat per casar-s\'hi','Un tresor llegendari','Aliats per a una guerra'],ans:1,exp:'El príncep volia trobar una princesa de veritat amb qui casar-se.'},
+{type:'c',q:'En quines circumstàncies va arribar la noia al palau?',opts:['En un carruatge daurat per la tarda','A peu durant una nit de tempesta, completament mulla','Acompanyada d\'una gran comitiva','Enviada per carta del rei d\'un regne veí'],ans:1,exp:'La noia va arribar sola, a peu, durant una nit de tempesta i estava completament mulla.'},
+{type:'c',q:'Per qué la reina va mantenir la prova en secret?',opts:['No volia que el príncep s\'enamorés sense la prova','Si la noia hagués sabut del pèsol podria haver fingit el resultat','Tenia por que el rei no estigués d\'acord','Era una tradició secreta del palau'],ans:1,exp:'Si la noia hagués sabut del pèsol, podria haver dit que havia dormit malament per passar la prova sense que fos veritat.'},
+{type:'c',q:'Qué demostra que la noia era una princesa autèntica?',opts:['La seva elegància de parlar','Les joies que portava','Que va sentir el pèsol a través de vint matalassos','Que coneixia tots els protocols del palau'],ans:2,exp:'La prova del pèsol és la que demostra, segons la lògica del conte, que la noia és una princesa veritable.'},
+{type:'c',q:'Quin tipus de prova és la del pèsol?',opts:['Una prova de força','Una prova d\'astúcia','Una prova de sensibilitat extrema','Una prova de coneixements'],ans:2,exp:'La prova mesura la sensibilitat física extrema, que el conte associa a ser una princesa autèntica.'},
+{type:'c',q:'Si la noia hagués dit que havia dormit molt bé, qué hauria pensat la reina?',opts:['Que era molt forta i resistent','Que no era una princesa autèntica','Que el pèsol no havia funcionat','Que la noia mentia per educació'],ans:1,exp:'L\'objectiu de la prova era comprovar la sensibilitat. Si no hagués sentit el pèsol, no hauria superat la prova.'},
+{type:'c',q:'Quin element creus que podria semblar injust en aquest conte?',opts:['Que el príncep era massa exigent','Associar la "sensibilitat extrema" a ser princesa pot semblar una idea estranya','Que la reina no hauria d\'haver intervingut','Que la tempesta era un element innecessari'],ans:1,exp:'Avui podria semblar qüestionable que la condició de "princesa autèntica" es demostri amb la fragilitat física extrema.'},
+{type:'c',q:'Qué li va passar al pèsol al final del conte?',opts:['La reina el va guardar com a record personal','El van posar en un museu','El príncep el va llençar','La princesa se\'l va emportar'],ans:1,exp:'El text diu que el petit pèsol va ser guardat en un museu.'},
+{type:'f',t:'La noia va arribar al palau durant una nit de {0}, completament {1}.',blanks:['tempesta','mulla'],pool:['tempesta','mulla','pluja','seca','neu','cansada'],exp:'La noia va arribar durant una tempesta i estava completament mulla de pluja.'},
+{type:'f',t:'La reina va posar un {0} sota vint {1} sense dir res a ningú.',blanks:['pèsol','matalassos'],pool:['pèsol','matalassos','fesol','llençols','pedra','coixins'],exp:'La reina va col·locar un petit pèsol sota vint matalassos com a prova secreta.'},
+{type:'f',t:'La noia va dir que no havia pogut {0} i que tenia el cos ple de {1}.',blanks:['dormir','cardenals'],pool:['dormir','cardenals','menjar','blaus','descansar','ferides'],exp:'La noia va dir que no havia pogut dormir i que tenia cardenals per alguna cosa que hi havia sota.'},
+{type:'f',t:'El petit {0} va ser guardat en un {1} per a la posteritat.',blanks:['pèsol','museu'],pool:['pèsol','museu','fesol','palau','gra','tresor'],exp:'El pèsol va ser guardat en un museu perquè tothom pogués veure la prova de la llegenda.'},
+{type:'v',q:'La noia va arribar al palau en un carruatge reial durant la nit.',ans:false,exp:'La noia va arribar a peu, sola, durant una nit de tempesta i estava completament mulla.'},
+{type:'v',q:'La reina va col·locar un pèsol sota vint matalassos sense dir res a ningú.',ans:true,exp:'El text diu que la reina va fer la prova secreta sense avisar ningú.'},
+{type:'v',q:'La noia va dir que havia dormit molt bé aquella nit al palau.',ans:false,exp:'La noia va dir que no havia pogut dormir gairebé gens i que tenia el cos ple de cardenals.'},
+{type:'v',q:'El pèsol va ser guardat en un museu al final del conte.',ans:true,exp:'El text diu que «el petit pèsol va ser guardat en un museu, on es pot veure encara avui».'}
+]},
+
+{id:9,title:'El moliner, el fill i l\'ase',
+text:`<p>Un moliner i el seu fill anaven al mercat amb el seu ase per vendre'l. Caminaven al costat de l'animal quan van passar per un poble. Els veïns els van veure i van dir: «Quin home tan ximple! Té un ase i no l'aprofita per cavalcar-hi!» El moliner ho va sentir i va pujar al llom de l'ase, deixant el fill a peu.</p>
+<p>Més endavant, la gent va comentar: «Quina vergonya! El pare va a cavall mentre el pobre nen va a peu.» El moliner, avergonyit, va baixar i va fer pujar el fill. Al cap de poc, els homes d'una posada van dir: «Mireu aquell peressos! El nen jove va muntat i el pobre vell es cansa les cames.»</p>
+<p>El fill, sense saber qué fer, va agafar el pare i tots dos van pujar a l'ase. Però ara una dona que rentava roba al riu els va cridar: «Pobret ase! Dos ganduls a sobre! Segur que l'animal acaba mort de cansament.» Avergonyits, tots dos van baixar. Finalment, van decidir portar l'ase sobre les espatlles per evitar qualsevol crítica. Però mentre creuaven un pont, l'animal es va espantar, va caure al riu i es va ofegar.</p>
+<p>Amb l'ase perdut, el moliner i el seu fill van tornar a casa tristos i amb les mans buides. El pare li va dir al fill: «Quan tothom intenta complaure, al final no complaues ningú i perds el que tens. Aprèn-ho bé: decideix el que és just i segueix el teu propi camí sense deixar-te portar per les opinions dels altres.» El fill va entendre que el seu pare tenia raó i mai més no va oblidar aquella lliçó de vida.</p>`,
+questions:[
+{type:'c',q:'On anaven el moliner i el fill?',opts:['A visitar uns parents','Al mercat per vendre l\'ase','A buscar menjar al camp','A un torneig del poble'],ans:1,exp:'El moliner i el seu fill anaven al mercat amb l\'objectiu de vendre l\'ase.'},
+{type:'c',q:'Per qué la primera gent els va criticar?',opts:['Perquè l\'ase estava molt prim','Perquè el fill plorava','Anaven tots dos a peu tenint un ase i no l\'aprofitaven','L\'ase anava carregat de mercaderies'],ans:2,exp:'La gent va pensar que era absurd tenir un ase i no cavalcar-hi.'},
+{type:'c',q:'Quin defecte principal mostra el moliner?',opts:['La gelosia','La incapacitat de mantenir decisions sense deixar-se influir pels altres','La cobdícia','La peresa'],ans:1,exp:'El moliner canvia constantment de decisió en funció del que li diuen els altres, sense tenir criteri propi.'},
+{type:'c',q:'Qué va passar quan creuaven el pont?',opts:['El pont es va trencar','L\'ase es va espantar, va caure al riu i es va ofegar','Un lladre els va robar l\'ase','L\'ase va refusar creuar'],ans:1,exp:'L\'animal es va espantar sobre el pont, va caure al riu i es va ofegar.'},
+{type:'c',q:'Quina lliçó va transmetre el moliner al seu fill?',opts:['Que cal escoltar sempre els consells dels altres','Intentar complaure tothom porta a perdre-ho tot','Que no s\'ha d\'anar mai al mercat','Que els ases no serveixen per cavalcar'],ans:1,exp:'El moliner li va explicar que intentar complaure tothom va fer que perdessin l\'ase.'},
+{type:'c',q:'Si el moliner i el fill haguessin ignorat totes les crítiques, qué hauria passat?',opts:['La gent s\'hauria posat furiosa','Haurien venut l\'ase al mercat sense perdre\'l','No haurien après cap lliçó','L\'ase hauria fugit igualment'],ans:1,exp:'Sense fer cas de les opinions alienes, haurien arribat al mercat amb l\'ase i l\'haurien pogut vendre.'},
+{type:'c',q:'Quants canvis de postura van fer durant el camí?',opts:['Dos','Tres','Quatre','Cinc'],ans:2,exp:'Van canviar quatre vegades: tots a peu → moliner munta → fill munta → tots dos munten → porten l\'ase.'},
+{type:'c',q:'Quin personatge fa la reflexió moral al final del conte?',opts:['La gent dels pobles','El fill','El moliner','L\'ase'],ans:2,exp:'Al final és el moliner qui extreu la lliçó i la transmet al seu fill.'},
+{type:'f',t:'El moliner i el fill anaven al {0} per vendre l\'ase.',blanks:['mercat'],pool:['mercat','riu','camp','bosc','poble','molí'],exp:'El moliner i el fill anaven al mercat amb l\'objectiu de vendre l\'ase.'},
+{type:'f',t:'Cada vegada que algú els criticava, el moliner {0} de decisió.',blanks:['canviava'],pool:['canviava','fugia','discutia','ignorava','plorava','marxava'],exp:'El moliner canviava de decisió cada cop que algú deia alguna cosa, sense mantenir el seu propi criteri.'},
+{type:'f',t:'Quan creuaven el {0}, l\'ase es va espantar i va caure al {1}.',blanks:['pont','riu'],pool:['pont','riu','camí','prat','prat','bosc'],exp:'L\'ase es va espantar creuant el pont i va caure al riu.'},
+{type:'f',t:'La lliçó del conte és que qui intenta {0} a tothom acaba {1} el que té.',blanks:['complaure','perdent'],pool:['complaure','perdent','ajudar','guanyant','escoltar','donant'],exp:'Intentar complaure tothom porta a no complaure ningú i a perdre el que tens.'},
+{type:'v',q:'El moliner i el fill anaven al mercat a comprar un ase nou.',ans:false,exp:'Anaven al mercat per vendre el seu ase, no per comprar-ne cap.'},
+{type:'v',q:'El moliner va canviar de decisió diverses vegades durant el camí.',ans:true,exp:'El moliner va canviar quatre vegades de postura en funció del que deia la gent que anaven trobant.'},
+{type:'v',q:'L\'ase va morir perquè es va espantar creuant un pont i va caure al riu.',ans:true,exp:'Mentre creuaven un pont, l\'animal es va espantar, va caure al riu i es va ofegar.'},
+{type:'v',q:'La lliçó del conte és que sempre cal escoltar els consells dels altres.',ans:false,exp:'Al contrari: la lliçó és que intentar complaure tothom porta a perdre-ho tot.'}
+]},
+
+{id:10,title:'La Caputxeta Vermella',
+text:`<p>Hi havia una vegada una noia que tothom coneixia com la Caputxeta Vermella perquè sempre portava una caputxa de color vermell que la seva àvia li havia cosit. Un dia, la mare la va cridar i li va dir: «La teva àvia no es troba bé. Porta-li aquesta cistella amb pa, mantega i vi, però no et desvies del camí ni parlis amb ningú pel bosc.» La Caputxeta va prometre que ho faria, però de seguida va oblidar les paraules de la mare quan el bosc li va semblar ple de meravelles.</p>
+<p>Mentre caminava, es va trobar amb un llop que li va preguntar amablement on anava. La Caputxeta, sense desconfiar gens, li va dir on vivia l'àvia i li va explicar que li portava el cistell. El llop va somriure i li va suggerir que recollís flors per alegrar-la. Mentre la noia s'entretenia al bosc collint flors, el llop va córrer per un camí més curt cap a casa de l'àvia, va trucar imitant la veu de la noia i se la va empassar d'un sol mos. Llavors es va posar la roba de l'àvia i es va ficar al llit a esperar.</p>
+<p>Quan la Caputxeta va arribar, tot li semblava estrany: la casa estava molt fosca i l'àvia tenia una veu massa greu, les orelles massa grans, els ulls massa grossos i una boca immensa. A cada observació, l'àvia responia: «Per sentir-te millor», «Per veure't millor»... fins que va dir «Per menjar-te millor!» i va saltar del llit. El llop es va empassar la noia i es va adormir ben satisfet.</p>
+<p>Un caçador que passava per davant va sentir uns roncs estranys. Va entrar, va trobar el llop adormit i, en veure que la panxa es movia, va comprendre el que havia passat. Amb molt de compte, va agafar les tisores i va obrir la panxa del llop. En van sortir l'àvia i la Caputxeta sanes i salves. Van omplir la panxa del llop de pedres pesades, el van cosir i, quan el llop es va despertar i va intentar caminar, el pes el va fer caure mort a terra. La Caputxeta va aprendre aquell dia que desobeir la mare i fiar-se d'estranys podia tenir conseqüències molt greus.</p>`,
+questions:[
+{type:'c',q:'Quin error crític va cometre la Caputxeta quan va trobar el llop al bosc?',opts:['Li va donar el cistell amb el menjar','Li va revelar on vivia l\'àvia i qué li portava','El va convidar a anar amb ella','Va trencar la promesa d\'arribar ràpid'],ans:1,exp:'Explicar a un desconegut on vivia l\'àvia i qué li portava va permetre al llop planificar l\'atac amb antelació.'},
+{type:'c',q:'Per qué el llop va suggerir a la Caputxeta que recollís flors?',opts:['Perquè sabia que l\'àvia les adorava','Per entretenir-la i arribar ell primer a casa de l\'àvia','Perquè volia que fos un regal millor','Perquè ell no volia les flors al bosc'],ans:1,exp:'El llop necessitava que la Caputxeta s\'aturés per poder arribar a casa de l\'àvia i executar el seu pla.'},
+{type:'c',q:'Com va aconseguir el llop que l\'àvia li obrís la porta?',opts:['Va forçar la porta','Va entrar per la finestra','Va trucar imitant la veu de la Caputxeta','Va esperar que l\'àvia sortís sola'],ans:2,exp:'El llop va imitar la veu de la Caputxeta i l\'àvia, pensant que era la seva neta, va obrir sense dubtar.'},
+{type:'c',q:'Qué revela el comportament de la Caputxeta quan parla amb «l\'àvia» sobre el seu estat?',opts:['Que no notava res de diferent','Que sospitava que alguna cosa era estranya però no va actuar a temps','Que tenia gana i no prestava atenció','Que estava molt contenta de veure l\'àvia'],ans:1,exp:'Les preguntes sobre les orelles, els ulls i la boca indiquen que notava anomalies però no va saber reaccionar a temps.'},
+{type:'c',q:'Si la Caputxeta hagués seguit el camí directe sense parlar amb el llop, qué hauria passat probablement?',opts:['El llop l\'hauria atrapada igualment al bosc','El llop no hauria sabut on anava i no hauria pogut planificar l\'atac','La mare hauria anat a buscar-les','L\'àvia hauria sortit a rebre-la al camí'],ans:1,exp:'Sense saber l\'adreça de l\'àvia, el llop no hauria pogut córrer a la casa per avançar-se a la noia.'},
+{type:'c',q:'Quina característica fa que el llop sigui especialment perillós en aquest conte?',opts:['La seva mida i força bruta','La capacitat d\'imitar veus i disfressar-se','La seva velocitat per córrer','El seu coneixement perfecte del bosc'],ans:1,exp:'El llop no ataca directament: enganya imitant veus i aparences, cosa que el fa molt més perillós que si fos només fort.'},
+{type:'c',q:'Quin paper juga el caçador al final i qué en revela sobre la protagonista?',opts:['És el veritable heroi i demostra que la Caputxeta no podia fer res','Arriba massa tard i no pot salvar l\'àvia','Apareix per casualitat i resolt un problema que la Caputxeta no ha pogut evitar','El rei l\'havia enviat expressament'],ans:2,exp:'El caçador resolt la situació com a element extern, subratllant que la Caputxeta no va poder salvar-se de les seves pròpies decisions.'},
+{type:'c',q:'Per qué van omplir la panxa del llop de pedres en lloc de simplement fer-lo fugir?',opts:['Perquè el llop era massa agressiu per deixar-lo anar','Per assegurar que no pogués tornar a fer mal a ningú','Perquè el caçador necessitava la seva pell','Per pura i simple venjança'],ans:1,exp:'La mort definitiva del llop garanteix que no tornarà a atacar cap altra persona; és una mesura de seguretat permanent.'},
+{type:'f',t:'La mare va demanar a la Caputxeta que portés a l\'àvia una {0} amb pa, mantega i {1}.',blanks:['cistella','vi'],pool:['cistella','vi','bossa','llet','cistell','fruita'],exp:'El text diu exactament que la cistella contenia pa, mantega i vi.'},
+{type:'f',t:'El llop va córrer per un camí més {0} i va arribar a casa de l\'àvia {1} que la Caputxeta.',blanks:['curt','abans'],pool:['curt','abans','llarg','després','dret','primer'],exp:'El llop va aprofitar una drecera per arribar a casa de l\'àvia mentre la Caputxeta s\'entretenia collint flors.'},
+{type:'f',t:'El caçador va obrir la panxa del llop amb unes {0} i en van sortir les dues {1} i salves.',blanks:['tisores','sanes'],pool:['tisores','sanes','ganivets','vives','eines','bones'],exp:'El caçador va usar tisores per obrir amb cura la panxa del llop i alliberar l\'àvia i la Caputxeta.'},
+{type:'f',t:'La Caputxeta va aprendre que {0} la mare i {1} dels estranys pot tenir conseqüències molt greus.',blanks:['desobeir','fiar-se'],pool:['desobeir','fiar-se','obeir','desconfiar','ignorar','separar-se'],exp:'La lliçó és doble: no desobeir les instruccions dels pares i no confiar en persones desconegudes.'},
+{type:'v',q:'Va ser la mare qui va suggerir a la Caputxeta que recollís flors pel camí per alegrar l\'àvia.',ans:false,exp:'Va ser el llop qui va suggerir recollir flors, per guanyar temps i arribar ell primer a casa de l\'àvia.'},
+{type:'v',q:'El llop va arribar a casa de l\'àvia abans que la Caputxeta.',ans:true,exp:'El llop va anar per un camí curt i va arribar primer mentre la Caputxeta s\'entretenia al bosc.'},
+{type:'v',q:'El caçador va matar el llop disparant-li amb l\'escopeta.',ans:false,exp:'El caçador li va obrir la panxa amb tisores, el van omplir de pedres i el van cosir; el pes el va fer caure mort.'},
+{type:'v',q:'L\'àvia va poder sortir sana i salva de la panxa del llop.',ans:true,exp:'El text diu que tant l\'àvia com la Caputxeta en van sortir sanes i salves quan el caçador va obrir la panxa del llop.'}
+]},
+
+{id:11,title:'El Flautista d\'Hamelin',
+text:`<p>Fa molts segles, la ciutat d'Hamelin estava completament infestada de rates. Els rosegadors ho envaïen tot: botigues, cases, esglésies i carrers. La gent no podia dormir, perdia les collites i les provisions desapareixien sense aturador. El consell de la ciutat, desesperats, va prometre una recompensa enorme a qualsevol persona que solucionés el problema.</p>
+<p>Un dia va arribar un home estrany, vestit amb roba de colors vius i contradictoris. Afirmava poder alliberar la ciutat de totes les rates per cent monedes d'or. El consell va acceptar immediatament sense dubtar, convençuts que pagarien qualsevol preu per acabar amb el flagell. L'home va treure una flauta de la butxaca i va tocar una melodia hipnòtica. De cada cantonada i forat de la ciutat, les rates van sortir en estampida i el van seguir fins al riu Weser, on es van ofegar totes.</p>
+<p>Quan el flautista va tornar a reclamar la seva recompensa, el consell havia canviat radicalment d'actitud. Ara que el problema estava resolt, cent monedes els semblaven una fortuna excessiva per un simple músic. Li van oferir cinc monedes i van dir-li que s'havia d'acontentar. El flautista, amb una calma glaçada, els va advertir que si no complien el tracte haurien de patir-ne les conseqüències. El consell es va riure d'ell i el va fer fora.</p>
+<p>L'endemà al matí, el flautista va tornar als carrers i va tocar una nova melodia, diferent i dolça. En sentir-la, tots els nens de la ciutat van sortir de les cases ballant i rient, seguits irresistiblement per aquella música. El flautista els va guiar fins a una muntanya propera, que es va obrir per deixar-los passar. La porta es va tancar per sempre darrere d'ells.</p>
+<p>Únicament dos nens no van poder entrar: un que era coix i no havia pogut seguir el ritme de la música, i un que era cec i no sabia on anava. Hamelin va quedar buida de veus infantils. Els pares, desesperats, mai no van poder recuperar els fills. La tragèdia es va gravar en la memòria de la ciutat com un recordatori amarg i definitiu: que una promesa, per incòmoda que sigui de complir, no es pot trencar mai impunement.</p>`,
+questions:[
+{type:'c',q:'Per qué el consell va acceptar tan ràpidament les condicions del flautista sense negociar?',opts:['Perquè coneixien la seva fama i confiaven en ell','La desesperació era tan gran que haurien pagat qualsevol preu','Perquè cent monedes els semblaven una quantitat justa','Perquè el rei els havia ordenat acceptar'],ans:1,exp:'La plaga de rates era tan greu que el consell va acceptar sense dubtar, convençuts que pagarien qualsevol preu.'},
+{type:'c',q:'Quin canvi d\'actitud va mostrar el consell una vegada resolt el problema?',opts:['Van doblar la recompensa per gratitud','Van voler pagar però no tenien prou diners','Van considerar excessiva la recompensa i van oferir molt menys','Van demanar al flautista que marxés sense res'],ans:2,exp:'Un cop solucionat el problema, cent monedes els semblaven massa i van oferir-ne cinc, trencant el tracte.'},
+{type:'c',q:'Qué va advertir el flautista al consell quan li van negar la recompensa?',opts:['Que tornaria a portar les rates','Que avissaria el rei del seu comportament','Que si no complien el tracte patirien les conseqüències','Que els portaria a judici'],ans:2,exp:'El flautista va advertir clarament que hi hauria conseqüències si no complien el que havien promès.'},
+{type:'c',q:'Per qué la melodia per als nens va funcionar de manera diferent de la de les rates?',opts:['Perquè el flautista havia oblidat la primera melodia','Perquè cada ésser viu respon a una música diferent i específica','Perquè la melodia per a les rates era massa lenta','Perquè volia que els nens anessin amb alegria'],ans:1,exp:'El flautista usa melodies específiques dirigides a cada tipus d\'ésser; la música no és universal sinó selectiva.'},
+{type:'c',q:'Quin nen va quedar fora de la muntanya per no poder seguir el ritme de la música?',opts:['El cec','El més petit de tots','El coix','El fill del conseller'],ans:2,exp:'El nen coix no podia seguir el ritme de la música i per això no va poder arribar a temps a la muntanya.'},
+{type:'c',q:'Si el consell hagués pagat les cent monedes acordades, qué hauria passat probablement?',opts:['El flautista hauria tornat a demanar-ne més','Els nens haurien quedat segurs i el flautista hauria marxat','Les rates haurien tornat igualment passades unes setmanes','El flautista no hauria pogut marxar de la ciutat'],ans:1,exp:'El flautista va complir el seu tracte eliminant les rates; si el consell hagués complert el seu, no hi hauria hagut represàlies.'},
+{type:'c',q:'Qué simbolitza el tancament permanent de la porta de la muntanya?',opts:['Que els nens van morir a l\'interior','Que la pèrdua era irreparable i sense solució possible','Que podrien ser rescatats amb un altre músic màgic','Que el flautista era en realitat un mag malvat'],ans:1,exp:'El tancament definitiu subratlla que les conseqüències de trencar una promesa poden ser permanents i irreversibles.'},
+{type:'c',q:'Quina relació simbòlica hi ha entre el comportament de les rates i el del consell?',opts:['Cap relació, són elements independents de la llegenda','Tots dos depredaven els recursos de la gent pobra','Tots dos s\'aprofiten d\'un benefici sense voler pagar el cost real','Les rates i el consell actuen junts contra el flautista'],ans:2,exp:'Les rates consumien sense pagar; el consell va rebre el servei sense voler pagar la recompensa acordada.'},
+{type:'f',t:'El flautista va demanar {0} monedes d\'or per alliberar Hamelin de les {1}.',blanks:['cent','rates'],pool:['cent','rates','mil','mosques','deu','puces'],exp:'El tracte acordat era cent monedes d\'or per eliminar totes les rates de la ciutat.'},
+{type:'f',t:'Les rates van seguir la {0} del flautista fins al riu {1}, on es van ofegar.',blanks:['melodia','Weser'],pool:['melodia','Weser','música','Rin','flauta','Danubi'],exp:'La melodia hipnòtica va guiar les rates fins al riu Weser on totes van morir ofegades.'},
+{type:'f',t:'El consell va oferir al flautista només {0} monedes en lloc de les {1} promeses.',blanks:['cinc','cent'],pool:['cinc','cent','deu','mil','tres','vint'],exp:'El consell va voler pagar cinc monedes en lloc de les cent que havien acordat formalment.'},
+{type:'f',t:'Dos nens no van entrar a la muntanya: un era {0} i l\'altre era {1}.',blanks:['coix','cec'],pool:['coix','cec','sord','mut','petit','malalt'],exp:'El nen coix no podia seguir el ritme de la música i el cec no sabia on anava; tots dos van quedar fora.'},
+{type:'v',q:'El flautista va arribar a Hamelin perquè el consell l\'havia enviat a buscar expressament.',ans:false,exp:'El flautista va arribar per compte propi i va proposar ell mateix l\'acord al consell de la ciutat.'},
+{type:'v',q:'Les rates es van ofegar al riu Weser seguint la música de la flauta.',ans:true,exp:'Les rates van seguir hipnotitzades la melodia fins al riu Weser, on es van ofegar totes.'},
+{type:'v',q:'El consell va acabar pagant les cent monedes desprès d\'una llarga discussió.',ans:false,exp:'El consell es va negar a pagar les cent monedes i va oferir només cinc, i no va cedir davant l\'advertiment del flautista.'},
+{type:'v',q:'Tots els nens d\'Hamelin van desaparèixer dins de la muntanya sense excepció.',ans:false,exp:'Dos nens van quedar fora: el coix, que no podia seguir el ritme, i el cec, que no sabia on anava.'}
+]},
+
+{id:12,title:'La Bella Dorment',
+text:`<p>En néixer la princesa Aurora, el rei i la reina van organitzar un gran banquet i van convidar dotze fades del regne perquè beneïssin la nena. Les fades li van donar dons meravellosos: bellesa, bondat, gràcia i intel·ligència entre molts d'altres. Però van cometre un error fatal: havien oblidat convidar la tretzena fada, la més vella i rancuniosa, que tenia un don guardiat des de feia molt de temps i que es va presentar igualment a la cerimònia, furiosa per l'exclusió.</p>
+<p>La tretzena fada, ofesa per no haver estat convidada, va llançar una maledicció sobre la princesa: quan tingués quinze anys es punxaria el dit amb un fus i moriria. Tothom al palau va quedar horroritzat. La dotzena fada, que encara no havia donat el seu do, va intervenir. No podia desfer la maledicció per complet, però la va suavitzar: en lloc de morir, la princesa s'adormeria cent anys fins que un príncep la despertés amb un petó.</p>
+<p>El rei va ordenar destruir tots els fusos del regne i va prohibir-ne la fabricació. Van passar quinze anys i Aurora va créixer feliç, sense saber la causa de la prohibició estranya. Un dia, mentre explorava les torres del castell que mai havia visitat, va trobar una velleta que filava. Fascinada per un objecte que mai havia vist, la princesa va tocar el fus i es va punxar el dit. Va caure immediatament en un son profund, i amb ella tot el castell: criats, guardians, cuiners, cavalls i fins i tot les mosques.</p>
+<p>Van passar cent anys. El castell va quedar cobert de bardisses espesses que ningú no podia travessar. Molts prínceps van intentar arribar-hi, però tots van fracassar. Finalment, un jove príncep va aconseguir tallar les bardisses amb la seva espasa i va entrar al castell mut i adormit. Va trobar Aurora i, enamorat de la seva bellesa, li va donar un petó. La princesa va obrir els ulls, i amb ella tot el castell va despertar com si no hagués passat res.</p>
+<p>El príncep i Aurora es van estimar de seguida i es van casar en una gran cerimònia. Però la lliçó que va quedar gravada en la memòria del regne era diferent del final feliç: una ofensa aparentment petita, com oblidar de convidar algú, havia condemnat a cent anys de son a tot un castell. Aurora, quan va saber tota la història, va dedicar la vida a assegurar-se que ningú al seu voltant no se sentís mai ignorat ni exclòs.</p>`,
+questions:[
+{type:'c',q:'Quina va ser la causa original que va desencadenar tota la tragèdia del conte?',opts:['Que la princesa va desobeir el seu pare','Que la tretzena fada era maligna per naturalesa','Que el rei no va prendre mesures de seguretat a temps','Que van oblidar convidar la tretzena fada al banquet'],ans:3,exp:'L\'error inicial va ser l\'omissió de la tretzena fada; la seva ira va ser conseqüència de sentir-se exclosa, no d\'una maldad innata.'},
+{type:'c',q:'Per qué la dotzena fada no va poder eliminar completament la maledicció?',opts:['Perquè no tenia prou poder màgic','Perquè havia gastat el seu do en una altra cosa','Perquè les malediccions no es desfan, només es modifiquen','Perquè el rei no li ho va permetre'],ans:2,exp:'El text indica que la dotzena fada no podia desfer-la completament, però sí suavitzar-la canviant la mort per un son.'},
+{type:'c',q:'Per qué la princesa va tocar el fus malgrat la prohibició del rei?',opts:['Perquè volia desafiar el seu pare','Perquè la maledicció la va atreure màgicament sense poder evitar-ho','Perquè no sabia de la prohibició i mai havia vist cap fus','Perquè la velleta la va enganyar deliberadament'],ans:2,exp:'Aurora no sabia la causa de la prohibició i mai havia vist un fus; la curiositat natural la va portar a tocar-lo.'},
+{type:'c',q:'Qué va quedar adormit al castell a part de la princesa Aurora?',opts:['Únicament els habitants humans del castell','Tot el castell: persones, animals i fins i tot les mosques','Tot el regne fins als darrers pobles','Només els criats i els guardians de la torre'],ans:1,exp:'El text especifica que es van adormir «criats, guardians, cuiners, cavalls i fins i tot les mosques».'},
+{type:'c',q:'Per qué tots els altres prínceps van fracassar en arribar al castell però el darrer va tenir èxit?',opts:['El darrer era el més fort físicament de tots','El darrer tenia una espasa màgica especial','Les bardisses van créixer fins que va expirar el temps de la maledicció','El darrer coneixia un passatge secret'],ans:2,exp:'Implícitament, els cent anys de la maledicció havien de transcórrer per complet perquè el príncep pogués accedir.'},
+{type:'c',q:'Quin defecte humà és el veritable detonant de la tragèdia?',opts:['La superstició i la por als maleficis del rei','La gelosia entre les fades del regne','La incapacitat de gestionar el sentiment d\'exclusió i la ira desproporcionada que genera','La desobediència i la curiositat perillosa de la princesa'],ans:2,exp:'La tretzena fada reacciona a una exclusió (potser involuntària) amb una ira desproporcionada que condemna una innocent.'},
+{type:'c',q:'Per qué el rei va ordenar destruir tots els fusos si la maledicció havia estat suavitzada?',opts:['Perquè no sabia que la maledicció havia estat suavitzada','Perquè no confiava en les paraules de la dotzena fada','Perquè preferia eliminar qualsevol risc per petit que semblés','Perquè el parlament del regne li ho va exigir'],ans:2,exp:'El rei va prendre la mesura preventiva màxima possible per garantir la seguretat de la seva filla.'},
+{type:'c',q:'Quina decisió vital pren Aurora quan és gran i coneix tota la seva pròpia història?',opts:['Decideix venjar-se de la tretzena fada per tot el que li va fer','Es dedica a que ningú al seu voltant no se senti mai ignorat o exclòs','Prohibeix totes les malediccions en el nou regne','Cerca la tretzena fada per demanar-li perdó personalment'],ans:1,exp:'Aurora extreu una lliçó activa i positiva: la inclusió com a valor central de la seva forma de viure.'},
+{type:'f',t:'La tretzena fada, {0} per no haver estat {1}, va maleir la princesa.',blanks:['furiosa','convidada'],pool:['furiosa','convidada','trista','avisada','gelosa','inclosa'],exp:'La tretzena fada estava furiosa per l\'exclusió del banquet i per això va llançar la maledicció sobre Aurora.'},
+{type:'f',t:'La dotzena fada va aconseguir que Aurora, en lloc de {0}, s\'adormís durant {1} anys.',blanks:['morir','cent'],pool:['morir','cent','patir','mil','desaparèixer','cinquanta'],exp:'Gràcies a la intervenció de la dotzena fada, la mort va ser substituïda per un son de cent anys.'},
+{type:'f',t:'El rei va ordenar destruir tots els {0} del regne per intentar evitar la {1}.',blanks:['fusos','maledicció'],pool:['fusos','maledicció','telers','profecia','tisores','malastrugança'],exp:'El rei va prohibir els fusos al regne sencer per evitar que la princesa pogués punxar-se el dit.'},
+{type:'f',t:'El príncep va tallar les {0} amb l\'espasa i va despertar la princesa Aurora amb un {1}.',blanks:['bardisses','petó'],pool:['bardisses','petó','reixes','encantament','portes','abraçada'],exp:'El príncep va tallar les bardisses que cobrien el castell i va despertar Aurora amb un petó.'},
+{type:'v',q:'Totes les fades del regne van ser convidades al banquet de la princesa Aurora.',ans:false,exp:'Van ser convidades dotze fades però la tretzena, la més vella, va ser omesa per error.'},
+{type:'v',q:'La dotzena fada va eliminar completament la maledicció de la tretzena fada.',ans:false,exp:'La dotzena fada no podia desfer-la del tot: la va suavitzar canviant la mort per un son de cent anys.'},
+{type:'v',q:'La princesa Aurora va caure adormida quan tenia quinze anys.',ans:true,exp:'El text diu que la maledicció s\'havia de complir «quan tingués quinze anys», i així va succeir.'},
+{type:'v',q:'Tots els prínceps que van intentar entrar al castell van quedar atrapats entre les bardisses.',ans:false,exp:'El text diu que tots van fracassar en arribar-hi, però no que quedessin atrapats; simplement no ho van aconseguir.'}
+]},
+
+{id:13,title:'El Gat amb Botes',
+text:`<p>Un moliner vell va morir i va repartir el que tenia entre els tres fills: el gran va rebre el molí, el segon un ase, i el petit, el més jove, un gat. El fill petit es desesperava: amb un gat no podia fer farina ni transportar càrrega. Però el gat li va dir amb total seguretat: «No et neguitegis, amo. Dóna'm un sac i unes bones botes i et faré el noble més ric del país.» El noi no hi creia, però no tenia res a perdre i va accedir.</p>
+<p>El gat, ben calçat i amb el sac, va anar al bosc a caçar. Dia rere dia va portar al palau diverses peces de caça, sempre afirmant que eren regals de l'il·lustre «Marquès de Carabàs». El rei va anar coneixent el nom i la generositat d'aquest noble misteriós. Mentrestant, el gat planejava el pas decisiu: havia sabut que el rei passaria en carruatge per la riba d'un riu proper amb la seva filla.</p>
+<p>El dia escollit, el gat va ordenar al seu amo que es banyés al riu. Quan el carruatge reial va passar, el gat va cridar alarmant que el Marquès de Carabàs s'estava ofegant. El rei el va fer treure de l'aigua i li va oferir roba dels seus millors nobles. Net, ben vestit i amb maneres dignes, el fill del moliner va semblar efectivament un senyor de categoria. La princesa, que el va trobar atractiu, el va convidar a pujar al carruatge.</p>
+<p>Mentre el fill del moliner anava amb el rei, el gat corria per davant. Anava dient a tots els camperols i guàrdies que trobava que les terres eren del Marquès de Carabàs, i que si no ho deien al rei les coses els anirien molt malament. Tots van obeir. Finalment, el gat va arribar a un gran castell propietat d'un ogre poderós, l'autèntic senyor de totes aquelles terres i ramats.</p>
+<p>El gat va entrar al castell i, amb falsa admiració, va dir a l'ogre que havia sentit que podia transformar-se en qualsevol animal. L'ogre, orgullós de les seves habilitats, es va convertir en un lleó enorme que va aterrir el gat. Però el gat el va desafiar: «Transformar-se en un animal gran és fàcil... sabries fer-te tan petit com un ratolí?» L'ogre, incapaç de resistir el repte a la seva vanitat, ho va fer. El gat se'l va menjar en un instant. El rei va visitar el «castell del Marquès» i, impressionat, va donar la seva filla en matrimoni al jove. El gat, satisfet, va anar a dormir davant de la xemeneia.</p>`,
+questions:[
+{type:'c',q:'Per qué el fill petit del moliner es va sentir perjudicat per l\'herència?',opts:['Perquè el molí era molt més valuós econòmicament que els altres béns','Perquè amb un gat no podia generar cap ingrés de forma pràctica','Perquè el gat era molt vell i malaltís','Perquè els seus germans el van enganyar en el repartiment'],ans:1,exp:'Amb un molí es pot fer farina i amb un ase es pot transportar càrrega; un gat, a priori, no genera cap ingrés visible.'},
+{type:'c',q:'Per qué el gat portava presents al rei en nom d\'un «Marquès de Carabàs» inexistent?',opts:['Perquè el seu amo es deia realment Marquès','Perquè el rei no acceptava regals de persones sense títol','Per construir una reputació falsa de noble que permetés al seu amo accedir a la cort','Per enganyar el rei i robar-li les riqueses'],ans:2,exp:'Sense títol ni fortuna, el noi mai no podria accedir al rei; el gat crea una identitat falsa però convincent.'},
+{type:'c',q:'Quin mètode va usar el gat per fer que els camperols mentissin al rei sobre les terres?',opts:['Els va pagar generosament en nom del Marquès','Els va prometre terres pròpies a cadascun','Els va amenaçar amb conseqüències si no obeïen','Els va convèncer que el Marquès era un senyor just i generós'],ans:2,exp:'El gat va dir als camperols que les coses els anirien molt malament si no afirmaven davant del rei que les terres eren del Marquès.'},
+{type:'c',q:'Quin defecte de l\'ogre va explotar el gat per vèncer-lo?',opts:['La gola i la gana insaciable','La vanitat i l\'orgull per les seves habilitats màgiques','La peresa i la confiança excessiva','La ira i la impulsivitat descontrolada'],ans:1,exp:'El gat va desafiar la vanitat de l\'ogre insinuant que potser no seria capaç de fer alguna cosa, i l\'ogre va caure irremeiablement al parany.'},
+{type:'c',q:'Per qué el gat va suggerir específicament la transformació en ratolí i no en un altre animal petit?',opts:['Perquè els ratolins eren l\'animal que l\'ogre menys estimava','Perquè els ratolins simbolitzen la petitesa i la debilitat','Perquè un ratolí era exactament el que el gat podia menjar','Per burlar-se de l\'orgull de l\'ogre amb l\'animal més ridícul'],ans:2,exp:'El gat va elegir el ratolí amb precisió perquè podia menjar-se\'l; era l\'objectiu final, no un simple detall.'},
+{type:'c',q:'Si l\'ogre no s\'hagués transformat en ratolí per vanitat, com hauria acabat la situació?',opts:['El gat hauria atacat l\'ogre en forma de lleó igualment','El fill del moliner hauria perdut tot el que havia guanyat','El rei hauria enviat soldats per eliminar l\'ogre','El gat hauria buscat urgentment una altra estratègia alternativa'],ans:1,exp:'Sense eliminar l\'ogre, l\'autèntic propietari hauria reclamat les terres i el castell, desfent tot el que el gat havia construït amb tant d\'esforç.'},
+{type:'c',q:'Quin tipus d\'intel·ligència demostra principalment el gat al llarg del conte?',opts:['Intel·ligència acadèmica i teòrica','Intel·ligència social: comprensió del comportament humà i manipulació estratègica','Intel·ligència física i habilitat en el combat directe','Intel·ligència màgica innata, ja que el gat té poders sobrenaturals'],ans:1,exp:'El gat no usa força ni màgia: analitza les motivacions del rei, els camperols i l\'ogre, i les aprofita estratègicament.'},
+{type:'c',q:'Quin paper juga la confiança inicial del fill del moliner en el gat?',opts:['No importa perquè el gat hauria actuat igualment sense permís','És clau: sense donar-li el sac i les botes, el gat no hauria pogut fer res de tot el que va fer','El noi va dissenyar el pla i el gat simplement el va executar','El noi no confiava gens en el gat i el gat va actuar a les seves espatlles'],ans:1,exp:'El primer pas és donar al gat el sac i les botes; sense aquesta confiança inicial, tota la cadena d\'esdeveniments hauria estat impossible.'},
+{type:'f',t:'El gat va demanar al seu amo un {0} i unes {1} per poder executar el seu pla.',blanks:['sac','botes'],pool:['sac','botes','cistell','sabates','bossa','guants'],exp:'El gat va necessitar un sac per caçar i unes botes per presentar-se amb la distinció adequada.'},
+{type:'f',t:'El gat va dir als {0} de les terres que afirmessin al rei que tot pertanyia al {1} de Carabàs.',blanks:['camperols','Marquès'],pool:['camperols','Marquès','soldats','Duc','guàrdies','Comte'],exp:'El gat va pressionar els camperols i guàrdies perquè diguessin al rei que les terres eren del Marquès de Carabàs.'},
+{type:'f',t:'El gat va convèncer l\'ogre que es transformés en un {0} i se\'l va {1} a l\'instant.',blanks:['ratolí','menjar'],pool:['ratolí','menjar','conill','caçar','ocell','devorar'],exp:'El gat va aprofitar la vanitat de l\'ogre per fer-lo convertir en un ratolí i menjar-se\'l immediatament.'},
+{type:'f',t:'Gràcies a l\'astúcia del gat, el fill del moliner es va casar amb la {0} del rei i es va convertir en un gran {1}.',blanks:['filla','noble'],pool:['filla','noble','neboda','senyor','cosina','marquès'],exp:'El pla del gat va acabar amb el seu amo casat amb la filla del rei i reconegut com un gran noble del país.'},
+{type:'v',q:'El fill gran del moliner va rebre el gat com a part de l\'herència del pare.',ans:false,exp:'El fill gran va rebre el molí; el segon, l\'ase; i el petit, el gat.'},
+{type:'v',q:'El gat va dir la veritat al rei sobre l\'origen humil del seu amo.',ans:false,exp:'El gat va inventar el títol de Marquès de Carabàs i va construir tota una identitat falsa i convincent per al seu amo.'},
+{type:'v',q:'L\'ogre era l\'autèntic propietari legítim del castell i de les terres.',ans:true,exp:'El text diu explícitament que l\'ogre era «l\'autèntic senyor de totes aquelles terres i ramats».'},
+{type:'v',q:'L\'ogre va morir perquè el lleó en que es va transformar va atacar el gat.',ans:false,exp:'El lleó va aterrir el gat però no el va atacar; el gat el va enganyar perquè es transformés en un ratolí i llavors se\'l va menjar.'}
+]},
+
+{id:14,title:'Aladdí i la Llàntia Màgica',
+text:`<p>En una ciutat d'Orient vivia un jove despreocupat anomenat Aladdí amb la seva mare vídua. Un dia va arribar un home que es va presentar com a oncle seu i li va proposar un viatge al desert per descobrir un gran tresor. En realitat, l'home era un mag perillós que necessitava que un jove concret entrés en una cova secreta que ell no podia accedir per compte propi. Li va posar un anell al dit, dient que l'ajudaria en cas de perill, i li va advertir que no toqués res més que la llàntia vella que hi havia al fons.</p>
+<p>Dins de la cova, Aladdí va quedar meravellat: hi havia arbres plens de fruites que resultaven ser pedres precioses de tots els colors. Va omplir les butxaques sense poder evitar-ho. Quan va agafar la llàntia del fons i va caminar cap a la sortida, el mag li va exigir que li lliurés la llàntia immediatament, abans de treure'l. Aladdí va sospitar del to imperatiu i es va negar. El mag, furiós i incapaç de controlar la seva ira, va tancar l'entrada de la cova amb un encanteri i va marxar, deixant el noi atrapat a les fosques.</p>
+<p>Desesperant a la foscor, Aladdí es va fregar les mans i, sense voler, va fregar l'anell. Va aparèixer un geni que el va treure de la cova. Un cop a casa, la mare va intentar netejar la llàntia vella per vendre-la al mercat. Quan la va fregar, va aparèixer un geni molt més poderós que va dir: «Sóc l'esclau de la llàntia. Qui la posseeixi podrà ordenar-me qualsevol desig.» Aladdí va demanar primer menjar, i posteriorment riqueses amb les quals va impressionar el soldà de la ciutat.</p>
+<p>El soldà, impressionat per les riqueses d'Aladdí, li va donar la seva filla en matrimoni. Però el mag, que havia descobert on vivia Aladdí, va tornar disfressat de venedor ambulant, cridant pels carrers: «Llànties velles per llànties noves!» La princesa, ignorant el secret de la llàntia, la va bescanviar per curiositat. El mag va aconseguir la llàntia i de seguida va usar el geni per transportar el palau sencer i la princesa fins a l'Àfrica.</p>
+<p>Aladdí no es va rendir. Amb l'ajuda discreta del geni de l'anell, va viatjar fins on era la princesa. Junts van elaborar un pla: la princesa va fingir haver-se enamorat del mag i li va oferir una copa de vi amb un somnifer dissolt. Quan el mag va caure adormit, Aladdí li va prendre la llàntia i va invocar el geni poderós. El palau va tornar al seu lloc i el mag va ser castigat. Aladdí i la princesa, reconeixent que la felicitat real no venia de la màgia sinó de la confiança mútua, van decidir no tornar a usar mai més la llàntia.</p>`,
+questions:[
+{type:'c',q:'Per qué el mag necessitava Aladdí per entrar a la cova en lloc d\'entrar-hi ell mateix?',opts:['Perquè la cova era massa petita físicament per a ell','Perquè el mag no sabia on estava la cova','Perquè la cova estava protegida i només un jove específic podia accedir-hi','Perquè tenia por de les pedres precioses de l\'interior'],ans:2,exp:'El mag no podia accedir per compte propi a la cova; necessitava un jove amb unes condicions concretes per fer-ho en el seu lloc.'},
+{type:'c',q:'Quin error estratègic va cometre el mag quan Aladdí es va negar a donar-li la llàntia?',opts:['Va revelar massa aviat que era un mag perillós','Va entrar a la cova ell mateix per agafar-la i es va quedar atrapat','Va perdre el control per la ira i va tancar la cova, sacrificant la seva única oportunitat','Va donar a Aladdí l\'anell sense preveure que podria usar-lo'],ans:2,exp:'Tancant Aladdí a la cova per ira, el mag va sacrificar la seva única oportunitat d\'aconseguir la llàntia; era un acte d\'impuls, no d\'estratègia.'},
+{type:'c',q:'Com va aconseguir el mag recuperar la llàntia mentre Aladdí era al palau?',opts:['La va robar de nit mentre tothom dormia','Es va disfressa de venedor i va aprofitar que la princesa ignorava el secret de la llàntia','Va amenaçar directament la princesa per aconseguir-la','Va subornar un criat del palau perquè li la robés'],ans:1,exp:'El mag es va disfressar de venedor ambulant i va proposar bescanviar llànties; la princesa, ignorant el secret, va accedir.'},
+{type:'c',q:'Quin error va cometre la princesa i per qué no se la pot culpar del tot?',opts:['Va confiar en un estrany malvat sent-ne plenament conscient','Va bescanviar la llàntia sense saber que era màgica ni que el mag la cercava','Va revelar a tothom el secret de la llàntia per imprudència','Va sortir del palau sola contra la prohibició del soldà'],ans:1,exp:'La princesa va actuar de bona fe: no sabia que la llàntia vella era l\'objecte més valuós del palau.'},
+{type:'c',q:'Quin pla van dissenyar Aladdí i la princesa junts per recuperar la llàntia?',opts:['Van enviar soldats fidels a atacar el mag per sorpresa','Van usar el geni de l\'anell per robar-la mentre el mag dormia','La princesa va fingir amor pel mag i li va donar vi amb somnifer mentre Aladdí esperava el moment','Van demanar ajuda al soldà i al seu exèrcit'],ans:2,exp:'La princesa va usar la seducció fingida i el somnifer per adormir el mag; Aladdí va recuperar la llàntia mentre dormia.'},
+{type:'c',q:'Qué va revelar el comportament del mag a la cova sobre el seu caràcter?',opts:['Que era calculador i sempre actuava amb frigor','Que era impulsiu: va prioritzar el càstig sobre el seu objectiu real','Que sabia que Aladdí era massa llest per ser enganyat fàcilment','Que volia eliminar Aladdí perquè coneixia massa secrets seus'],ans:1,exp:'Tancar Aladdí va ser una decisió impulsiva i contraproduent: el mag va perdre la llàntia per no poder controlar la seva ira.'},
+{type:'c',q:'Qué simbolitza la decisió final d\'Aladdí i la princesa de no tornar a usar mai més la llàntia?',opts:['Que la llàntia s\'havia quedat sense poder màgic','Que Aladdí la va donar al soldà com a present de pau','Que troben la felicitat en la relació real i no en el poder o la riquesa màgica','Que van destruir la llàntia per evitar nous perills futurs'],ans:2,exp:'El text diu que reconeixien que la felicitat real «no venia de la màgia sinó de la confiança mútua».'},
+{type:'c',q:'Per qué la decisió d\'Aladdí de no donar la llàntia al mag en sortir de la cova va resultar tan decisiva?',opts:['Perquè si l\'hagués donada, el mag l\'hauria recompensat generosament','Perquè si l\'hagués donada, el mag hauria tingut el poder i probablement hauria deixat Aladdí atrapat igualment','Perquè la llàntia no tenia cap valor sense l\'anell complementari','Perquè el mag no sabia que hi havia un geni a la llàntia fins que Aladdí la va fregar'],ans:1,exp:'El mag necessitava Aladdí per entrar, però un cop hagués tingut la llàntia, no tenia cap motiu per treure\'l de la cova i complir cap promesa.'},
+{type:'f',t:'El mag va dir a Aladdí que l\'anell l\'ajudaria en cas de {0}, però en realitat formava part del seu propi {1}.',blanks:['perill','pla'],pool:['perill','pla','necessitat','engany','dificultat','estratagema'],exp:'L\'anell es presentà com a protecció per a Aladdí, però en realitat era part del pla del mag per accedir a la cova.'},
+{type:'f',t:'La mare d\'Aladdí va fregar la {0} per netejar-la i va invocar accidentalment un {1} poderós.',blanks:['llàntia','geni'],pool:['llàntia','geni','pedra','mag','copa','esperit'],exp:'Quan la mare va intentar netejar la llàntia per vendre-la, va aparèixer el poderós geni de la llàntia.'},
+{type:'f',t:'La princesa va donar al mag una copa de vi amb un {0} perquè quedés {1}.',blanks:['somnifer','adormit'],pool:['somnifer','adormit','verí','mort','elixir','inconscient'],exp:'La princesa va usar un somnifer dissolt en el vi per adormir el mag, permetent a Aladdí recuperar la llàntia.'},
+{type:'f',t:'Al final, Aladdí i la princesa van decidir no tornar a usar la {0}, ja que la {1} real no en depenia.',blanks:['llàntia','felicitat'],pool:['llàntia','felicitat','màgia','riquesa','pedra','llibertat'],exp:'Van reconèixer que la felicitat real no venia de la màgia sinó de la confiança mútua entre ells.'},
+{type:'v',q:'El mag era realment l\'oncle d\'Aladdí.',ans:false,exp:'El mag es va fer passar per oncle d\'Aladdí per guanyar-se la confiança del noi, però era un impostor perillós.'},
+{type:'v',q:'Aladdí va trobar pedres precioses en forma de fruites als arbres de la cova.',ans:true,exp:'El text diu que «hi havia arbres plens de fruites que resultaven ser pedres precioses de tots els colors».'},
+{type:'v',q:'La princesa sabia que la llàntia era màgica quan la va bescanviar pel mag.',ans:false,exp:'La princesa ignorava completament el secret de la llàntia; per això la va bescanviar de bona fe.'},
+{type:'v',q:'Al final del conte, Aladdí i la princesa van decidir no tornar a usar mai més la llàntia màgica.',ans:true,exp:'El text diu explícitament que «van decidir no tornar a usar mai més la llàntia», valorant la confiança mútua per sobre de la màgia.'}
+]},
+
+{id:15,title:'El Tigre i el Gripau',text:`<p>Hi havia una vegada, en un bosc de Corea, un tigre molt orgullós que es pensava que era l'animal més fort i temut de tota la contrada. Un dia, passejant per la vora d'un estany, va trobar un gripau que dormia tranquil·lament sobre una pedra.</p>
+<p>—Jo soc el rei d'aquest bosc —va rugir el tigre—. Tots els animals em temen i fugen quan em veuen!</p>
+<p>El gripau va obrir un ull amb calma i va dir:</p>
+<p>—Potser ho ets aquí. Però al meu país, jo soc el que menja tigres per esmorzar.</p>
+<p>El tigre es va quedar parat. No podia creure el que sentia.</p>
+<p>—Tigres? Tu menges tigres? —va dir tot tremolant.</p>
+<p>—Cada matí —va respondre el gripau amb veu tranquil·la—. Avui me n'he menjat tres. Podria menjar-ne un quart si tinc gana.</p>
+<p>En aquell moment, una rata de camp va passar corrent al costat del tigre. El tigre, que ja estava molt nerviós, va confondre-la amb un altre gripau enorme que venia a atacar-lo. Presa del pànic, va sortir corrents bosc endins i no va parar fins que va arribar a un altre país.</p>
+<p>Des d'aquell dia, el gripau va poder dormir tranquil sobre la seva pedra. I el tigre mai més no va tornar a presumir de ser el més temut del bosc.</p>`,
+questions:[
+{type:'c',q:'On dormia el gripau quan el tigre el va trobar?',opts:['En un arbre alt','Sobre una pedra a la vora d\'un estany','A l\'interior d\'una cova','Enmig d\'un camp de blat'],ans:1,exp:'El text diu que el gripau «dormia tranquil·lament sobre una pedra» a la vora d\'un estany.'},
+{type:'c',q:'De qué presumia el tigre?',opts:['De ser el més ràpid del bosc','De ser l\'animal més fort i temut','De tenir la cua més llarga','D\'haver viatjat per tot el món'],ans:1,exp:'El tigre es pensava que era «l\'animal més fort i temut de tota la contrada».'},
+{type:'c',q:'Qué va dir el gripau que menjava cada matí?',opts:['Rates i insectes','Herba i bolets','Tigres','Peixos i granotes'],ans:2,exp:'El gripau va dir: «jo soc el que menja tigres per esmorzar».'},
+{type:'c',q:'Per qué va fugir el tigre del bosc?',opts:['Perquè va sentir un rugit aterridor','Perquè tenia gana i no trobava menjar','Perquè va confondre una rata amb un altre gripau enorme','Perquè va veure un caçador amb una trampa'],ans:2,exp:'El tigre «va confondre-la amb un altre gripau enorme» i va fugir presa del pànic.'},
+{type:'c',q:'Quin missatge principal transmet aquest conte?',opts:['Els animals grans sempre vencen els petits','La intel·ligència i l\'astúcia poden superar la força bruta','Cal tenir molta cura dels gripaus al bosc','Els tigres sempre acaben guanyant les batalles'],ans:1,exp:'El conte ens ensenya que la intel·ligència del gripau pot superar la força bruta del tigre.'},
+{type:'v',q:'El tigre era un animal humil que no presumia mai.',ans:false,exp:'El tigre era «molt orgullós» i presumia de ser el més temut del bosc.'},
+{type:'v',q:'El gripau va usar l\'engany per espantar el tigre.',ans:true,exp:'El gripau va mentir dient que menjava tigres per esmorzar, fent fugir el tigre sense cap lluita.'},
+{type:'v',q:'La rata de camp va atacar el tigre directament.',ans:false,exp:'La rata simplement va passar corrents; el tigre la va confondre amb un gripau gegant per por.'},
+{type:'f',t:'El tigre pensava que era el {0} del bosc. El gripau va dir que menjava {1} per esmorzar.',blanks:['rei','tigres'],pool:['rei','tigres','esclau','gripaus','guardià','amos'],exp:'El tigre es creia el rei del bosc; el gripau va dir que menjava tigres per esmorzar per espantar-lo.'},
+{type:'f',t:'Presa del {0}, el tigre va sortir corrents bosc endins i va deixar el gripau {1}.',blanks:['pànic','tranquil'],pool:['pànic','tranquil','plaer','nerviós','son','content'],exp:'El text diu que el tigre va fugir «presa del pànic» i que el gripau va poder dormir «tranquil» sobre la pedra.'}
+]},
+
+{id:16,title:'Camí de l\'escola (poema)',text:`<p><em>Poema de Lola Casas</em></p>
+<p>Cada matí em desperto<br>i miro el cel a través del vidre:<br>si el sol ja surt i canta el vent<br>ja és hora de córrer al carrer.</p>
+<p>Agafo la motxilla vermella,<br>el berenar dins un bossot blau,<br>saludo la veïna de l'escala<br>i baixo les escales de dos en dos.</p>
+<p>Al carrer, les fulles gronxen,<br>els ocells fan la seva cançó,<br>i jo, amb passos de gegant,<br>arribo a l'escola amb el cor content.</p>
+<p>La mestra ens espera somrient,<br>obrim els llibres a la primera pàgina,<br>i el dia s'omple de lletres i números,<br>de jocs, de preguntes i d'imaginació.</p>`,
+questions:[
+{type:'c',q:'Quantes estrofes té el poema?',opts:['Dues','Tres','Quatre','Cinc'],ans:2,exp:'El poema té quatre estrofes de quatre versos cadascuna.'},
+{type:'c',q:'Com és la motxilla de la narradora?',opts:['Blava','Verda','Vermella','Groga'],ans:2,exp:'El poema diu: «Agafo la motxilla vermella».'},
+{type:'c',q:'Qué hi ha dins el bossot blau?',opts:['Els llibres','El berenar','La botella d\'aigua','El material escolar'],ans:1,exp:'El poema diu: «el berenar dins un bossot blau».'},
+{type:'c',q:'Quin estat d\'ànim transmet el poema?',opts:['Tristesa i avorriment','Por i nerviosisme','Alegria i entusiasme','Cansament i son'],ans:2,exp:'La narradora arriba «amb el cor content», i tot el poema és ple d\'energia i alegria.'},
+{type:'c',q:'Quants versos té cada estrofa?',opts:['Tres','Quatre','Cinc','Sis'],ans:1,exp:'Cada una de les quatre estrofes té exactament quatre versos.'},
+{type:'c',q:'Com baixa les escales la narradora?',opts:['Amb molta calma','De dos en dos','Saltant d\'un en un','Lliscant per la barana'],ans:1,exp:'El poema diu: «baixo les escales de dos en dos».'},
+{type:'v',q:'La narradora mira el cel cada matí per decidir si sortir.',ans:true,exp:'El poema comença: «Cada matí em desperto / i miro el cel a través del vidre».'},
+{type:'v',q:'Al carrer, la narradora sent els ocells cantant.',ans:true,exp:'El poema diu: «els ocells fan la seva cançó».'},
+{type:'v',q:'La mestra esperava els alumnes plorant.',ans:false,exp:'El poema diu que «la mestra ens espera somrient», no plorant.'},
+{type:'v',q:'El poema parla d\'una tarda de cap de setmana.',ans:false,exp:'El poema descriu un matí de dia d\'escola, no un cap de setmana.'},
+{type:'f',t:'La narradora mira el {0} a través del vidre i baixa les escales de {1} en dos.',blanks:['cel','dos'],pool:['cel','dos','sol','tres','mar','quatre'],exp:'El poema diu «miro el cel a través del vidre» i «baixo les escales de dos en dos».'}
+]},
+
+{id:17,title:'Companys i amics',text:`<p>La classe de 4t A té vint-i-quatre alumnes, però avui en Pau ens presenta cinc amics molt especials.</p>
+<p>La Marta és alta i morena, amb els ulls grans i bruns. Li agrada molt llegir i cada setmana porta un llibre nou a l'escola. És molt estudiosa i sempre ajuda els companys quan no entenen alguna cosa.</p>
+<p>En Joan és el més alt de la classe. Porta ulleres i sempre somriu. La seva passió és el futbol; juga cada tarda al camp del barri amb els seus amics.</p>
+<p>La Sofia té els cabells rossos i llargs. Li agrada dibuixar i pintar; a casa seva té una paret plena de quadres que ha fet ella mateixa. Somnia de ser artista de gran.</p>
+<p>En Marc és baixet i molt ràpid. En l'hora d'esbarjo sempre organitza jocs per a tothom. És molt sociable i mai no li falten amics.</p>
+<p>La Neus té els ulls blaus i parla molt de pressa. Li agraden els animals i té dos gats i un conill a casa. Voldria ser veterinària quan sigui gran.</p>
+<p>Tots cinc són molt diferents, però es porten molt bé. A l'escola aprenen junts i fora de l'escola es troben als parcs i a les festes del barri.</p>`,
+questions:[
+{type:'c',q:'Quants alumnes té la classe de 4t A?',opts:['Vint','Vint-i-dos','Vint-i-quatre','Trenta'],ans:2,exp:'El text diu: «La classe de 4t A té vint-i-quatre alumnes».'},
+{type:'c',q:'Qué li agrada fer a la Marta?',opts:['Jugar a futbol','Dibuixar i pintar','Llegir','Cuidar animals'],ans:2,exp:'El text diu que «li agrada molt llegir i cada setmana porta un llibre nou a l\'escola».'},
+{type:'c',q:'Qui organitza els jocs durant l\'esbarjo?',opts:['La Marta','En Joan','La Sofia','En Marc'],ans:3,exp:'El text diu: «en l\'hora d\'esbarjo, en Marc sempre organitza jocs per a tothom».'},
+{type:'c',q:'Qué vol ser la Neus de gran?',opts:['Mestra','Artista','Veterinària','Futbolista'],ans:2,exp:'El text diu: «Voldria ser veterinària quan sigui gran».'},
+{type:'c',q:'Quants animals té la Neus a casa?',opts:['Un gat i un conill','Dos gats i un conill','Un gat i dos conills','Tres gats'],ans:1,exp:'El text diu: «té dos gats i un conill a casa».'},
+{type:'v',q:'En Joan porta ulleres.',ans:true,exp:'El text diu explícitament: «porta ulleres i sempre somriu».'},
+{type:'v',q:'La Sofia vol ser veterinària de gran.',ans:false,exp:'La Sofia «somnia de ser artista de gran». La que vol ser veterinària és la Neus.'},
+{type:'v',q:'En Marc és el més alt de la classe.',ans:false,exp:'«En Joan és el més alt de la classe». En Marc és descrit com a «baixet».'},
+{type:'f',t:'La Sofia li agrada {0} i pintar. Somnia de ser {1} de gran.',blanks:['dibuixar','artista'],pool:['dibuixar','artista','llegir','veterinària','escriure','mestra'],exp:'El text diu: «li agrada dibuixar i pintar» i que «somnia de ser artista de gran».'},
+{type:'f',t:'En Joan juga a {0} cada tarda al camp del {1}.',blanks:['futbol','barri'],pool:['futbol','barri','bàsquet','parc','tenis','carrer'],exp:'La passió d\'en Joan és el futbol i juga «al camp del barri».'}
+]},
+
+{id:18,title:'Alerta amb la Sequera',text:`<p><strong>ALERTA AMB LA SEQUERA</strong></p>
+<p>Les reserves d'aigua als embassaments de Catalunya han baixat fins al 45% de la seva capacitat. Els experts adverteixen que, si no plou en les properes setmanes, moltes zones podran patir restriccions en l'ús de l'aigua.</p>
+<p>La sequera és la manca d'aigua a causa de poca pluja durant un llarg període de temps. Afecta els camps de conreu, els rius i els llacs, i pot posar en perill els animals i les plantes.</p>
+<p>L'Agència Catalana de l'Aigua ha demanat als ciutadans que facin un ús responsable de l'aigua: tancar l'aixeta mentre et rentes les dents, dutxar-te en lloc de banyar-te, i regar les plantes a la nit per evitar l'evaporació.</p>
+<p>Els agricultors són els primers afectats. Sense prou aigua, les collites de blat, tomàquets i fruita poden perdre's. Alguns pagesos ja han hagut d'abandonar els seus camps.</p>
+<p>Tots podem ajudar: si estalviem un litre d'aigua al dia, entre tots podem fer una gran diferència per al futur del planeta.</p>`,
+questions:[
+{type:'c',q:'Fins a quin percentatge han baixat les reserves d\'aigua als embassaments?',opts:['Al 25%','Al 35%','Al 45%','Al 60%'],ans:2,exp:'El text diu: «han baixat fins al 45% de la seva capacitat».'},
+{type:'c',q:'Qué és la sequera?',opts:['Un tipus de pluja intensa','La manca d\'aigua per la poca pluja','Una inundació dels rius','Una tempesta de vent fort'],ans:1,exp:'El text defineix la sequera com «la manca d\'aigua a causa de poca pluja durant un llarg període de temps».'},
+{type:'c',q:'Quina mesura proposa l\'Agència per estalviar aigua?',opts:['Deixar sempre l\'aixeta oberta','Regar les plantes al migdia','Tancar l\'aixeta mentre et rentes les dents','Banyar-se cada dia en lloc de dutxar-se'],ans:2,exp:'El text proposa «tancar l\'aixeta mentre et rentes les dents» com a mesura d\'estalvi.'},
+{type:'c',q:'Qui és el primer afectat per la sequera?',opts:['Els estudiants','Els pescadors','Els agricultors','Els metges'],ans:2,exp:'El text diu: «els agricultors són els primers afectats».'},
+{type:'c',q:'Per qué cal regar les plantes a la nit?',opts:['Perquè de nit les plantes creixen més','Per evitar l\'evaporació','Perquè de dia no es pot fer','Per estalviar electricitat'],ans:1,exp:'El text diu «regar les plantes a la nit per evitar l\'evaporació».'},
+{type:'v',q:'La sequera pot posar en perill els animals i les plantes.',ans:true,exp:'El text diu: «pot posar en perill els animals i les plantes».'},
+{type:'v',q:'L\'article recomana banyar-se en lloc de dutxar-se per estalviar.',ans:false,exp:'El text recomana el contrari: «dutxar-te en lloc de banyar-te».'},
+{type:'v',q:'Alguns pagesos han hagut d\'abandonar els seus camps per la sequera.',ans:true,exp:'El text diu: «alguns pagesos ja han hagut d\'abandonar els seus camps».'},
+{type:'f',t:'Les reserves d\'aigua han baixat per la {0}. Els experts demanen un ús {1} de l\'aigua.',blanks:['sequera','responsable'],pool:['sequera','responsable','inundació','excessiu','tempesta','moderat'],exp:'La sequera ha reduït les reserves; l\'Agència demana un ús responsable per afrontar la crisi.'},
+{type:'f',t:'Sense prou aigua, les {0} de blat i fruita es perden. Estalviant un {1} al dia tots podem ajudar.',blanks:['collites','litre'],pool:['collites','litre','plantes','got','reserves','recipient'],exp:'La manca d\'aigua afecta les collites i cadascú pot contribuir estalviant un litre d\'aigua al dia.'}
+]},
+
+{id:19,title:'Receptes del món',text:`<p><strong>RECEPTES DEL MÓN</strong></p>
+<p>Avui et presentem tres receptes de llocs molt diferents del món. Cuina-les amb l'ajuda d'un adult!</p>
+<p><strong>PURÉ DE VERDURES (Europa)</strong><br>Ingredients: 2 pastanagues, 1 porro, 2 patates, 1 ceba, sal i oli d'oliva.<br>Preparació: Pela i talla les verdures a trossos. Posa-les en una olla amb aigua i bull-les durant 20 minuts. Quan siguin toves, tritura-les amb la batedora fins obtenir un puré cremós. Afegeix sal i un raig d'oli. Serveix calent.</p>
+<p><strong>PLÀTAN FREGIT (Àfrica i Amèrica Llatina)</strong><br>Ingredients: 2 plàtans no massa madurs, oli per fregir, sal.<br>Preparació: Pela els plàtans i talla'ls en rodanxes. Escalfa l'oli en una paella. Fregeix les rodanxes fins que siguin daurades. Treu-les i posa-les en paper absorbent. Espolsa una mica de sal per sobre. Serveix calent.</p>
+<p><strong>CHOCLO AMB MANTEQUILLA (Amèrica del Sud)</strong><br>Ingredients: 2 panotxes de blat de moro, mantequilla, sal.<br>Preparació: Pela les panotxes i treu els filaments. Bull-les en una olla amb aigua durant 15 minuts. Treu-les i unta-les amb mantequilla. Espolsa sal per sobre. Menja-les ben calentes.</p>`,
+questions:[
+{type:'c',q:'De quina part del món és el Puré de Verdures?',opts:['Àfrica','Amèrica del Sud','Àsia','Europa'],ans:3,exp:'El text indica entre parèntesis que el Puré de Verdures és una recepta d\'Europa.'},
+{type:'c',q:'Quants minuts cal bullir les verdures per al puré?',opts:['10 minuts','15 minuts','20 minuts','30 minuts'],ans:2,exp:'La recepta diu: «bull-les durant 20 minuts».'},
+{type:'c',q:'Com es talla el plàtan per a la recepta?',opts:['En trossos irregulars','En làmines fines','En rodanxes','Sencer'],ans:2,exp:'La recepta diu: «Pela els plàtans i talla\'ls en rodanxes».'},
+{type:'c',q:'Qué s\'afegeix al choclo un cop bullit?',opts:['Oli i sal','Mantequilla i sal','Sucre i canyella','Formatge ratllat'],ans:1,exp:'La recepta diu: «Unta-les amb mantequilla. Espolsa sal per sobre».'},
+{type:'c',q:'Quants minuts cal bullir el choclo?',opts:['5 minuts','10 minuts','15 minuts','25 minuts'],ans:2,exp:'La recepta diu: «Bull-les en una olla amb aigua durant 15 minuts».'},
+{type:'v',q:'El plàtan fregit és una recepta típica d\'Europa.',ans:false,exp:'El plàtan fregit és d\'Àfrica i Amèrica Llatina, no d\'Europa.'},
+{type:'v',q:'Per fer el puré de verdures cal triturar-les amb la batedora.',ans:true,exp:'La recepta diu: «tritura-les amb la batedora fins obtenir un puré cremós».'},
+{type:'v',q:'El choclo és blat de moro.',ans:true,exp:'El text parla de «panotxes de blat de moro»; «choclo» és el nom que reben a Amèrica del Sud.'},
+{type:'f',t:'Per fer el plàtan fregit cal escalfar {0} en una paella i fregir les {1} fins que siguin daurades.',blanks:['oli','rodanxes'],pool:['oli','rodanxes','mantequilla','trossos','sucre','llesques'],exp:'La recepta diu: «Escalfa l\'oli en una paella. Fregeix les rodanxes fins que siguin daurades».'},
+{type:'f',t:'El puré s\'obté triturant les verdures amb la {0} fins obtenir una textura {1}.',blanks:['batedora','cremosa'],pool:['batedora','cremosa','forquilla','líquida','ganivet','espessa'],exp:'La recepta diu: «tritura-les amb la batedora fins obtenir un puré cremós».'}
+]}
+];
+
+// ── LEVELS & ACHIEVEMENTS ─────────────────────────────────────────────────────
+const LEVELS=[
+  {min:0,name:'Lector Novell'},
+  {min:150,name:'Lector Curiós'},
+  {min:400,name:'Lector Hàbil'},
+  {min:800,name:'Lector Expert'},
+  {min:1400,name:'Gran Lector'}
+];
+
+const ACHS=[
+  {id:'first',sym:'I',name:'Primer Pas',desc:'Completa el teu primer conte'},
+  {id:'perfect',sym:'★',name:'Sense Errors',desc:'Aconsegueix 10/10 en un conte'},
+  {id:'three',sym:'III',name:'En Ratxa',desc:'Completa 3 contes'},
+  {id:'half',sym:'V',name:'A Meitats',desc:'Completa 5 contes'},
+  {id:'all',sym:'X',name:'Tots els Contes',desc:'Completa tots els textos'},
+  {id:'perfect3',sym:'★★★',name:'Impecable',desc:'Aconsegueix 10/10 tres vegades'}
+];
+
+// ── STATE HELPERS ──────────────────────────────────────────────────────────────
+const K={xp:'cl_xp',achs:'cl_achs',done:'cl_done',order:'cl_order',idx:'cl_idx'};
+const gXP=()=>parseInt(localStorage.getItem(K.xp)||'0');
+const gDone=()=>JSON.parse(localStorage.getItem(K.done)||'{}');
+const gAchs=()=>JSON.parse(localStorage.getItem(K.achs)||'[]');
+const gIdx=()=>parseInt(localStorage.getItem(K.idx)||'0');
+
+function gOrder(){
+  let o=JSON.parse(localStorage.getItem(K.order)||'null');
+  if(!o){o=shuffle(STORIES.map((_,i)=>i));localStorage.setItem(K.order,JSON.stringify(o));}
+  return o;
+}
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function getLvl(xp){
+  let l=LEVELS[0];
+  for(const x of LEVELS)if(xp>=x.min)l=x;
+  return l;
+}
+
+function getNextLvl(xp){
+  for(const x of LEVELS)if(xp<x.min)return x;
+  return null;
+}
+
+function advanceOrder(){
+  const order=gOrder(), idx=gIdx()+1;
+  if(idx>=order.length){
+    localStorage.setItem(K.order,JSON.stringify(shuffle(STORIES.map((_,i)=>i))));
+    localStorage.setItem(K.idx,'0');
+  } else {
+    localStorage.setItem(K.idx,String(idx));
+  }
+}
+
+function saveResult(storyId, score){
+  const done=gDone();
+  const firstTime=!done[storyId];
+  done[storyId]={score,total:sess.qs.length,date:new Date().toLocaleDateString('ca-ES')};
+  localStorage.setItem(K.done,JSON.stringify(done));
+  return firstTime;
+}
+
+function awardXP(n){
+  const xp=gXP()+n;
+  localStorage.setItem(K.xp,String(xp));
+  return xp;
+}
+
+function checkAchs(score, done){
+  const earned=gAchs();
+  const newA=[];
+  const dc=Object.keys(done).length;
+  const maxScore=sess.qs.length;
+  const perf=Object.values(done).filter(d=>d.score===d.total).length;
+  const tryE=(id,cond)=>{if(!earned.includes(id)&&cond){earned.push(id);newA.push(id);}};
+  tryE('first',dc>=1);
+  tryE('perfect',score===maxScore);
+  tryE('three',dc>=3);
+  tryE('half',dc>=5);
+  tryE('all',dc>=STORIES.length);
+  tryE('perfect3',perf>=3);
+  localStorage.setItem(K.achs,JSON.stringify(earned));
+  return newA;
+}
+
+// ── SESSION ───────────────────────────────────────────────────────────────────
+let sess={storyId:null,qs:[],answers:{},fillState:{}};
+let clStatsVisible=false;
+let clAchsVisible=false;
+
+function pickQuestions(story){
+  return shuffle(story.questions).slice(0,10);
+}
+
+function initFillState(qs){
+  const fs={};
+  qs.forEach((q,qi)=>{
+    if(q.type==='f') fs[qi]={placed:new Array(q.blanks.length).fill(null),sel:null};
+  });
+  return fs;
+}
+
+// ── RENDER HELPERS ─────────────────────────────────────────────────────────────
+const root=document.getElementById('root');
+
+function xpBar(xp){
+  const l=getLvl(xp), nl=getNextLvl(xp);
+  const base=l.min, top=nl?nl.min:xp+1;
+  const pct=Math.min(100,Math.round((xp-base)/(top-base)*100));
+  return `<div class="xp-block">
+    <div class="xp-top"><span class="level-name">${l.name}</span><span class="xp-nums">${xp} XP${nl?` · fins ${nl.name}: ${nl.min-xp} XP`:' · Nivell màxim'}</span></div>
+    <div class="xp-track"><div class="xp-fill" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome(){
+  const xp=gXP(), order=gOrder(), idx=gIdx(), done=gDone(), earned=gAchs();
+  const nextId=STORIES[order[idx%order.length]].id;
+  const doneCount=Object.keys(done).length;
+  const totalXP=STORIES.reduce((s,_)=>s,0);
+
+  let rows='';
+  STORIES.forEach((s,i)=>{
+    const d=done[s.id];
+    const isNext=s.id===nextId&&!d;
+    rows+=`<div class="srow${isNext?' next-up':''}" onclick="startStory(${s.id})">
+      <span class="srow-num">${i+1}</span>
+      <span class="srow-title">${s.title}</span>
+      <span class="srow-right${d?' done':isNext?' next':''}">${d?`${d.score}/${d.total||13}`:isNext?'Pròxim':'—'}</span>
+    </div>`;
+  });
+
+  let achRows='';
+  ACHS.forEach(a=>{
+    const e=earned.includes(a.id);
+    achRows+=`<div class="ach-row${e?' earned':' locked'}">
+      <div class="ach-sym">${a.sym}</div>
+      <div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
+      ${e?'<span style="margin-left:auto;font-size:.75rem;font-weight:700;color:#92400e">Obtingut</span>':''}
+    </div>`;
+  });
+
+  const statsHtml=clStatsVisible?`<div class="stats-row">
+    <div class="stat"><div class="stat-num">${doneCount}</div><div class="stat-lbl">Contes</div></div>
+    <div class="stat"><div class="stat-num">${xp}</div><div class="stat-lbl">XP Total</div></div>
+    <div class="stat"><div class="stat-num">${earned.length}</div><div class="stat-lbl">Assoliments</div></div>
+  </div><button class="reset-lnk" onclick="if(confirm('Esborrar tot el progrés?'))resetAll()">Reiniciar progrés</button>`:'';
+
+  const achsHtml=clAchsVisible?`<div class="ach-grid">${achRows}</div>`:'';
+
+  root.innerHTML=`
+    <div class="hdr"><h1>Comprensió Lectora</h1></div>
+    ${xpBar(xp)}
+    <div class="gam-tabs">
+      <button class="gam-tab${clStatsVisible?' on':''}" onclick="toggleClStats()">Estadístiques</button>
+      <button class="gam-tab${clAchsVisible?' on':''}" onclick="toggleClAchs()">Assoliments</button>
+    </div>
+    ${statsHtml}
+    ${achsHtml}
+    <div class="slist">${rows}</div>`;
+}
+
+window.toggleClStats=function(){clStatsVisible=!clStatsVisible;renderHome();};
+window.toggleClAchs=function(){clAchsVisible=!clAchsVisible;renderHome()};
+
+// ── STORY READER ───────────────────────────────────────────────────────────────
+window.startStory=function(id){
+  const story=STORIES.find(s=>s.id===id);
+  sess={storyId:id,qs:[],answers:{},fillState:{}};
+  root.innerHTML=`
+    <button class="back" onclick="renderHome()">← Tornar</button>
+    <div class="story-meta">
+      <h2>${story.title}</h2>
+      <p class="muted mt2">Llegeix el text amb atenció abans de respondre.</p>
+    </div>
+    <div class="story-text">${story.text}</div>
+    <div class="row-btns">
+      <button class="btn btn-dark" onclick="startQuiz(${id})">Respondre les preguntes</button>
+    </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+// ── QUIZ ───────────────────────────────────────────────────────────────────────
+window.startQuiz=function(id){
+  const story=STORIES.find(s=>s.id===id);
+  sess.qs=pickQuestions(story);
+  sess.answers={};
+  sess.fillState=initFillState(sess.qs);
+  renderQuiz();
+};
+
+function renderQuiz(){
+  const story=STORIES.find(s=>s.id===sess.storyId);
+  const dots=sess.qs.map((_,i)=>`<div class="qdot${sess.answers[i]!==undefined||isFilledCorrectly(i)?'answered':''}" id="dot${i}"></div>`).join('');
+
+  let qhtml='';
+  sess.qs.forEach((q,qi)=>{
+    if(q.type==='c'){
+      qhtml+=buildChoiceQ(q,qi);
+    } else if(q.type==='v'){
+      qhtml+=buildTFQ(q,qi);
+    } else {
+      qhtml+=buildFillQ(q,qi);
+    }
+  });
+
+  root.innerHTML=`
+    <button class="back" onclick="startStory(${sess.storyId})">← Tornar al text</button>
+    <h2 style="margin-bottom:14px">${story.title}</h2>
+    <div class="qdots">${dots}</div>
+    ${qhtml}
+    <div class="row-btns mt4">
+      <button class="btn btn-dark" onclick="checkAnswers()">Comprova les respostes</button>
+    </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildChoiceQ(q,qi){
+  return `<div class="qcard" id="qc${qi}">
+    <div class="q-top">Pregunta ${qi+1} · Tria la millor resposta</div>
+    <div class="q-stem">${q.q}</div>
+    ${q.opts.map((o,oi)=>`
+      <div class="opt${sess.answers[qi]===oi?' on':''}" id="opt-${qi}-${oi}" onclick="pickC(${qi},${oi})">
+        <div class="opt-dot"></div><span>${o}</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+function buildTFQ(q,qi){
+  const sel=sess.answers[qi];
+  return `<div class="qcard" id="qtf${qi}">
+    <div class="q-top">Pregunta ${qi+1} · Verdader o Fals</div>
+    <div class="q-stem">${q.q}</div>
+    <div class="tf-row">
+      <div class="tf-btn${sel===true?' on':''}" id="tf-${qi}-true" onclick="pickTF(${qi},true)">Verdader</div>
+      <div class="tf-btn${sel===false?' on':''}" id="tf-${qi}-false" onclick="pickTF(${qi},false)">Fals</div>
+    </div>
+  </div>`;
+}
+
+window.pickTF=function(qi,val){
+  sess.answers[qi]=val;
+  [true,false].forEach(v=>{
+    const el=document.getElementById(`tf-${qi}-${v}`);
+    if(el) el.className='tf-btn'+(v===val?' on':'');
+  });
+  updateDots();
+};
+
+function buildFillQ(q,qi){
+  const fs=sess.fillState[qi];
+  const sentence=buildFillSentence(q,qi,fs);
+  const poolHtml=buildPool(q,qi,fs);
+  return `<div class="qcard fill-card" id="qf${qi}">
+    <div class="q-top">Pregunta ${qi+1} · Omple els buits</div>
+    <div id="fill-inner-${qi}">
+      <div class="fill-sent">${sentence}</div>
+      <div class="label mt3" style="margin-bottom:8px">Paraules disponibles</div>
+      <div class="word-pool">${poolHtml}</div>
+    </div>
+  </div>`;
+}
+
+function buildFillSentence(q,qi,fs){
+  return q.t.replace(/\{(\d+)\}/g,(match,bi)=>{
+    const word=fs.placed[parseInt(bi)];
+    return `<span class="blank${word?'':' empty'}" onclick="blankClick(${qi},${bi})">${word||''}</span>`;
+  });
+}
+
+function buildPool(q,qi,fs){
+  const usedWords=fs.placed.filter(w=>w!==null);
+  return shuffle([...q.pool]).map(w=>{
+    const used=usedWords.includes(w);
+    const picked=fs.sel===w;
+    return `<span class="chip${used?' used':picked?' picked':''}" onclick="chipClick(${qi},'${w}')">${w}</span>`;
+  }).join('');
+}
+
+function isFilledCorrectly(qi){
+  const q=sess.qs[qi];
+  if(q.type!=='f')return false;
+  const fs=sess.fillState[qi];
+  return fs.placed.every((w,i)=>w===q.blanks[i]);
+}
+
+function updateFillInner(qi){
+  const el=document.getElementById('fill-inner-'+qi);
+  if(!el)return;
+  const q=sess.qs[qi];
+  const fs=sess.fillState[qi];
+  el.innerHTML=`<div class="fill-sent">${buildFillSentence(q,qi,fs)}</div>
+    <div class="label mt3" style="margin-bottom:8px">Paraules disponibles</div>
+    <div class="word-pool">${buildPool(q,qi,fs)}</div>`;
+  updateDots();
+}
+
+function updateDots(){
+  sess.qs.forEach((_,i)=>{
+    const el=document.getElementById('dot'+i);
+    if(el) el.className='qdot'+(sess.answers[i]!==undefined||isFilledCorrectly(i)?' answered':'');
+  });
+}
+
+window.pickC=function(qi,oi){
+  sess.answers[qi]=oi;
+  const q=sess.qs[qi];
+  q.opts.forEach((_,i)=>{
+    const el=document.getElementById(`opt-${qi}-${i}`);
+    if(el) el.className='opt'+(i===oi?' on':'');
+  });
+  updateDots();
+};
+
+window.chipClick=function(qi,word){
+  const fs=sess.fillState[qi];
+  fs.sel=(fs.sel===word)?null:word;
+  updateFillInner(qi);
+};
+
+window.blankClick=function(qi,bi){
+  const fs=sess.fillState[qi];
+  bi=parseInt(bi);
+  if(fs.sel!==null){
+    fs.placed[bi]=fs.sel;
+    fs.sel=null;
+  } else if(fs.placed[bi]!==null){
+    fs.placed[bi]=null;
+  }
+  updateFillInner(qi);
+};
+
+// ── CHECK ANSWERS ─────────────────────────────────────────────────────────────
+window.checkAnswers=function(){
+  const unanswered=sess.qs.findIndex((q,i)=>{
+    if(q.type==='c'||q.type==='v') return sess.answers[i]===undefined;
+    return sess.fillState[i].placed.some(w=>w===null);
+  });
+  if(unanswered>=0){
+    alert(`Falta completar la pregunta ${unanswered+1}. Respon-les totes!`);
+    const qEl=document.getElementById('qtf'+unanswered)||document.getElementById('qc'+unanswered)||document.getElementById('qf'+unanswered);
+    qEl?.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  let score=0, xpEarned=0;
+  const results=sess.qs.map((q,i)=>{
+    let correct=false;
+    if(q.type==='c'){
+      correct=sess.answers[i]===q.ans;
+      if(correct) xpEarned+=10;
+      return {q,correct,userAns:q.opts[sess.answers[i]],correctAns:q.opts[q.ans]};
+    } else if(q.type==='v'){
+      correct=sess.answers[i]===q.ans;
+      if(correct) xpEarned+=10;
+      return {q,correct,userAns:sess.answers[i]?'Verdader':'Fals',correctAns:q.ans?'Verdader':'Fals'};
+    } else {
+      const fs=sess.fillState[i];
+      correct=q.blanks.every((b,bi)=>fs.placed[bi]===b);
+      if(correct) xpEarned+=15;
+      const placed=fs.placed.map(w=>w||'—').join(', ');
+      const expected=q.blanks.join(', ');
+      return {q,correct,userAns:placed,correctAns:expected};
+    }
+  });
+
+  score=results.filter(r=>r.correct).length;
+  const tot=sess.qs.length;
+  if(score>=tot-2) xpEarned+=20;
+  if(score===tot) xpEarned+=50;
+
+  const prevXP=gXP();
+  const newXP=awardXP(xpEarned);
+  if(score>0)gCorrect(score);
+  const firstTime=saveResult(sess.storyId, score);
+  if(firstTime || gOrder()[gIdx()%gOrder().length]===sess.storyId) advanceOrder();
+  const newAchs=checkAchs(score, gDone());
+
+  renderResults(score, xpEarned, results, newAchs, prevXP, newXP);
+};
+
+// ── RESULTS ───────────────────────────────────────────────────────────────────
+function renderResults(score, xpEarned, results, newAchs, prevXP, newXP){
+  const story=STORIES.find(s=>s.id===sess.storyId);
+  const tot=sess.qs.length;
+  const msg=score===tot?'Perfecte! Increïble feina.':score>=tot-2?'Molt bé! Gairebé perfecte.':score>=Math.round(tot*0.7)?'Bé! Continues millorant.':score>=Math.round(tot*0.5)?'Passable. Rellegeix el text i ho faràs millor.':'Segueix practicant, ho aconseguiràs!';
+
+  const achFlashes=newAchs.map(id=>{
+    const a=ACHS.find(x=>x.id===id);
+    return `<div class="ach-flash ach-new-flash">
+      <div class="ach-sym">${a.sym}</div>
+      <div class="ach-flash-text"><div class="name">Assoliment: ${a.name}</div><div class="desc">${a.desc}</div></div>
+    </div>`;
+  }).join('');
+
+  const revItems=results.map((r,i)=>{
+    const ok=r.correct;
+    const sentenceHint=r.q.type==='f'?`<div class="rev-q" style="font-weight:400;color:var(--m);margin-bottom:3px;font-size:.82rem">${r.q.t.replace(/\{(\d+)\}/g,(_,bi)=>`[${r.q.blanks[bi]}]`)}</div>`:'';
+    return `<div class="rev-item">
+      <div class="rev-icon ${ok?'ok':'err'}">${ok?'✓':'✗'}</div>
+      <div class="rev-body">
+        <div class="rev-q">${i+1}. ${r.q.q||'Omple els buits'}</div>
+        ${sentenceHint}
+        ${ok
+          ?`<div class="rev-ans-ok">Correcta: ${r.correctAns}</div>`
+          :`<div class="rev-ans-err">La teva: ${r.userAns}</div><div class="rev-ans-ok">Correcta: ${r.correctAns}</div>`}
+        ${!ok?`<div class="rev-exp">${r.q.exp}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  root.innerHTML=`
+    <div class="score-hero">
+      <div><span class="score-big">${score}</span><span class="score-denom">/${tot}</span></div>
+      <div class="score-msg">${msg}</div>
+      <div><span class="xp-gain">+${xpEarned} XP</span>${score>=tot-2?`<span class="xp-bonus">(inclou +${score===tot?50:20} de bonus)</span>`:''}</div>
+    </div>
+    ${xpBar(newXP)}
+    ${achFlashes?`<div style="margin-bottom:16px">${achFlashes}</div>`:''}
+    <div class="label mt4" style="margin-bottom:12px">Revisió de respostes — ${story.title}</div>
+    <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:4px 16px">${revItems}</div>
+    <div class="row-btns mt4">
+      <button class="btn btn-ok" onclick="renderHome()">Tornar a l'inici</button>
+      <button class="btn btn-outline" onclick="startStory(${sess.storyId})">Rellegir el conte</button>
+    </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── RESET ─────────────────────────────────────────────────────────────────────
+window.resetAll=function(){
+  Object.values(K).forEach(k=>localStorage.removeItem(k));
+  renderHome();
+};
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderHome();
+gRender();
+</script>
+</body>
+</html>

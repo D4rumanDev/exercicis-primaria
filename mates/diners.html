@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diners</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* ── CSS ESPECÍFIC DINERS ── */
+.vis-center{display:flex;justify-content:center;align-items:center;margin:14px 0}
+.coins-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;margin:14px 0}
+.price-big{font-size:2.2rem;font-weight:900;color:var(--t);text-align:center;padding:10px 0;letter-spacing:.02em}
+.price-big .hl{color:var(--a)}
+.q-dyn{font-size:.95rem;font-weight:700;color:var(--t);text-align:center;margin:8px 0}
+.conv-box{background:var(--bg);border:1px solid var(--b);border-radius:var(--r);padding:14px;text-align:center;margin:12px 0}
+.conv-q{font-size:1.4rem;font-weight:900;color:var(--t);margin-bottom:4px}
+.conv-hint{font-size:.82rem;color:var(--m)}
+.canvi-scene{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;align-items:center;margin:12px 0}
+.canvi-box{text-align:center}
+.canvi-lbl{font-size:.72rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.canvi-val{font-size:1.1rem;font-weight:800;color:var(--t)}
+.canvi-arrow{font-size:1.8rem;color:var(--m);align-self:center}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Diners</h1>
+    <div class="muted">Sumes · Conversions · Canvi · Problemes</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: SUMA D'IMPORTS -->
+<div class="card">
+  <h2><span class="num">1</span> Quant és tot plegat?</h2>
+  <div class="card-sub">Suma totes les monedes i bitllets que veus.</div>
+  <div id="d2-vis" class="coins-row"></div>
+  <div id="d2-opts" class="opts-row"></div>
+  <div id="d2-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextSum()">Següent →</button>
+  </div>
+</div>
+
+<!-- 2: EUROS I CÈNTIMS -->
+<div class="card">
+  <h2><span class="num">2</span> Euros i cèntims</h2>
+  <div class="card-sub">Converteix entre euros i cèntims. Recorda: <strong>1 € = 100 cèntims</strong>.</div>
+  <div id="d3-box" class="conv-box"></div>
+  <div id="d3-opts" class="opts-row"></div>
+  <div id="d3-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextConv()">Següent →</button>
+  </div>
+</div>
+
+<!-- 3: EL CANVI -->
+<div class="card">
+  <h2><span class="num">3</span> El canvi</h2>
+  <div class="card-sub">Calcula quants diners et retornen.</div>
+  <div id="d4-scene" class="canvi-scene"></div>
+  <div id="d4-q" class="q-dyn"></div>
+  <div id="d4-opts" class="opts-row"></div>
+  <div id="d4-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextCanvi()">Següent →</button>
+  </div>
+</div>
+
+<!-- 4: PROBLEMES -->
+<div class="card">
+  <h2><span class="num">4</span> Problemes</h2>
+  <div id="prob-list"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
+  </div>
+</div>
+
+</div><!-- /page -->
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="problemes.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_din_v1';
+
+
+GAM_ACHS = [
+  {id:'first',    s:'🌟', n:'Primer Encert',        d:'Primera resposta correcta'},
+  {id:'s3',       s:'🔥', n:'Ratxa x3',              d:'3 encerts seguits'},
+  {id:'s5',       s:'⚡', n:'Ratxa x5',              d:'5 encerts seguits'},
+  {id:'s10',      s:'💥', n:'Ratxa x10',             d:'10 encerts seguits'},
+  {id:'din-sum',  s:'🧾', n:'Caixera',               d:'5 sumes de diners correctes'},
+  {id:'din-cnv',  s:'🔄', n:'Conversora',            d:'5 conversions euros↔cèntims'},
+  {id:'din-chg',  s:'💸', n:'Gestora del Canvi',     d:'5 canvis calculats correctament'},
+  {id:'ok50',     s:'🥉', n:'50 Encerts',            d:'50 respostes correctes'},
+  {id:'ok200',    s:'🥈', n:'200 Encerts',           d:'200 respostes correctes'}
+];
+
+function gExtraAchs(g,tryA){
+  const e=eLoad();
+  tryA('din-sum',(e.sum||0)>=5);
+  tryA('din-cnv',(e.conv||0)>=5);
+  tryA('din-chg',(e.canvi||0)>=5);
+}
+
+
+// ── HELPERS DE DINERS ──
+// Tots els valors en cèntims (enters)
+const MONEDES=[
+  {val:1,    type:'coin', fill:'#c97c2f', stroke:'#7d4800'},
+  {val:2,    type:'coin', fill:'#c97c2f', stroke:'#7d4800'},
+  {val:5,    type:'coin', fill:'#c97c2f', stroke:'#7d4800'},
+  {val:10,   type:'coin', fill:'#d4b44a', stroke:'#8b6914'},
+  {val:20,   type:'coin', fill:'#d4b44a', stroke:'#8b6914'},
+  {val:50,   type:'coin', fill:'#d4b44a', stroke:'#8b6914'},
+  {val:100,  type:'coin', fill:'#d4b44a', stroke:'#888', inner:'#a8a8a8'},
+  {val:200,  type:'coin', fill:'#a8a8a8', stroke:'#666', inner:'#d4b44a'},
+  {val:500,  type:'bill', fill:'#6ab55e', stroke:'#3a7031'},
+  {val:1000, type:'bill', fill:'#d4a017', stroke:'#7d5500'},
+  {val:2000, type:'bill', fill:'#6b9ccc', stroke:'#2c5f8a'},
+  {val:5000, type:'bill', fill:'#e87b3a', stroke:'#9a3e10'},
+];
+
+function fmtMoney(cents){
+  if(cents<100)return cents+' cèntims';
+  const e=Math.floor(cents/100),c=cents%100;
+  return c===0?e+' €':e+','+(c<10?'0':'')+c+' €';
+}
+
+function coinSVG(val,big=false){
+  const m=MONEDES.find(x=>x.val===val);
+  if(!m)return '';
+  const lbl=fmtMoney(val);
+  if(m.type==='coin'){
+    const S=big?82:64;
+    const cx=S/2,cy=S/2,r=S/2-3;
+    const ir=m.inner?Math.round(r*0.52):0;
+    const fs=big?13:11;
+    const inner=m.inner?`<circle cx="${cx}" cy="${cy}" r="${ir}" fill="${m.inner}" stroke="${m.stroke}" stroke-width="1.5"/>`:'';
+    return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${m.fill}" stroke="${m.stroke}" stroke-width="2.5"/>${inner}<text x="${cx}" y="${cy}" font-size="${fs}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="#1e293b">${lbl}</text></svg>`;
+  }else{
+    const W=big?130:100,H=big?66:52;
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect x="2" y="2" width="${W-4}" height="${H-4}" rx="6" fill="${m.fill}" stroke="${m.stroke}" stroke-width="2"/><rect x="7" y="7" width="${W-14}" height="${H-14}" rx="3" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><text x="${W/2}" y="${H/2}" font-size="${big?18:14}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="#fff">${lbl}</text></svg>`;
+  }
+}
+
+// ── BLOC 1: SUMA D'IMPORTS ──
+const SUM_POOL=[
+  {vals:[10,20,5],     total:35},
+  {vals:[50,20,10],    total:80},
+  {vals:[100,50],      total:150},
+  {vals:[200,50,20],   total:270},
+  {vals:[50,50,20],    total:120},
+  {vals:[100,20,10,5], total:135},
+  {vals:[200,100,50],  total:350},
+  {vals:[500,200],     total:700},
+  {vals:[1000,500,100],total:1600},
+  {vals:[2000,500],    total:2500},
+  {vals:[200,100],     total:300},
+  {vals:[50,20,5],     total:75},
+];
+let sumPrev=-1;
+function nextSum(){
+  let idx;do{idx=ri(0,SUM_POOL.length-1);}while(idx===sumPrev&&SUM_POOL.length>1);
+  sumPrev=idx;
+  const q=SUM_POOL[idx];
+  document.getElementById('d2-vis').innerHTML=q.vals.map(v=>coinSVG(v)).join('');
+  document.getElementById('d2-fb').textContent='';
+  const correct=fmtMoney(q.total);
+  // Wrong options: total ± one coin value, or a near miss
+  const diffs=[q.vals[0],q.vals[q.vals.length-1],q.vals[Math.floor(q.vals.length/2)]];
+  const wrongSet=new Set();
+  diffs.forEach(d=>{
+    const a=q.total+d,b=q.total-d;
+    if(a!==q.total)wrongSet.add(a);
+    if(b>0&&b!==q.total)wrongSet.add(b);
+  });
+  const wrongs=sh([...wrongSet].filter(v=>v>0)).slice(0,3).map(fmtMoney);
+  while(wrongs.length<3)wrongs.push(fmtMoney(q.total+(wrongs.length+1)*10));
+  renderOpts('d2-opts',sh([correct,...wrongs]),correct,
+    ()=>{setFb('d2-fb',true,pick(OK)+' — Total: '+correct);gCorrect(4,'sum');},
+    ()=>{setFb('d2-fb',false,'Era '+correct);gWrong();}
+  );
+}
+
+// ── BLOC 3: EUROS I CÈNTIMS ──
+const CONV_POOL=[
+  {q:'1,50 €',     dir:'e2c', ans:'150 cèntims', w:['15 cèntims','1.050 cèntims','105 cèntims']},
+  {q:'2,35 €',     dir:'e2c', ans:'235 cèntims', w:['23 cèntims','2.350 cèntims','253 cèntims']},
+  {q:'0,75 €',     dir:'e2c', ans:'75 cèntims',  w:['7 cèntims','750 cèntims','705 cèntims']},
+  {q:'3,00 €',     dir:'e2c', ans:'300 cèntims', w:['30 cèntims','3.000 cèntims','330 cèntims']},
+  {q:'5,20 €',     dir:'e2c', ans:'520 cèntims', w:['52 cèntims','5.200 cèntims','502 cèntims']},
+  {q:'0,50 €',     dir:'e2c', ans:'50 cèntims',  w:['5 cèntims','500 cèntims','505 cèntims']},
+  {q:'250 cèntims',dir:'c2e', ans:'2,50 €',      w:['25 €','0,25 €','2,05 €']},
+  {q:'175 cèntims',dir:'c2e', ans:'1,75 €',      w:['17 €','1,07 €','17,5 €']},
+  {q:'400 cèntims',dir:'c2e', ans:'4,00 €',      w:['40 €','0,40 €','4,40 €']},
+  {q:'310 cèntims',dir:'c2e', ans:'3,10 €',      w:['31 €','3,01 €','31,0 €']},
+  {q:'600 cèntims',dir:'c2e', ans:'6,00 €',      w:['60 €','0,60 €','6,06 €']},
+  {q:'125 cèntims',dir:'c2e', ans:'1,25 €',      w:['12 €','0,125 €','1,025 €']},
+];
+let convPrev=-1;
+function nextConv(){
+  let idx;do{idx=ri(0,CONV_POOL.length-1);}while(idx===convPrev&&CONV_POOL.length>1);
+  convPrev=idx;
+  const c=CONV_POOL[idx];
+  const arrow=c.dir==='e2c'?'euros → cèntims':'cèntims → euros';
+  document.getElementById('d3-box').innerHTML=
+    `<div class="conv-q">${c.q} = ?</div><div class="conv-hint">${arrow}</div>`;
+  document.getElementById('d3-fb').textContent='';
+  renderOpts('d3-opts',sh([c.ans,...c.w]),c.ans,
+    ()=>{setFb('d3-fb',true,pick(OK)+' — '+c.q+' = '+c.ans);gCorrect(3,'conv');},
+    ()=>{setFb('d3-fb',false,'Era '+c.ans);gWrong();}
+  );
+}
+
+// ── BLOC 4: EL CANVI ──
+const CANVI_POOL=[
+  {item:"una goma",         price:30,   paid:50,   change:20},
+  {item:'un llapis',        price:45,   paid:100,  change:55},
+  {item:'una carpeta',      price:150,  paid:200,  change:50},
+  {item:'un quadern',       price:125,  paid:200,  change:75},
+  {item:'un llibre',        price:350,  paid:500,  change:150},
+  {item:'uns colors',       price:250,  paid:500,  change:250},
+  {item:'una regla',        price:80,   paid:100,  change:20},
+  {item:'un estoig',        price:475,  paid:500,  change:25},
+  {item:'una motxilla',     price:1550, paid:2000, change:450},
+  {item:'un joc de taula',  price:1275, paid:2000, change:725},
+  {item:'una pilota',       price:320,  paid:500,  change:180},
+  {item:'un bolígraf',      price:65,   paid:100,  change:35},
+];
+let canviPrev=-1;
+function nextCanvi(){
+  let idx;do{idx=ri(0,CANVI_POOL.length-1);}while(idx===canviPrev&&CANVI_POOL.length>1);
+  canviPrev=idx;
+  const q=CANVI_POOL[idx];
+  // Show bill for "paid" and price tag
+  const paidMon=MONEDES.find(m=>m.val===q.paid)||MONEDES.find(m=>m.type==='bill'&&m.val<=q.paid);
+  const billSVG=paidMon?coinSVG(q.paid,false):`<span style="font-size:1.2rem;font-weight:900">${fmtMoney(q.paid)}</span>`;
+  document.getElementById('d4-scene').innerHTML=
+    `<div class="canvi-box"><div class="canvi-lbl">Preu</div><div class="canvi-val">${fmtMoney(q.price)}</div></div>`+
+    `<div class="canvi-arrow">→</div>`+
+    `<div class="canvi-box"><div class="canvi-lbl">Pagues</div>${billSVG}</div>`;
+  document.getElementById('d4-q').textContent=`Compres ${q.item} per ${fmtMoney(q.price)}. Quant et tornen?`;
+  document.getElementById('d4-fb').textContent='';
+  const correct=fmtMoney(q.change);
+  const wrongSet=new Set();
+  [q.price, q.paid, q.change+q.price, Math.abs(q.paid-q.price-10), q.change+50].forEach(v=>{
+    if(v>0&&v!==q.change)wrongSet.add(v);
+  });
+  const wrongs=sh([...wrongSet]).slice(0,3).map(fmtMoney);
+  while(wrongs.length<3)wrongs.push(fmtMoney(q.change+(wrongs.length+1)*5));
+  renderOpts('d4-opts',sh([correct,...wrongs]),correct,
+    ()=>{setFb('d4-fb',true,pick(OK)+` — ${fmtMoney(q.paid)} − ${fmtMoney(q.price)} = ${correct}`);gCorrect(4,'canvi');},
+    ()=>{setFb('d4-fb',false,`Era ${correct} — ${fmtMoney(q.paid)} − ${fmtMoney(q.price)} = ${correct}`);gWrong();}
+  );
+}
+
+// ── BLOC 5: PROBLEMES ──
+const PROB_POOL=getProbs('diners');
+
+function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,4);}
+
+// ── INIT ──
+gRender();
+nextSum(); nextConv(); nextCanvi(); nextProblemes();
+</script>
+</body>
+</html>

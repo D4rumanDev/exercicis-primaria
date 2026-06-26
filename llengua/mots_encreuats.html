@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mots Encreuats</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+:root{--cw:36px}
+.size-btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.size-btn{padding:7px 18px;border-radius:8px;border:2px solid var(--b);cursor:pointer;font-weight:600;background:var(--s);color:var(--t);font-family:inherit;font-size:.85rem;transition:all .1s}
+.size-btn.active{border-color:var(--a);background:#dbeafe;color:var(--a)}
+.cw-wrap{overflow-x:auto;padding:8px 0;text-align:center}
+.cw-grid{display:inline-grid;gap:2px}
+.cw-cell{width:var(--cw);height:var(--cw);position:relative;flex-shrink:0}
+.cw-cell.black{background:#1e293b;border-radius:2px}
+.cw-cell input{position:absolute;inset:0;width:100%;height:100%;text-align:center;font-size:1.05rem;font-weight:700;border:1px solid #cbd5e1;border-radius:2px;background:#fff;color:var(--t);text-transform:uppercase;padding:0;cursor:pointer;font-family:inherit;transition:background .15s}
+.cw-cell input:focus{border-color:var(--a);background:#eff6ff;outline:none}
+.cw-cell input.ok{background:#dcfce7!important;color:#166534;border-color:#4ade80}
+.cw-cell input.ko{background:#fee2e2!important;color:#dc2626;border-color:#f87171}
+.cn{position:absolute;top:1px;left:2px;font-size:.48rem;color:#94a3b8;pointer-events:none;z-index:1;line-height:1;font-weight:700}
+.clues-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+.clues-ttl{font-size:.72rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.clue{font-size:.84rem;color:var(--t);margin-bottom:5px;line-height:1.4}
+.clue b{color:var(--a);margin-right:3px}
+@media(max-width:500px){:root{--cw:28px}.cw-cell input{font-size:.85rem}.clues-wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Mots Encreuats</h1>
+    <div class="muted">Endevina les paraules a partir de les definicions</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<div class="card">
+  <h2><span class="num">⊞</span> Nova partida</h2>
+  <div class="card-sub">Tria la mida i genera un nou crucigramma automàticament.</div>
+  <div class="size-btns">
+    <button class="size-btn active" data-d="S" onclick="setDiff('S')">Petit · 5 mots</button>
+    <button class="size-btn" data-d="M" onclick="setDiff('M')">Mitjà · 8 mots</button>
+    <button class="size-btn" data-d="L" onclick="setDiff('L')">Gran · 12 mots</button>
+  </div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline" onclick="newGame()">Genera ▶</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2><span class="num">✎</span> Emplena el crucigramma</h2>
+  <div class="cw-wrap">
+    <div id="cw-grid" class="cw-grid"></div>
+  </div>
+  <div id="cw-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button id="comprova-btn" class="btn btn-dark" onclick="checkAll()">Comprova ✓</button>
+    <button class="btn btn-outline btn-sm" onclick="newGame()">Nova ↺</button>
+    <button class="btn btn-outline btn-sm" onclick="revealAll()">Solució</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2><span class="num">→↓</span> Definicions</h2>
+  <div class="clues-wrap">
+    <div>
+      <div class="clues-ttl">→ Horitzontal</div>
+      <div id="clues-h"></div>
+    </div>
+    <div>
+      <div class="clues-ttl">↓ Vertical</div>
+      <div id="clues-v"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cat_cword_v1';
+
+GAM_ACHS = [
+  ...GAM_ACHS,
+  {id:'cw1',  s:'🔑', n:'Primer Crucigrama', d:'Completa el primer crucigrama'},
+  {id:'cw5',  s:'🧩', n:'5 Creuats',         d:'Completa 5 creuades'},
+  {id:'cw10', s:'🏆', n:'10 Creuats',        d:'Completa 10 creuades'},
+];
+function gExtraAchs(g, tryA){
+  const e = eLoad();
+  tryA('cw1',  (e.cword||0) >= 1);
+  tryA('cw5',  (e.cword||0) >= 5);
+  tryA('cw10', (e.cword||0) >= 10);
+}
+
+// ── WORD POOL ──
+const CWORD_POOL = [
+  // 3 lletres
+  {w:'gat',     c:"Animal domèstic que miaula"},
+  {w:'gos',     c:"Animal domèstic que borda"},
+  {w:'nas',     c:"Part de la cara per olorar"},
+  {w:'sol',     c:"Astre que dona llum de dia"},
+  {w:'neu',     c:"Precipitació blanca i freda"},
+  {w:'mar',     c:"Gran massa d'aigua salada"},
+  {w:'cel',     c:"Volta blava sobre nosaltres"},
+  {w:'riu',     c:"Corrent d'aigua dolça que desemboca al mar"},
+  // 4 lletres
+  {w:'boca',    c:"Part de la cara per menjar i parlar"},
+  {w:'poma',    c:"Fruita rodona, vermella o verda"},
+  {w:'casa',    c:"Edifici on vivim"},
+  {w:'home',    c:"Persona adulta del sexe masculí (porta H!)"},
+  {w:'hora',    c:"Seixanta minuts (porta H!)"},
+  {w:'bota',    c:"Calçat alt que puja per sobre del turmell"},
+  {w:'vida',    c:"L'existència dels éssers vius"},
+  {w:'verd',    c:"Color de les fulles i els camps"},
+  {w:'flor',    c:"Part acolorida de la planta"},
+  {w:'parc',    c:"Jardí gran i públic on la gent passeja"},
+  // 5 lletres
+  {w:'arbre',   c:"Planta gran amb tronc de fusta"},
+  {w:'herba',   c:"Planta baixa dels prats i jardins (porta H!)"},
+  {w:'blanc',   c:"Color de la neu i la llet"},
+  {w:'barca',   c:"Embarcació petita de fusta o metall"},
+  {w:'cotxe',   c:"Vehicle de quatre rodes per circular per la carretera"},
+  {w:'heroi',   c:"Personatge valent que salva els altres (porta H!)"},
+  {w:'taula',   c:"Moble on mengem, escrivim o treballem"},
+  {w:'porta',   c:"S'obre i es tanca per entrar o sortir d'un lloc"},
+  {w:'canvi',   c:"Modificació d'una cosa per una altra"},
+  {w:'humit',   c:"Que conté molta humitat o aigua (porta H!)"},
+  // 6 lletres
+  {w:'escola',  c:"Lloc on anem a aprendre cada dia"},
+  {w:'llapis',  c:"Estri de fusta per escriure i dibuixar"},
+  {w:'ovella',  c:"Animal de granja que dona llana"},
+  {w:'cadira',  c:"Moble amb quatre potes per seure"},
+  {w:'hivern',  c:"Estació freda de l'any (porta H!)"},
+  {w:'pilota',  c:"Objecte rodó que fem servir per jugar"},
+  {w:'conill',  c:"Animal de llarga orella i pèl suau"},
+  // 7 lletres
+  {w:'vehicle', c:"Cotxe, moto, camió... (porta H interna!)"},
+  {w:'alcohol', c:"Líquid transparent que desinfecta ferides (porta H interna!)"},
+];
+
+// ── CROSSWORD ENGINE ──
+const GSIZ = 19;
+
+function doPlace(G, word, row, col, dir){
+  const dr=dir==='V'?1:0, dc=dir==='H'?1:0;
+  for(let i=0;i<word.length;i++) G[row+dr*i][col+dc*i]=word[i];
+}
+
+function canPlace(G, word, row, col, dir){
+  const n=word.length, dr=dir==='V'?1:0, dc=dir==='H'?1:0;
+  const eR=row+dr*(n-1), eC=col+dc*(n-1);
+  if(row<0||col<0||eR>=GSIZ||eC>=GSIZ) return false;
+  // cell before and after the word must be empty
+  const pR=row-dr, pC=col-dc, nR=eR+dr, nC=eC+dc;
+  if(pR>=0&&pC>=0&&G[pR][pC]!==null) return false;
+  if(nR<GSIZ&&nC<GSIZ&&G[nR][nC]!==null) return false;
+  let ints=0;
+  for(let i=0;i<n;i++){
+    const r=row+dr*i, c=col+dc*i, cell=G[r][c];
+    if(cell!==null){
+      if(cell!==word[i]) return false;
+      ints++;
+    } else {
+      // new empty cell: no parallel neighbors allowed (would form unintended words)
+      if(dir==='H'){
+        if((r>0&&G[r-1][c]!==null)||(r<GSIZ-1&&G[r+1][c]!==null)) return false;
+      } else {
+        if((c>0&&G[r][c-1]!==null)||(c<GSIZ-1&&G[r][c+1]!==null)) return false;
+      }
+    }
+  }
+  return ints>0;
+}
+
+function getBounds(placed){
+  let r0=GSIZ,r1=0,c0=GSIZ,c1=0;
+  for(const p of placed){
+    const eR=p.dir==='V'?p.row+p.w.length-1:p.row;
+    const eC=p.dir==='H'?p.col+p.w.length-1:p.col;
+    if(p.row<r0)r0=p.row; if(eR>r1)r1=eR;
+    if(p.col<c0)c0=p.col; if(eC>c1)c1=eC;
+  }
+  return{r0,r1,c0,c1};
+}
+
+function tryGen(words){
+  const G=Array.from({length:GSIZ},()=>Array(GSIZ).fill(null));
+  const placed=[];
+  const fw=words[0];
+  const fr=Math.floor(GSIZ/2), fc=Math.floor((GSIZ-fw.w.length)/2);
+  doPlace(G,fw.w,fr,fc,'H');
+  placed.push({...fw,row:fr,col:fc,dir:'H'});
+
+  for(let i=1;i<words.length;i++){
+    const cw=words[i];
+    const cands=[];
+    for(const p of placed){
+      for(let pi=0;pi<p.w.length;pi++){
+        for(let wi=0;wi<cw.w.length;wi++){
+          if(p.w[pi]!==cw.w[wi]) continue;
+          const dir=p.dir==='H'?'V':'H';
+          const row=p.dir==='H'?p.row-wi:p.row+pi;
+          const col=p.dir==='H'?p.col+pi:p.col-wi;
+          if(canPlace(G,cw.w,row,col,dir)) cands.push({row,col,dir});
+        }
+      }
+    }
+    if(cands.length){
+      const best=cands[Math.floor(Math.random()*cands.length)];
+      doPlace(G,cw.w,best.row,best.col,best.dir);
+      placed.push({...cw,...best});
+    }
+  }
+
+  if(placed.length<3) return null;
+  const{r0,r1,c0,c1}=getBounds(placed);
+  const rows=r1-r0+1, cols=c1-c0+1;
+
+  // Standard crossword numbering: scan top-left to bottom-right
+  const nums=Array.from({length:rows},()=>Array(cols).fill(0));
+  let n=1;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const gr=r0+r, gc=c0+c;
+      if(G[gr][gc]===null) continue;
+      const sA=(gc===0||G[gr][gc-1]===null)&&gc+1<GSIZ&&G[gr][gc+1]!==null;
+      const sD=(gr===0||G[gr-1][gc]===null)&&gr+1<GSIZ&&G[gr+1][gc]!==null;
+      if(sA||sD) nums[r][c]=n++;
+    }
+  }
+  for(const p of placed) p.num=nums[p.row-r0][p.col-c0];
+
+  return{G,placed,r0,c0,rows,cols,nums};
+}
+
+// ── STATE ──
+let diff='S';
+
+function setDiff(d){
+  diff=d;
+  document.querySelectorAll('.size-btn').forEach(b=>b.classList.toggle('active',b.dataset.d===d));
+}
+
+function newGame(){
+  const cnt={S:6,M:9,L:13}[diff];
+  let pool=[...CWORD_POOL];
+  // For small grids prefer shorter words (more likely to intersect in tight space)
+  if(diff==='S') pool.sort((a,b)=>a.w.length-b.w.length);
+  if(diff==='L') pool.sort((a,b)=>b.w.length-a.w.length);
+
+  let res=null;
+  for(let att=0;att<12;att++){
+    pool=sh(pool);
+    res=tryGen(pool.slice(0,cnt+4));
+    if(res&&res.placed.length>=3) break;
+  }
+
+  document.getElementById('cw-fb').textContent='';
+  document.getElementById('cw-fb').className='fb mt2';
+  document.getElementById('clues-h').textContent='';
+  document.getElementById('clues-v').textContent='';
+  document.getElementById('comprova-btn').style.display='';
+
+  if(!res){
+    const p=document.createElement('p');
+    p.className='muted'; p.style.padding='16px 0';
+    p.textContent="No s'ha pogut generar. Torna a intentar-ho.";
+    const g=document.getElementById('cw-grid');
+    g.textContent=''; g.appendChild(p);
+    return;
+  }
+  renderCW(res);
+}
+
+function renderCW({G,placed,r0,c0,rows,cols,nums}){
+  const el=document.getElementById('cw-grid');
+  el.style.gridTemplateColumns=`repeat(${cols},var(--cw))`;
+  el.innerHTML='';
+
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const gr=r0+r, gc=c0+c;
+      const div=document.createElement('div');
+      if(G[gr][gc]){
+        div.className='cw-cell';
+        if(nums[r][c]){
+          const sp=document.createElement('span');
+          sp.className='cn';
+          sp.textContent=nums[r][c];
+          div.appendChild(sp);
+        }
+        const inp=document.createElement('input');
+        inp.type='text'; inp.maxLength=1;
+        inp.dataset.ans=G[gr][gc].toUpperCase();
+        inp.setAttribute('autocomplete','off');
+        inp.addEventListener('input',onInp);
+        inp.addEventListener('keydown',onKd);
+        div.appendChild(inp);
+      } else {
+        div.className='cw-cell black';
+      }
+      el.appendChild(div);
+    }
+  }
+
+  const hW=placed.filter(p=>p.dir==='H').sort((a,b)=>a.num-b.num);
+  const vW=placed.filter(p=>p.dir==='V').sort((a,b)=>a.num-b.num);
+  renderClueList('clues-h', hW);
+  renderClueList('clues-v', vW);
+}
+
+function renderClueList(id, words){
+  const el=document.getElementById(id);
+  el.textContent='';
+  words.forEach(p=>{
+    const d=document.createElement('div'); d.className='clue';
+    const b=document.createElement('b');   b.textContent=p.num+'.';
+    d.appendChild(b);
+    d.appendChild(document.createTextNode(p.c));
+    el.appendChild(d);
+  });
+}
+
+function allInps(){ return[...document.querySelectorAll('#cw-grid input')]; }
+
+function onInp(e){
+  const inp=e.target;
+  inp.value=inp.value.toUpperCase().replace(/[^A-Z]/g,'').slice(-1);
+  inp.classList.remove('ok','ko');
+  if(inp.value){
+    const all=allInps(), i=all.indexOf(inp);
+    if(i+1<all.length) all[i+1].focus();
+  }
+}
+
+function onKd(e){
+  const all=allInps(), i=all.indexOf(e.target);
+  if(e.key==='Backspace'&&!e.target.value&&i>0){
+    all[i-1].focus(); all[i-1].value=''; all[i-1].classList.remove('ok','ko');
+    e.preventDefault();
+  }
+  if(e.key==='ArrowRight'&&i+1<all.length){all[i+1].focus();e.preventDefault();}
+  if(e.key==='ArrowLeft'&&i>0)           {all[i-1].focus();e.preventDefault();}
+  if(e.key==='ArrowDown'){
+    // find input in same column in next row — best-effort via DOM order
+    const cols=parseInt(document.getElementById('cw-grid').style.gridTemplateColumns.match(/\d+/)[0]);
+    if(i+cols<all.length){all[i+cols].focus();e.preventDefault();}
+  }
+  if(e.key==='ArrowUp'){
+    const cols=parseInt(document.getElementById('cw-grid').style.gridTemplateColumns.match(/\d+/)[0]);
+    if(i-cols>=0){all[i-cols].focus();e.preventDefault();}
+  }
+}
+
+function checkAll(){
+  let ok=0, tot=0;
+  allInps().forEach(inp=>{
+    tot++;
+    const correct=inp.dataset.ans;
+    inp.classList.toggle('ok', inp.value===correct);
+    inp.classList.toggle('ko', inp.value!==correct);
+    if(inp.value===correct) ok++;
+  });
+  const fb=document.getElementById('cw-fb');
+  if(ok===tot&&tot>0){
+    fb.textContent='✓ Perfecte! Tots els mots correctes!';
+    fb.className='fb ok mt2';
+    document.getElementById('comprova-btn').style.display='none';
+    gCorrect(20,'cword');
+    boom();
+  } else {
+    fb.textContent=`${ok} de ${tot} lletres correctes. Continua!`;
+    fb.className='fb ko mt2';
+  }
+}
+
+function revealAll(){
+  allInps().forEach(inp=>{inp.value=inp.dataset.ans;inp.classList.add('ok');inp.classList.remove('ko');});
+  document.getElementById('cw-fb').textContent='Solució mostrada.';
+  document.getElementById('cw-fb').className='fb mt2';
+}
+
+// Init
+gRender();
+newGame();
+</script>
+</body>
+</html>
