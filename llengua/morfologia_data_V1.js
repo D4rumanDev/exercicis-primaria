@@ -1,7 +1,7 @@
 // morfologia_data.js — pools de dades per a catala_morfologia.html
 
 const PLURAL_POOL = [
-  // 1-15: Originals revisats
+  // Del PDF (acts. 1, 8)
   {s:'calaix',   p:'calaixos',    w:['calaixs','caixes','caixetes']},
   {s:'cordó',    p:'cordons',     w:['cordós','cordes','cordones']},
   {s:'faldilla', p:'faldilles',   w:['faldillas','faldillos','faldills']},
@@ -17,7 +17,7 @@ const PLURAL_POOL = [
   {s:'camió',    p:'camions',     w:['camiós','camiones','camioses']},
   {s:'país',     p:'països',      w:['paiss','paisos','paisses']},
   {s:'llapis',   p:'llapis',      w:['llapises','llapissos','llapiss']},
-  // 16-30: Ampliació original + correccions
+  // Ampliació
   {s:'avió',     p:'avions',      w:['avios','aviós','avioles']},
   {s:'arbre',    p:'arbres',      w:['arbros','arbresos','arbrejos']},
   {s:'cotxe',    p:'cotxes',      w:['cotxos','cotxesos','cotxis']},
@@ -30,34 +30,13 @@ const PLURAL_POOL = [
   {s:'peu',      p:'peus',        w:['pies','peues','peuns']},
   {s:'ull',      p:'ulls',        w:['ullos','ulos','ulles']},
   {s:'guix',     p:'guixos',      w:['guixs','guixes','guixets']},
-  {s:'ós',       p:'ossos',       w:['óss','osos','oses']}, // ós (animal) -> ossos
+  {s:'ós',       p:'ossos',       w:['óss','osos','oses']},
   {s:'globus',   p:'globus',      w:['globusos','globuss','globussos']},
   {s:'llauna',   p:'llaunes',     w:['llaunas','llaunos','llaunis']},
-  // 31-50: Nova ampliació fins a 50
-  {s:'mesos',    p:'mesos',       w:['messos','mesis','meses']},
-  {s:'casa',     p:'cases',       w:['casas','casos','casis']},
-  {s:'bosc',     p:'boscos',      w:['boscs','bosques','bosces']},
-  {s:'text',     p:'textos',      w:['texts','textes','textis']},
-  {s:'desig',    p:'desitjos',    w:['desigs','desitges','desijos']},
-  {s:'raig',     p:'raigs',       w:['raitjos','raiges','raijos']},
-  {s:'puny',     p:'punys',       w:['punyos','punyes','punyets']},
-  {s:'llit',     p:'llits',       w:['llitos','llites','llitsos']},
-  {s:'fulla',    p:'fulles',      w:['fullas','fullos','fullis']},
-  {s:'finestra', p:'finestres',   w:['finestras','finestros','finestris']},
-  {s:'metge',    p:'metges',      w:['metgos','metgesos','metgis']},
-  {s:'plat',     p:'plats',       w:['platos','plates','platsos']},
-  {s:'pont',     p:'ponts',       w:['pontes','pontos','ponts-dos']},
-  {s:'mida',     p:'mides',       w:['midas','midos','midis']},
-  {s:'parc',     p:'parcs',       w:['parcos','parces','parcsos']},
-  {s:'creu',     p:'creus',       w:['creues','creuns','creules']},
-  {s:'llum',     p:'llums',       w:['llumes','llumos','llumsos']},
-  {s:'bota',     p:'botes',       w:['botas','botos','botis']},
-  {s:'manta',    p:'mantes',      w:['mantas','mantos','mantis']},
-  {s:'rebuig',   p:'rebuigs',     w:['rebutjos','rebuiges','rebuijos']}
 ];
 
 const ACCENT_POOL = [
-  // 1-10: Agudes originals
+  // Agudes (tònic a la darrera síl·laba)
   {syl:'ca · mí',         t:'aguda'},
   {syl:'bal · có',        t:'aguda'},
   {syl:'pas · tís',       t:'aguda'},
@@ -68,7 +47,7 @@ const ACCENT_POOL = [
   {syl:'a · mor',         t:'aguda'},
   {syl:'a · vi · ó',      t:'aguda'},
   {syl:'bo · tó',         t:'aguda'},
-  // 11-22: Planes originals
+  // Planes (tònic a la penúltima síl·laba)
   {syl:'tau · la',        t:'plana'},
   {syl:'por · ta',        t:'plana'},
   {syl:'fes · ta',        t:'plana'},
@@ -81,7 +60,7 @@ const ACCENT_POOL = [
   {syl:'pis · ta',        t:'plana'},
   {syl:'fi · nes · tra',  t:'plana'},
   {syl:'es · co · la',    t:'plana'},
-  // 23-30: Esdrúixoles originals
+  // Esdrúixoles (tònic a l'antepenúltima síl·laba)
   {syl:'mú · si · ca',    t:'esdrúixola'},
   {syl:'pà · gi · na',    t:'esdrúixola'},
   {syl:'à · li · ga',     t:'esdrúixola'},
@@ -90,38 +69,17 @@ const ACCENT_POOL = [
   {syl:'fà · bri · ca',   t:'esdrúixola'},
   {syl:'rà · pi · da',    t:'esdrúixola'},
   {syl:'pràc · ti · ca',  t:'esdrúixola'},
-  // 31-50: Nova ampliació equilibrada (Agudes, Planes, Esdrúixoles)
-  {syl:'tam · bé',        t:'aguda'},
-  {syl:'pa · rís',        t:'aguda'},
-  {syl:'can · çó',        t:'aguda'},
-  {syl:'as · cen · sor',  t:'aguda'},
-  {syl:'pen · sador',     t:'aguda'},
-  {syl:'es · t rany',     t:'aguda'},
-  {syl:'or · di · na · dor', t:'aguda'},
-  {syl:'ca · dira',       t:'plana'},
-  {syl:'fin · gres · tra', t:'plana'},
-  {syl:'li · bre',        t:'plana'},
-  {syl:'bo · te · lla',   t:'plana'},
-  {syl:'pa · rets',       t:'plana'},
-  {syl:'or · ga · nit · za', t:'plana'},
-  {syl:'plàs · tic',      t:'plana'},
-  {syl:'tí · tol',        t:'plana'},
-  {syl:'brú · i · xa',    t:'esdrúixola'},
-  {syl:'llàg · ri · ma',  t:'esdrúixola'},
-  {syl:'hè · li · cia',   t:'esdrúixola'},
-  {syl:'histò · ri · a',  t:'esdrúixola'},
-  {syl:'bo · lín · graf',  t:'plana'} // Bo·lín·graf (plana acabada en f, s'accentua)
 ];
 const ACCENT_OPTS = ['aguda', 'plana', 'esdrúixola'];
 
 const ANTON_POOL = [
-  // 1-5: Originals
+  // Del PDF (act. 3)
   {w:'trista',      a:'alegre',       wrong:['silenciosa','poruca','xerraire']},
   {w:'xerraire',    a:'callat',       wrong:['alegre','agradable','trist']},
   {w:'silenciós',   a:'sorollós',     wrong:['valent','callat','agradable']},
   {w:'poruc',       a:'valent',       wrong:['sorollós','alegre','callat']},
   {w:'agradable',   a:'desagradable', wrong:['silenciós','valent','xerraire']},
-  // 6-25: Ampliació original
+  // Ampliació
   {w:'alt',         a:'baix',         wrong:['gran','ràpid','fort']},
   {w:'ràpid',       a:'lent',         wrong:['alt','petit','calent']},
   {w:'calent',      a:'fred',         wrong:['suau','dur','tou']},
@@ -142,37 +100,15 @@ const ANTON_POOL = [
   {w:'dolç',        a:'amarg',        wrong:['fred','ràpid','petit']},
   {w:'ric',         a:'pobre',        wrong:['petit','fosc','lent']},
   {w:'lluny',       a:'prop',         wrong:['fosc','ric','petit']},
-  // 26-30: Més del pool inicial
   {w:'primer',      a:'últim',        wrong:['petit','gran','llarg']},
   {w:'fred',        a:'calent',       wrong:['ric','baix','lent']},
   {w:'gros',        a:'prim',         wrong:['llarg','baix','fosc']},
   {w:'dret',        a:'torçat',       wrong:['dur','fosc','petit']},
   {w:'clar',        a:'fosc',         wrong:['ràpid','gran','fred']},
-  // 31-50: Nova ampliació fins a 50
-  {w:'pesat',       a:'lleuger',      wrong:['prim','fosc','lent']},
-  {w:'optimista',   a:'pessimista',   wrong:['alegre','valent','trist']},
-  {w:'generós',     a:'avar',         wrong:['pobre','ric','petit']},
-  {w:'bonic',       a:'lleig',        wrong:['vell','net','tou']},
-  {w:'ample',       a:'estret',       wrong:['curt','baix','petit']},
-  {w:'intel·ligent',a:'ximple',       wrong:['valent','poruc','lent']},
-  {w:'divertit',    a:'avorrit',      wrong:['trist','lent','calent']},
-  {w:'segur',       a:'perillós',     wrong:['difícil','tou','dèbil']},
-  {w:'modern',      a:'antic',        wrong:['nou','vell','brut']},
-  {w:'ample',       a:'estret',       wrong:['llarg','baix','gran']},
-  {w:'àgil',        a:'feixuc',       wrong:['lent','petit','dèbil']},
-  {w:'salvatge',    a:'domèstic',     wrong:['trist','petit','lent']},
-  {w:' transparent',a:'opac',         wrong:['clar','fosc','net']},
-  {w:'sencer',      a:'trencat',      wrong:['petit','buit','vell']},
-  {w:'àcid',        a:'dolç',         wrong:['amarg', 'salat', 'fred']},
-  {w:' depth',      a:'superfície',   wrong:['fosc','alt','ple']},
-  {w:'públic',      a:'privat',       wrong:['nou','obert','clar']},
-  {w:'feixuc',      a:'lleuger',      wrong:['tou','petit','prim']},
-  {w:'salat',       a:'sòs',          wrong:['dolç','amarg','fred']},
-  {w:'humit',       a:'sec',          wrong:['fred','calent','net']}
 ];
 
 const ART_POOL = [
-  // 1-12: Originals
+  // Del PDF (act. 8)
   {s:'la ceba',      p:'les cebes',     w:['la cebes','els cebes','les ceba']},
   {s:'la magrana',   p:'les magranes',  w:['la magranes','els magranes','les magrana']},
   {s:'la pruna',     p:'les prunes',    w:['la prunes','els prunes','les pruna']},
@@ -185,7 +121,7 @@ const ART_POOL = [
   {s:"l'escola",     p:'les escoles',   w:["l'escoles",'els escoles','les escola']},
   {s:'la pilota',    p:'les pilotes',   w:['la pilotes','els pilotes','les pilota']},
   {s:"l'àguila",     p:'les àguiles',   w:["l'àguiles",'els àguiles','les àguila']},
-  // 13-25: Ampliació original
+  // Ampliació
   {s:'la nena',      p:'les nenes',     w:['la nenes','els nenes','les nena']},
   {s:'la bossa',     p:'les bosses',    w:['la bosses','els bosses','les bossa']},
   {s:'la gallina',   p:'les gallines',  w:['la gallines','els gallines','les gallina']},
@@ -199,36 +135,10 @@ const ART_POOL = [
   {s:"l'orella",     p:'les orelles',   w:["l'orelles",'els orelles','les orella']},
   {s:'la cançó',     p:'les cançons',   w:['la cançons','els cançons','les cançó']},
   {s:'la campana',   p:'les campanes',  w:['la campanes','els campanes','les campana']},
-  // 26-50: Nova ampliació fins a 50
-  {s:'la poma',      p:'les pomes',     w:['la pomes','els pomes','les poma']},
-  {s:'la taronja',   p:'les taronges',  w:['la taronges','els taronges','les taronja']},
-  {s:'la llimona',   p:'les llimones',  w:['la llimones','els llimones','les llimona']},
-  {s:"l'escombra",   p:'les escombres', w:["l'escombres",'els escombres','les escombra']},
-  {s:'la gata',      p:'les gates',     w:['la gates','els gates','les gata']},
-  {s:"l'omplena",    p:'les omplenes',  w:["l'omplenes",'els omplenes','les omplena']},
-  {s:'la cullera',   p:'les culleres',  w:['la culleres','els culleres','les cullera']},
-  {s:'la forquilla', p:'les forquilles',w:['la forquilles','els forquilles','les forquilla']},
-  {s:'la llibreta',  p:'les llibretes', w:['la llibretes','els llibretes','les llibreta']},
-  {s:'la motxilla',  p:'les motxilles', w:['la motxilles','els motxilles','les motxilla']},
-  {s:'la sabata',    p:'les sabates',   w:['la sabates','els sabates','les sabata']},
-  {s:'la jaqueta',   p:'les jaquetes',  w:['la jaquetes','els jaquetes','les jaqueta']},
-  {s:'la formiga',   p:'les formigues', w:['la formigues','els formigues','les formiga']},
-  {s:'la mosca',     p:'les mosques',   w:['la mosques','els mosques','les mosca']},
-  {s:"l'espelma",    p:'les espelmes',  w:["l'espelmes",'els espelmes','les espelma']},
-  {s:'la joguina',   p:'les joguines',  w:['la joguines','els joguines','les joguina']},
-  {s:'la cuina',     p:'les cuines',    w:['la cuines','els cuines','les cuina']},
-  {s:'la farmàcia',  p:'les farmàcies', w:['la farmàcies','els farmàcies','les farmàcia']},
-  {s:'la joglaressa',p:'les joglaresses',w:['la joglaresses','els joglaresses','les joglaressa']},
-  {s:'la ratlla',    p:'les ratlles',   w:['la ratlles','els ratlles','les ratlla']},
-  {s:"l'estrella",   p:'les estrelles', w:["l'estrelles",'els estrelles','les estrella']},
-  {s:'la lluna',     p:'les llunes',    w:['la llunes','els llunes','les lluna']},
-  {s:'la boira',     p:'les boires',    w:['la boires','els boires','les boira']},
-  {s:'la platja',    p:'les platges',   w:['la platges','els platges','les platja']},
-  {s:'la muntanya',  p:'les muntanyes', w:['la muntanyes','els muntanyes','les muntanya']}
 ];
 
 const VB_POOL = [
-  // 1-18: Originals
+  // Del PDF (act. 12)
   {word:'am_ulància', ans:'B', full:'ambulància',  hint:'amb- (al costat de) porta B'},
   {word:'con_ersa',   ans:'V', full:'conversa',    hint:'con- + vocal sol portar V'},
   {word:'o_rador',    ans:'B', full:'obrador',     hint:'ob- porta B'},
@@ -247,7 +157,7 @@ const VB_POOL = [
   {word:'_ota',       ans:'B', full:'bota',        hint:'Bota (calçat/barril) porta B'},
   {word:'_oca',       ans:'B', full:'boca',        hint:'Boca porta B'},
   {word:'a_is',       ans:'V', full:'avis',        hint:'Avi (avi/àvia) i derivats porten V'},
-  // 19-30: Ampliació original
+  // Ampliació
   {word:'_erd',       ans:'V', full:'verd',        hint:'El color verd porta V'},
   {word:'_arri',      ans:'B', full:'barri',       hint:'Barri (zona de la ciutat) porta B'},
   {word:'_ida',       ans:'V', full:'vida',        hint:'Vida porta V'},
@@ -260,31 +170,10 @@ const VB_POOL = [
   {word:'cla_ell',    ans:'V', full:'clavell',     hint:'Clavell (flor) porta V'},
   {word:'_entall',    ans:'V', full:'ventall',     hint:'Vent i derivats porten V'},
   {word:'su_marí',    ans:'B', full:'submarí',     hint:'Sub- (sota) sempre porta B'},
-  // 31-50: Nova ampliació fins a 50
-  {word:'_eure',      ans:'B', full:'beure',       hint:'Beure (líquid) porta B; veure porta V'},
-  {word:'_reus',      ans:'B', full:'breus',       hint:'Breu porta B'},
-  {word:'_envolgut',  ans:'B', full:'benvolgut',   hint:'Ben- de benvingut o benvolgut porta B'},
-  {word:'tram_ia',    ans:'V', full:'tramvia',     hint:'Darrere de m s\'escriu v (excepció combinada m+v)'},
-  {word:'mo_il',      ans:'V', full:'mòbil',       hint:'Mòbil porta V'},
-  {word:'a_ril',      ans:'B', full:'abril',       hint:'El mes d\'abril porta B'},
-  {word:'fe_rer',     ans:'B', full:'febrer',      hint:'Febrer s\'escriu amb B, novembre amb V'},
-  {word:'tre_all',    ans:'B', full:'treball',     hint:'Treball i treballar porten B'},
-  {word:'_olp',       ans:'B', full:'volp',        hint:'Volp o cop porta B, excepte derivats genèrics'},
-  {word:'_arba',      ans:'B', full:'barba',       hint:'Barba porta dues B'},
-  {word:'ca_all',     ans:'V', full:'cavall',      hint:'Cavall s\'escriu amb V'},
-  {word:'_olp',       ans:'B', full:'bolp',        hint:'Bolp (brossa) o bolcar porta B'},
-  {word:'lla_or',     ans:'V', full:'llavor',      hint:'Llavor s\'escriu amb V'},
-  {word:'_enir',      ans:'V', full:'venir',       hint:'Venir porta V'},
-  {word:'_oluntat',   ans:'V', full:'voluntat',    hint:'Voluntat porta V'},
-  {word:'_anc',       ans:'B', full:'banc',        hint:'Banc de seure porta B'},
-  {word:'bla_am',     ans:'V', full:'blavam',      hint:'Derivat de blau porta V'},
-  {word:'ca_ana',     ans:'B', full:'cabana',      hint:'Cabana porta B'},
-  {word:'go_ern',     ans:'V', full:'govern',      hint:'Govern i governar porten V'},
-  {word:'co_ard',     ans:'B', full:'cobard',      hint:'Cobard o covard (Admesa cobard/covard en diccionaris, normatiu: covard)', ans:'V', full:'covard', hint:'Covard porta V en la normativa actual'}
 ];
 
 const CAT_POOL = [
-  // 1-20: Originals
+  // Del PDF (act. 13)
   {w:'menjo',        cat:'verb',     exp:'Menjar és un verb (acció).'},
   {w:'crispetes',    cat:'nom',      exp:'Crispetes és un nom (cosa).'},
   {w:'rocoses',      cat:'adjectiu', exp:'Rocoses descriu una qualitat.'},
@@ -305,43 +194,35 @@ const CAT_POOL = [
   {w:'música',       cat:'nom',      exp:'Música és un nom.'},
   {w:'salten',       cat:'verb',     exp:'Saltar és un verb (acció).'},
   {w:'suau',         cat:'adjectiu', exp:'Suau descriu una qualitat.'},
-  // 21-38: Ampliació original (Verbs, Noms, Adjectius)
+  // Ampliació — verbs
   {w:'llegeix',      cat:'verb',     exp:'Llegir és un verb (acció).'},
   {w:'escolta',      cat:'verb',     exp:'Escoltar és un verb (acció).'},
   {w:'dibuixa',      cat:'verb',     exp:'Dibuixar és un verb (acció).'},
   {w:'neda',         cat:'verb',     exp:'Nedar és un verb (acció).'},
   {w:'pensa',        cat:'verb',     exp:'Pensar és un verb (acció).'},
   {w:'vola',         cat:'verb',     exp:'Volar és un verb (acció).'},
+  // Ampliació — noms
   {w:'cotxe',        cat:'nom',      exp:'Cotxe és un nom (cosa).'},
   {w:'sol',          cat:'nom',      exp:'Sol és un nom (astre).'},
   {w:'jardí',        cat:'nom',      exp:'Jardí és un nom (lloc).'},
   {w:'pedra',        cat:'nom',      exp:'Pedra és un nom (cosa).'},
   {w:'núvol',        cat:'nom',      exp:'Núvol és un nom (fenomen natural).'},
   {w:'cadira',       cat:'nom',      exp:'Cadira és un nom (cosa).'},
+  // Ampliació — adjectius
   {w:'petit',        cat:'adjectiu', exp:'Petit descriu una mida.'},
   {w:'rodó',         cat:'adjectiu', exp:'Rodó descriu una forma.'},
   {w:'fresc',        cat:'adjectiu', exp:'Fresc descriu una qualitat.'},
   {w:'difícil',      cat:'adjectiu', exp:'Difícil descriu una qualitat.'},
   {w:'net',          cat:'adjectiu', exp:'Net descriu un estat.'},
   {w:'valent',       cat:'adjectiu', exp:'Valent descriu una qualitat.'},
-  // 39-50: Nova ampliació fins a 50
-  {w:'poma',         cat:'nom',      exp:'Poma és un nom (fruita).'},
-  {w:'canta',        cat:'verb',     exp:'Cantar és un verb (acció).'},
-  {w:'llarg',        cat:'adjectiu', exp:'Llarg descriu una dimensió.'},
-  {w:'joguina',      cat:'nom',      exp:'Joguina és un nom (objecte).'},
-  {w:'cuina',        cat:'verb',     exp:'Cuinar o cuina pot actuar com a verb o nom. Triem verb: cuinar.'},
-  {w:'feliç',        cat:'adjectiu', exp:'Feliç descriu un estat d\'ànim.'},
-  {w:'arbre',        cat:'nom',      exp:'Arbre és un nom (planta).'},
-  {w:'dorm',         cat:'verb',     exp:'Dormir és un verb (acció/estat).'},
-  {w:'ràpid',        cat:'adjectiu', exp:'Ràpid descriu una velocitat.'},
-  {w:'gos',          cat:'nom',      exp:'Gos és un nom (animal).'},
-  {w:'pinta',        cat:'verb',     exp:'Pintar és un verb (acció).'},
-  {w:'alt',          cat:'adjectiu', exp:'Alt descriu una estatura.'}
 ];
 const CAT_OPTS = ['nom', 'verb', 'adjectiu'];
 
+// base: paraula SENSE accent (forma que es mostra a l'alumne)
+// full: forma correcta (amb accent o sense si no en necessita)
+// w:    2 opcions incorrectes (amb accent erroni o mal col·locat)
 const TIPUSACC_POOL = [
-  // 1-8: Cal accent obert original
+  // Cal accent OBERT (à, è, ò)
   {base:'cafe',    full:'cafè',    w:['café','cafe'],       hint:"cafè porta accent obert (è) — so obert"},
   {base:'pero',    full:'però',    w:['peró','pero'],       hint:"però porta accent obert (ò) — so obert"},
   {base:'rapid',   full:'ràpid',   w:['rápid','rapid'],     hint:"ràpid porta accent obert (à)"},
@@ -350,16 +231,16 @@ const TIPUSACC_POOL = [
   {base:'magic',   full:'màgic',   w:['mágic','magic'],     hint:"màgic porta accent obert (à)"},
   {base:'bestia',  full:'bèstia',  w:['béstia','bestia'],   hint:"bèstia porta accent obert (è)"},
   {base:'pagina',  full:'pàgina',  w:['página','pagina'],   hint:"pàgina porta accent obert (à)"},
-  // 9-16: Cal accent tancat original
+  // Cal accent TANCAT (é, í, ó, ú)
   {base:'cami',    full:'camí',    w:['càmi','cami'],       hint:"camí porta accent tancat (í) — la í és sempre tancada"},
   {base:'pastis',  full:'pastís',  w:['pàstis','pastis'],   hint:"pastís porta accent tancat (í) — la í és sempre tancada"},
   {base:'cordo',   full:'cordó',   w:['còrdo','cordo'],     hint:"cordó porta accent tancat (ó) — la ó de cordó és tancada"},
   {base:'boto',    full:'botó',    w:['bòto','boto'],       hint:"botó porta accent tancat (ó)"},
-  {base:'també',   full:'també',   w:['tambè','tambe'],     hint:"també porta accent tancat (é)"},
+  {base:'tambe',   full:'també',   w:['tambè','tambe'],     hint:"també porta accent tancat (é)"},
   {base:'musica',  full:'música',  w:['musíca','musica'],   hint:"música porta accent tancat (ú) — és esdrúixola"},
   {base:'jardi',   full:'jardí',   w:['jàrdi','jardi'],     hint:"jardí porta accent tancat (í)"},
   {base:'balco',   full:'balcó',   w:['balcò','balco'],     hint:"balcó porta accent tancat (ó)"},
-  // 17-23: Cap accent escrit original
+  // Cap accent escrit (paraules planes i agudes que no el necessiten)
   {base:'porta',   full:'porta',   w:['pòrta','pórta'],     hint:"porta és plana en -a: no porta accent escrit"},
   {base:'festa',   full:'festa',   w:['fèsta','fésta'],     hint:"festa és plana en -a: no porta accent"},
   {base:'arbre',   full:'arbre',   w:['àrbre','árbre'],     hint:"arbre és plana en -e: no porta accent"},
@@ -367,39 +248,11 @@ const TIPUSACC_POOL = [
   {base:'mare',    full:'mare',    w:['màre','máre'],       hint:"mare és plana en -e: no porta accent"},
   {base:'camp',    full:'camp',    w:['càmp','cámp'],       hint:"camp és aguda en -p: no s'accentua"},
   {base:'parc',    full:'parc',    w:['pàrc','párc'],       hint:"parc és aguda en -c: no s'accentua"},
-  // 24-50: Nova ampliació equilibrada (oberts, tancats, sense accent)
-  {base:'sofà',    full:'sofà',    w:['sofá','sofa'],       hint:"sofà porta accent obert (à) perquè és aguda en vocal"},
-  {base:'tambe',   full:'també',   w:['tambè','tambe'],     hint:"també porta accent tancat (é)"},
-  {base:'interes', full:'interès', w:['interés','interes'], hint:"interès porta accent obert (è)"},
-  {base:'comu',    full:'comú',    w:['comù','comu'],       hint:"comú porta accent tancat (ú)"},
-  {base:'fenomen', full:'fenomen', w:['fenòmen','fenómen'],hint:"fenomen és plana acabada en -en: no s'accentua"},
-  {base:'examen',  full:'examen',  w:['exàmen','exámen'],   hint:"examen és plana acabada en -en: no s'accentua"},
-  {base:'mar',     full:'mar',     w:['màr','már'],         hint:"mar és monosíl·laba i no porta accent diacrític"},
-  {base:'bassa',   full:'bassa',   w:['bàssa','bássa'],     hint:"bassa és plana acabada en -a: sense accent"},
-  {base:'gambi',   full:'gandul',  w:['gàndul','gándul'],   hint:"gandul és aguda acabada en -l: sense accent"},
-  {base:'america', full:'amèrica', w:['américa','america'], hint:"amèrica és esdrúixola i porta accent obert (è)"},
-  {base:'valencia',full:'valència',w:['valéncia','valencia'],hint:"valència és esdrúixola i porta accent obert (è)"},
-  {base:'esglesia',full:'església',w:['esglèsia','esglesia'],hint:"església és esdrúixola i porta accent tancat (é)"},
-  {base:'fabrica', full:'fàbrica', w:['fábrica','fabrica'], hint:"fàbrica és esdrúixola amb accent obert (à)"},
-  {base:'kilòmetre',full:'quilòmetre',w:['quilómetre','kilometre'],hint:"quilòmetre és esdrúixola amb accent obert (ò)"},
-  {base:'telefon', full:'telèfon', w:['teléfon','telefon'], hint:"telèfon és plana acabada en -on: s'accentua (è)"},
-  {base:'safo',    full:'safó',    w:['safò','safo'],       hint:"safó o carbó porta accent tancat (ó)"},
-  {base:'carbo',   full:'carbó',   w:['carbò','carbo'],     hint:"carbó és aguda acabada en vocal (ó)"},
-  {base:'plora',   full:'plora',   w:['plòra','plóra'],     hint:"plora és plana acabada en -a: sense accent"},
-  {base:'pensa',   full:'pensa',   w:['pènsa','pénsa'],     hint:"pensa és plana acabada en -a: sense accent"},
-  {base:'cantaran',full:'cantaran',w:['cantaràn','cantarán'],hint:"cantaran és aguda acabada en -an: sense accent"},
-  {base:'parlaran',full:'parlaran',w:['parlaràn','parlarán'],hint:"parlaran és aguda acabada en -an: sense accent"},
-  {base:'replegà', full:'replegà', w:['replegá','replega'],   hint:"replegà (passat) porta accent obert (à)"},
-  {base:'tindra',  full:'tindrà',  w:['tindrá','tindra'],   hint:"tindrà (futur) porta accent obert (à)"},
-  {base:'catala',  full:'català',  w:['catalá','catala'],   hint:"català és aguda acabada en vocal (à)"},
-  {base:'atles',   full:'atles',   w:['àtles','átles'],     hint:"atles és plana acabada en -es: sense accent"},
-  {base:'proxim',  full:'pròxim',  w:['próxim','proxim'],   hint:"pròxim és plana no acabada en els casos rars: s'accentua (ò)"},
-  {base:'util',    full:'útil',    w:['ùtil','util'],       hint:"útil és plana acabada en -l: s'accentua (ú)"}
 ];
 
-// _ marca la posició on la h podria anar
+// _ marca la posició on la h podria anar (sempre al principi o en posició medial)
 const HWORDS_POOL = [
-  // 1-13: Porten H inicial originals
+  // Porten H inicial
   {word:'_ome',       ans:'h',     full:'home',       hint:'home (persona) sempre s\'escriu amb h'},
   {word:'_ora',       ans:'h',     full:'hora',       hint:'hora s\'escriu amb h'},
   {word:'_erba',      ans:'h',     full:'herba',      hint:'herba s\'escriu amb h'},
@@ -413,10 +266,10 @@ const HWORDS_POOL = [
   {word:'_eroi',      ans:'h',     full:'heroi',      hint:'heroi s\'escriu amb h'},
   {word:'_umà',       ans:'h',     full:'humà',       hint:'humà s\'escriu amb h'},
   {word:'_àmster',    ans:'h',     full:'hàmster',    hint:'hàmster s\'escriu amb h'},
-  // 14-15: Porten H medial originals
+  // Porten H medial (entre vocals)
   {word:'ve_icle',    ans:'h',     full:'vehicle',    hint:'vehicle porta h entre la e i la i'},
   {word:'alco_ol',    ans:'h',     full:'alcohol',    hint:'alcohol porta h entre les dues o'},
-  // 16-25: NO porten H originals
+  // NO porten H (errors freqüents)
   {word:'_estiu',     ans:'cap h', full:'estiu',      hint:'estiu (estació càlida) NO porta h'},
   {word:'_ovella',    ans:'cap h', full:'ovella',     hint:'ovella (animal) NO porta h'},
   {word:'_orella',    ans:'cap h', full:'orella',     hint:'orella NO porta h'},
@@ -427,7 +280,7 @@ const HWORDS_POOL = [
   {word:'_oreneta',   ans:'cap h', full:'oreneta',    hint:'oreneta (ocell) NO porta h'},
   {word:'_ase',       ans:'cap h', full:'ase',        hint:'ase (animal) NO porta h'},
   {word:'_illa',      ans:'cap h', full:'illa',       hint:'illa NO porta h'},
-  // 26-34: Ampliació original H inicial
+  // Ampliació — H inicial
   {word:'_umor',      ans:'h',     full:'humor',      hint:"humor s'escriu amb h"},
   {word:'_ereu',      ans:'h',     full:'hereu',      hint:"hereu (fill gran) s'escriu amb h"},
   {word:'_orror',     ans:'h',     full:'horror',     hint:"horror s'escriu amb h"},
@@ -437,24 +290,15 @@ const HWORDS_POOL = [
   {word:'_umitat',    ans:'h',     full:'humitat',    hint:"humitat s'escriu amb h"},
   {word:'_ola',       ans:'h',     full:'hola',       hint:"hola s'escriu amb h"},
   {word:'_abitant',   ans:'h',     full:'habitant',   hint:"habitant s'escriu amb h"},
-  // 35-38: Ampliació original H medial
+  // Ampliació — H medial (entre vocals)
   {word:'a_ir',       ans:'h',     full:'ahir',       hint:"ahir (el dia d'ahir) porta h medial"},
   {word:'tot_om',     ans:'h',     full:'tothom',     hint:"tothom porta h: tot + hom (= home)"},
   {word:'sub_asta',   ans:'h',     full:'subhasta',   hint:"subhasta porta h medial"},
   {word:'en_orabona', ans:'h',     full:'enhorabona', hint:"enhorabona porta h medial"},
-  // 39-42: Ampliació original Cap H
+  // Ampliació — Cap H (errors freqüents)
   {word:'_avui',      ans:'cap h', full:'avui',       hint:"avui (el dia d'avui) NO porta h"},
   {word:'co_et',      ans:'cap h', full:'coet',       hint:"coet (no 'cohet'!) NO porta h"},
   {word:'_orfe',      ans:'cap h', full:'orfe',       hint:"orfe (sense pares) NO porta h"},
-  {word:'_os',        ans:'cap h', full:'os',         hint:"os (os de l'esquelet) NO porta h"}, // Corregit text explicatiu respecte l'óss de dalt
-  // 43-50: Nova ampliació fins a 50
-  {word:'ex_ibir',    ans:'h',     full:'exhibir',    hint:"exhibir porta h medial darrere la x"},
-  {word:'_iure',      ans:'cap h', full:'iure',       hint:"iure (com en dret propi o d'altres) o iogurt NO porten h"},
-  {word:'_iogurt',    ans:'cap h', full:'iogurt',     hint:"iogurt NO porta h"},
-  {word:'co_esió',    ans:'h',     full:'cohesió',    hint:"cohesió porta h medial"},
-  {word:'_harmonia',  ans:'h',     full:'harmonia',   hint:"harmonia s'escriu amb h"},
-  {word:'_hereva',    ans:'h',     full:'hereva',     hint:"hereva s'escriu amb h"},
-  {word:'_idrogen',   ans:'h',     full:'hidrogen',   hint:"hidrogen comença amb h (prefix hidro-)"},
-  {word:'_edera',     ans:'h',     full:'hedera',     hint:"heura (o hedera) s'escriu amb h"}
+  {word:'_os',        ans:'cap h', full:'os',         hint:"os (os del cos) NO porta h"},
 ];
 const HWORDS_OPTS = ['h', 'cap h'];
