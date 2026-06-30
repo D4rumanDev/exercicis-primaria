@@ -205,11 +205,8 @@ function buildConts(){
     const marks=[];
     for(let m=1;m<=10;m++){
       const my=nH+bH-Math.round(bH*m/10);
-      const lg=m%5===0,hl=m===lv,ll=lg?11:(hl?8:5);
-      marks.push(
-        `<line x1="${W-wT-ll}" y1="${my}" x2="${W-wT}" y2="${my}" stroke="${hl?'#f59e0b':'var(--m)'}" stroke-width="${lg||hl?2:1.2}"/>` +
-        (lg||hl?`<text x="${W-wT-ll-2}" y="${my+3.5}" text-anchor="end" font-size="${lg?8.5:8}" font-weight="700" fill="${hl?'#f59e0b':'var(--m)'}">${fmtN(m*cap/10)}</text>`:'')
-      );
+      const lg=m%5===0,hl=m===lv,ll=lg?11:5;
+      marks.push(`<line x1="${W-wT-ll}" y1="${my}" x2="${W-wT}" y2="${my}" stroke="${hl?'#f59e0b':'var(--m)'}" stroke-width="${lg||hl?2:1.2}"/>`);
     }
     const svg=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
       <defs>
