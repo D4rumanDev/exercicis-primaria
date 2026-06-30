@@ -178,17 +178,31 @@ function s1Init() {
 }
 
 function s1Render() {
-  document.getElementById('s1-grid').innerHTML = s1Items.map((p, i) => {
-    if (s1Matched.has(i))
-      return `<div class="s1-card matched"><span class="ci">${p.icon}</span><span class="cn">${p.name} ✓</span></div>`;
-    const sel = s1SelIdx === i ? ' sel' : '';
-    return `<div class="s1-card${sel}" onclick="s1PickEmoji(${i})"><span class="ci">${p.icon}</span><span class="cn">?</span></div>`;
-  }).join('');
+  const grid = document.getElementById('s1-grid');
+  grid.innerHTML = '';
+  s1Items.forEach((p, i) => {
+    const div = document.createElement('div');
+    if (s1Matched.has(i)) {
+      div.className = 's1-card matched';
+      div.innerHTML = `<span class="ci">${p.icon}</span><span class="cn">${p.name} ✓</span>`;
+    } else {
+      div.className = 's1-card' + (s1SelIdx === i ? ' sel' : '');
+      div.innerHTML = `<span class="ci">${p.icon}</span><span class="cn">?</span>`;
+      div.onclick = () => s1PickEmoji(i);
+    }
+    grid.appendChild(div);
+  });
 
+  const wbank = document.getElementById('s1-wbank');
+  wbank.innerHTML = '';
   const remaining = s1Items.filter((_, i) => !s1Matched.has(i)).map(p => p.name);
-  document.getElementById('s1-wbank').innerHTML = sh([...remaining])
-    .map(n => `<button class="s1-wchip" onclick="s1PickWord('${n.replace(/'/g,"\\'")}'">${n}</button>`)
-    .join('');
+  sh([...remaining]).forEach(n => {
+    const btn = document.createElement('button');
+    btn.className = 's1-wchip';
+    btn.textContent = n;
+    btn.onclick = () => s1PickWord(n);
+    wbank.appendChild(btn);
+  });
 }
 
 function s1PickEmoji(i) {
