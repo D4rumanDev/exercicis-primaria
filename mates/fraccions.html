@@ -266,17 +266,13 @@ function barSVG(n,d,th,W=260,H=72,inter=false){
     +`</svg>`;
 }
 
-function dominoSVG(n,d,th,W=90,H=26*Math.min(d,8)+20){
-  H=Math.max(H,80);
-  const rowH=(H-12)/d;let s='';
-  s+=`<rect x="2" y="2" width="${W-4}" height="${H-4}" rx="10" fill="white" stroke="${th.stroke}" stroke-width="2.5"/>`;
+function dominoSVG(n,d,th,W=88){
+  const cH=26,gap=5,px=8,py=4,cW=W-px*2;
+  const H=py*2+d*cH+(d-1)*gap;
+  let s='';
   for(let i=0;i<d;i++){
-    const y=6+i*rowH,h=rowH-4;
-    s+=`<rect x="9" y="${y.toFixed(1)}" width="${W-18}" height="${h.toFixed(1)}" rx="6" fill="${i<n?th.fill:th.empty}" stroke="${th.stroke}" stroke-width="1.5"/>`;
-  }
-  if(n>0&&n<d){
-    const ly=(6+n*rowH-2).toFixed(1);
-    s+=`<line x1="2" y1="${ly}" x2="${W-2}" y2="${ly}" stroke="${th.stroke}" stroke-width="3"/>`;
+    const y=py+i*(cH+gap);
+    s+=`<rect data-i="${i}" x="${px}" y="${y}" width="${cW}" height="${cH}" rx="6" fill="${i<n?th.fill:th.empty}" stroke="${th.stroke}" stroke-width="${i<n?'1.8':'1.2'}"/>`;
   }
   return`<svg width="${W}" height="${H}">${s}</svg>`;
 }
