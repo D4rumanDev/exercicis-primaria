@@ -223,17 +223,17 @@ function angleSVG(deg, size=170){
   const clr=deg<90?'#f87171':deg===90?'#60a5fa':deg<180?'#fbbf24':'#a78bfa';
   if(deg===90){
     const sq=Math.round(arcR*.65);
-    return `<svg width="${size}" height="${size}"><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy-r}" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/><path d="M${cx+sq},${cy} L${cx+sq},${cy-sq} L${cx},${cy-sq} L${cx},${cy} Z" fill="${clr}" fill-opacity=".35" stroke="${clr}" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="4" fill="#1e293b"/></svg>`;
+    return `<svg width="${size}" height="${size}"><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="var(--t)" stroke-width="3" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy-r}" stroke="var(--t)" stroke-width="3" stroke-linecap="round"/><path d="M${cx+sq},${cy} L${cx+sq},${cy-sq} L${cx},${cy-sq} L${cx},${cy} Z" fill="${clr}" fill-opacity=".35" stroke="${clr}" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="4" fill="var(--t)"/></svg>`;
   }
   if(deg===180){
-    return `<svg width="${size}" height="${size}"><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/><path d="M${cx},${cy} L${cx+arcR},${cy} A${arcR},${arcR} 0 0 0 ${cx-arcR},${cy} Z" fill="${clr}" fill-opacity=".4" stroke="${clr}" stroke-width="1.5"/><circle cx="${cx}" cy="${cy}" r="4" fill="#1e293b"/></svg>`;
+    return `<svg width="${size}" height="${size}"><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="var(--t)" stroke-width="3" stroke-linecap="round"/><path d="M${cx},${cy} L${cx+arcR},${cy} A${arcR},${arcR} 0 0 0 ${cx-arcR},${cy} Z" fill="${clr}" fill-opacity=".4" stroke="${clr}" stroke-width="1.5"/><circle cx="${cx}" cy="${cy}" r="4" fill="var(--t)"/></svg>`;
   }
   const rad=deg*Math.PI/180;
   const x2=(cx+r*Math.cos(rad)).toFixed(1), y2=(cy-r*Math.sin(rad)).toFixed(1);
   const ax=(cx+arcR*Math.cos(rad)).toFixed(1), ay=(cy-arcR*Math.sin(rad)).toFixed(1);
   const la=deg>180?1:0;
   // wedge: vèrtex → punt base dret → arc CCW → punt del segon raig → tancar
-  return `<svg width="${size}" height="${size}"><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/><path d="M${cx},${cy} L${cx+arcR},${cy} A${arcR},${arcR} 0 ${la} 0 ${ax},${ay} Z" fill="${clr}" fill-opacity=".35" stroke="${clr}" stroke-width="1.5"/><circle cx="${cx}" cy="${cy}" r="4" fill="#1e293b"/></svg>`;
+  return `<svg width="${size}" height="${size}"><line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="var(--t)" stroke-width="3" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="var(--t)" stroke-width="3" stroke-linecap="round"/><path d="M${cx},${cy} L${cx+arcR},${cy} A${arcR},${arcR} 0 ${la} 0 ${ax},${ay} Z" fill="${clr}" fill-opacity=".35" stroke="${clr}" stroke-width="1.5"/><circle cx="${cx}" cy="${cy}" r="4" fill="var(--t)"/></svg>`;
 }
 function angleType(deg){
   if(deg<90)return'Agut'; if(deg===90)return'Recte'; if(deg<180)return'Obtús'; if(deg===180)return'Pla'; return'Complet';
@@ -276,13 +276,13 @@ function protractorSVG(deg,W=240){
     return [(cx+r*Math.cos(rad)).toFixed(1),(cy-r*Math.sin(rad)).toFixed(1)];
   };
   // Fons semicercle (de dreta a esquerra, sweep=0=CCW pantalla=cap amunt)
-  const bg=`<path d="M${cx+R},${cy} A${R},${R} 0 1 0 ${cx-R},${cy} Z" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>`;
+  const bg=`<path d="M${cx+R},${cy} A${R},${R} 0 1 0 ${cx-R},${cy} Z" fill="var(--bg-lo)" stroke="var(--b)" stroke-width="1.5"/>`;
   // Marques i etiquetes (cada 10°, numerat cada 30°)
   let tks='';
   for(let d=0;d<=180;d+=10){
     const maj=d%30===0;
     const [x1,y1]=pt(d,R),[x2,y2]=pt(d,R-(maj?14:6));
-    tks+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${maj?'#64748b':'#94a3b8'}" stroke-width="${maj?2:1}"/>`;
+    tks+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--m)" stroke-width="${maj?2:1}"/>`;
   }
   // Ventall de color de 0° fins a deg
   const arcR=Math.round(R*.28);
@@ -291,7 +291,7 @@ function protractorSVG(deg,W=240){
   const wedge=`<path d="M${cx},${cy} L${(cx+arcR).toFixed(1)},${cy} A${arcR},${arcR} 0 0 0 ${ax},${ay} Z" fill="${clr}" fill-opacity=".35" stroke="${clr}" stroke-width="1.5"/>`;
   // Fletxa
   const [armX,armY]=pt(deg,R-3);
-  return `<svg width="${W}" height="${H}">${bg}<line x1="${(cx-R-4).toFixed(0)}" y1="${cy}" x2="${(cx+R+4).toFixed(0)}" y2="${cy}" stroke="#1e293b" stroke-width="2"/>${tks}${wedge}<line x1="${cx}" y1="${cy}" x2="${armX}" y2="${armY}" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="4" fill="#1e293b"/></svg>`;
+  return `<svg width="${W}" height="${H}">${bg}<line x1="${(cx-R-4).toFixed(0)}" y1="${cy}" x2="${(cx+R+4).toFixed(0)}" y2="${cy}" stroke="var(--t)" stroke-width="2"/>${tks}${wedge}<line x1="${cx}" y1="${cy}" x2="${armX}" y2="${armY}" stroke="var(--t)" stroke-width="2.5" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="4" fill="var(--t)"/></svg>`;
 }
 const PROT_VALS=[30,60,90,120,150];
 let estPrev=-1;
@@ -335,12 +335,12 @@ function clockSVG(h, m, size=160){
   let ticks='';
   for(let i=0;i<12;i++){
     const a=toR(i*30), r1=R-2, r2=i%3===0?R-11:R-6;
-    ticks+=`<line x1="${(cx+r1*Math.cos(a)).toFixed(1)}" y1="${(cy+r1*Math.sin(a)).toFixed(1)}" x2="${(cx+r2*Math.cos(a)).toFixed(1)}" y2="${(cy+r2*Math.sin(a)).toFixed(1)}" stroke="#94a3b8" stroke-width="${i%3===0?2.5:1.5}"/>`;
+    ticks+=`<line x1="${(cx+r1*Math.cos(a)).toFixed(1)}" y1="${(cy+r1*Math.sin(a)).toFixed(1)}" x2="${(cx+r2*Math.cos(a)).toFixed(1)}" y2="${(cy+r2*Math.sin(a)).toFixed(1)}" stroke="var(--m)" stroke-width="${i%3===0?2.5:1.5}"/>`;
   }
   let nums='';
   [[12,0],[3,90],[6,180],[9,270]].forEach(([n,d])=>{
     const nr=R-18, a=toR(d);
-    nums+=`<text x="${(cx+nr*Math.cos(a)).toFixed(1)}" y="${(cy+nr*Math.sin(a)+4).toFixed(1)}" font-size="11" font-weight="700" text-anchor="middle" fill="#64748b">${n}</text>`;
+    nums+=`<text x="${(cx+nr*Math.cos(a)).toFixed(1)}" y="${(cy+nr*Math.sin(a)+4).toFixed(1)}" font-size="11" font-weight="700" text-anchor="middle" fill="var(--m)">${n}</text>`;
   });
   // Arc de color entre les dues busques per indicar quin angle es mesura.
   // hDeg ≤ 180: arc CW (sweep=1) des de 12 fins l'hora → arc curt.
@@ -358,7 +358,7 @@ function clockSVG(h, m, size=160){
     const sw=hDeg<=180?1:0; // CW si l'angle és ≤180 (curt per la dreta), CCW si >180 (curt per l'esquerra)
     arcEl=`<path d="M${cx},${cy} L${sx},${sy} A${arcR},${arcR} 0 0 ${sw} ${ex},${ey} Z" fill="${clr}" fill-opacity=".35" stroke="${clr}" stroke-width="1.5"/>`;
   }
-  return `<svg width="${size}" height="${size}"><circle cx="${cx}" cy="${cy}" r="${R}" fill="white" stroke="#e2e8f0" stroke-width="3"/>${ticks}${nums}${arcEl}<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="4.5" fill="#1e293b"/></svg>`;
+  return `<svg width="${size}" height="${size}"><circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--s)" stroke="var(--b)" stroke-width="3"/>${ticks}${nums}${arcEl}<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="var(--t)" stroke-width="5" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="var(--a)" stroke-width="3" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="4.5" fill="var(--t)"/></svg>`;
 }
 function nextClock(){
   let idx; do{idx=ri(0,CLOCK_QS.length-1);}while(idx===clkPrev);
@@ -380,7 +380,7 @@ function rightAngleMark(V, P1, P2, sq=11){
   const dx1=P1.x-V.x, dy1=P1.y-V.y, l1=Math.sqrt(dx1*dx1+dy1*dy1)||1;
   const dx2=P2.x-V.x, dy2=P2.y-V.y, l2=Math.sqrt(dx2*dx2+dy2*dy2)||1;
   const u1x=dx1/l1*sq, u1y=dy1/l1*sq, u2x=dx2/l2*sq, u2y=dy2/l2*sq;
-  return `<path d="M${(V.x+u1x).toFixed(1)},${(V.y+u1y).toFixed(1)} L${(V.x+u1x+u2x).toFixed(1)},${(V.y+u1y+u2y).toFixed(1)} L${(V.x+u2x).toFixed(1)},${(V.y+u2y).toFixed(1)}" fill="none" stroke="#1e293b" stroke-width="2"/>`;
+  return `<path d="M${(V.x+u1x).toFixed(1)},${(V.y+u1y).toFixed(1)} L${(V.x+u1x+u2x).toFixed(1)},${(V.y+u1y+u2y).toFixed(1)} L${(V.x+u2x).toFixed(1)},${(V.y+u2y).toFixed(1)}" fill="none" stroke="var(--t)" stroke-width="2"/>`;
 }
 
 function triSVG(pts, labels, labelType, rightAt, W=210, H=175){
@@ -400,12 +400,12 @@ function triSVG(pts, labels, labelType, rightAt, W=210, H=175){
     [[A,B,labels[0]],[B,C,labels[1]],[C,A,labels[2]]].forEach(([p1,p2,lbl])=>{
       const mx=(p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
       const dx=mx-gx, dy=my-gy, len=Math.sqrt(dx*dx+dy*dy)||1;
-      lbls+=`<text x="${(mx+dx/len*16).toFixed(0)}" y="${(my+dy/len*16+4).toFixed(0)}" font-size="11" font-weight="800" text-anchor="middle" fill="#1e293b">${lbl}</text>`;
+      lbls+=`<text x="${(mx+dx/len*16).toFixed(0)}" y="${(my+dy/len*16+4).toFixed(0)}" font-size="11" font-weight="800" text-anchor="middle" fill="var(--t)">${lbl}</text>`;
     });
   } else {
     [[A,labels[0]],[B,labels[1]],[C,labels[2]]].forEach(([pt,lbl])=>{
       const dx=pt.x-gx, dy=pt.y-gy, len=Math.sqrt(dx*dx+dy*dy)||1;
-      lbls+=`<text x="${(pt.x+dx/len*19).toFixed(0)}" y="${(pt.y+dy/len*19+4).toFixed(0)}" font-size="11" font-weight="800" text-anchor="middle" fill="#1e293b">${lbl}</text>`;
+      lbls+=`<text x="${(pt.x+dx/len*19).toFixed(0)}" y="${(pt.y+dy/len*19+4).toFixed(0)}" font-size="11" font-weight="800" text-anchor="middle" fill="var(--t)">${lbl}</text>`;
     });
   }
   return `<svg width="${W}" height="${H}"><polygon points="${A.x.toFixed(1)},${A.y.toFixed(1)} ${B.x.toFixed(1)},${B.y.toFixed(1)} ${C.x.toFixed(1)},${C.y.toFixed(1)}" fill="${col}" fill-opacity=".2" stroke="${col}" stroke-width="2.5"/>${extra}${lbls}</svg>`;
@@ -484,9 +484,9 @@ function nextUnk(){
   let lbls='';
   [[A,a1+'°',false],[B,a2+'°',false],[C,'?',true]].forEach(([pt,lbl,isQ])=>{
     const dx=pt.x-gx, dy=pt.y-gy, len=Math.sqrt(dx*dx+dy*dy)||1;
-    lbls+=`<text x="${(pt.x+dx/len*19).toFixed(0)}" y="${(pt.y+dy/len*19+4).toFixed(0)}" font-size="${isQ?16:11}" font-weight="900" text-anchor="middle" fill="${isQ?'#dc2626':'#1e293b'}">${lbl}</text>`;
+    lbls+=`<text x="${(pt.x+dx/len*19).toFixed(0)}" y="${(pt.y+dy/len*19+4).toFixed(0)}" font-size="${isQ?16:11}" font-weight="900" text-anchor="middle" fill="${isQ?'var(--ko)':'var(--t)'}">${lbl}</text>`;
   });
-  document.getElementById('unk-vis').innerHTML=`<svg width="${W}" height="${H}"><polygon points="${A.x.toFixed(1)},${A.y.toFixed(1)} ${B.x.toFixed(1)},${B.y.toFixed(1)} ${C.x.toFixed(1)},${C.y.toFixed(1)}" fill="#bfdbfe" fill-opacity=".45" stroke="#60a5fa" stroke-width="2.5"/>${lbls}</svg>`;
+  document.getElementById('unk-vis').innerHTML=`<svg width="${W}" height="${H}"><polygon points="${A.x.toFixed(1)},${A.y.toFixed(1)} ${B.x.toFixed(1)},${B.y.toFixed(1)} ${C.x.toFixed(1)},${C.y.toFixed(1)}" fill="var(--bd-hi)" fill-opacity=".45" stroke="var(--a)" stroke-width="2.5"/>${lbls}</svg>`;
   document.getElementById('unk-q').textContent=`${a1}° + ${a2}° + ? = 180°`;
   clrInp('unk-inp');
   document.getElementById('unk-fb').textContent='';
@@ -533,7 +533,7 @@ function perimSVG(q){
   }
   const rx=(W-rw)/2,ry=(H-rh)/2;
   const sl=q.type==='sq'?q.a:q.b;
-  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto"><rect x="${rx.toFixed(0)}" y="${ry.toFixed(0)}" width="${rw}" height="${rh}" fill="#60a5fa" fill-opacity=".18" stroke="#60a5fa" stroke-width="2.5" rx="3"/><text x="${(rx+rw/2).toFixed(0)}" y="${(ry-10).toFixed(0)}" font-size="13" font-weight="800" text-anchor="middle" fill="#1e293b">${q.a} cm</text><text x="${(rx+rw+12).toFixed(0)}" y="${(ry+rh/2+5).toFixed(0)}" font-size="13" font-weight="800" text-anchor="start" fill="#1e293b">${sl} cm</text></svg>`;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto"><rect x="${rx.toFixed(0)}" y="${ry.toFixed(0)}" width="${rw}" height="${rh}" fill="var(--a)" fill-opacity=".18" stroke="var(--a)" stroke-width="2.5" rx="3"/><text x="${(rx+rw/2).toFixed(0)}" y="${(ry-10).toFixed(0)}" font-size="13" font-weight="800" text-anchor="middle" fill="var(--t)">${q.a} cm</text><text x="${(rx+rw+12).toFixed(0)}" y="${(ry+rh/2+5).toFixed(0)}" font-size="13" font-weight="800" text-anchor="start" fill="var(--t)">${sl} cm</text></svg>`;
 }
 function nextPerim(){
   let idx;do{idx=ri(0,PERIM_QS.length-1);}while(idx===perPrev&&PERIM_QS.length>1);
@@ -573,7 +573,7 @@ function areaSVG(q){
   let cells='';
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)
     cells+=`<rect x="${ox+c*cs}" y="${oy+r*cs}" width="${cs}" height="${cs}" fill="#34d399" fill-opacity=".25" stroke="#34d399" stroke-opacity=".7" stroke-width="1"/>`;
-  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">${cells}<text x="${(ox+gw/2).toFixed(0)}" y="${oy-10}" font-size="13" font-weight="800" text-anchor="middle" fill="#1e293b">${q.a} cm</text><text x="${ox+gw+12}" y="${(oy+gh/2+5).toFixed(0)}" font-size="13" font-weight="800" text-anchor="start" fill="#1e293b">${sl} cm</text></svg>`;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">${cells}<text x="${(ox+gw/2).toFixed(0)}" y="${oy-10}" font-size="13" font-weight="800" text-anchor="middle" fill="var(--t)">${q.a} cm</text><text x="${ox+gw+12}" y="${(oy+gh/2+5).toFixed(0)}" font-size="13" font-weight="800" text-anchor="start" fill="var(--t)">${sl} cm</text></svg>`;
 }
 function nextArea(){
   let idx;do{idx=ri(0,AREA_QS.length-1);}while(idx===areaPrev&&AREA_QS.length>1);
