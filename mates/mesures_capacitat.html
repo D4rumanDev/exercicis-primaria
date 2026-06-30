@@ -14,8 +14,8 @@
 .opts{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
 .ob{padding:8px 12px;border:1.5px solid var(--b);border-radius:var(--r);background:var(--s);cursor:pointer;font-size:.88rem;font-weight:600;transition:all .15s;min-height:40px;font-family:inherit}
 .ob:hover{border-color:var(--a);color:var(--a)}
-.ob.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.ob.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ob.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.ob.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .ob:disabled{cursor:default}
 .frac-ex{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
 .fbot{display:flex;flex-direction:column;align-items:center;gap:4px}
@@ -24,23 +24,23 @@
 .fres{display:flex;flex-direction:column;align-items:center;gap:5px}
 .fi{width:82px;padding:5px;border:2px solid var(--b);border-radius:8px;font-size:.95rem;font-weight:700;text-align:center;outline:none}
 .fi:focus{border-color:var(--a)}
-.fi.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.fi.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.fi.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.fi.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .ctable{width:100%;border-collapse:collapse;margin-bottom:10px}
 .ctable th{background:var(--a);color:#fff;padding:7px 4px;text-align:center;font-size:.85rem}
-.ctable td{border:1px solid #e2e8f0;padding:5px 2px;text-align:center;font-size:.88rem}
+.ctable td{border:1px solid var(--b);padding:5px 2px;text-align:center;font-size:.88rem}
 .ctable tr:nth-child(even) td{background:var(--bg-lo)}
 .tg{font-weight:700;color:var(--t)}
 .ti{width:66px;padding:3px 4px;border:2px solid var(--b);border-radius:6px;font-size:.9rem;font-weight:700;text-align:center;outline:none}
 .ti:focus{border-color:var(--a)}
-.ti.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.ti.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ti.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.ti.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .conv-list{display:flex;flex-direction:column;gap:8px}
 .conv-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:.9rem;color:var(--t)}
 .ci{width:76px;padding:4px 6px;border:2px solid var(--b);border-radius:8px;font-size:.95rem;font-weight:700;text-align:center;outline:none}
 .ci:focus{border-color:var(--a)}
-.ci.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.ci.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ci.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.ci.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .cu{font-size:.82rem;color:var(--m);font-weight:600}
 .jar-ex{display:flex;flex-direction:column;align-items:center;gap:8px}
 .jar-q{font-size:.95rem;font-weight:600;line-height:1.5;color:var(--t);text-align:center;max-width:340px;margin-bottom:14px}
@@ -48,15 +48,15 @@
 .jar-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center}
 .ji{width:82px;padding:5px 7px;border:2px solid var(--b);border-radius:8px;font-size:.95rem;font-weight:700;text-align:center;outline:none}
 .ji:focus{border-color:var(--a)}
-.ji.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.ji.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.ji.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.ji.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .prob-list{display:flex;flex-direction:column;gap:12px}
 .prob-t{font-size:.95rem;color:var(--t);margin-bottom:14px;line-height:1.5}
 .prob-r{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .pi{width:76px;padding:5px 7px;border:2px solid var(--b);border-radius:8px;font-size:.9rem;font-weight:700;text-align:center;outline:none}
 .pi:focus{border-color:var(--a)}
-.pi.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.pi.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.pi.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.pi.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .pu{font-size:.8rem;color:var(--m);font-weight:600}
 .pfb{font-size:.78rem;font-weight:600;margin-top:3px}
 .pfb.ok{color:var(--ok)}.pfb.ko{color:var(--ko)}
@@ -70,8 +70,8 @@
 .env-opts{display:flex;flex-direction:column;gap:4px;width:100%}
 .env-ob{padding:8px;border:1.5px solid var(--b);border-radius:var(--r);background:var(--s);cursor:pointer;font-size:.88rem;font-weight:600;text-align:center;transition:all .15s;font-family:inherit}
 .env-ob:hover{border-color:var(--a);color:var(--a)}
-.env-ob.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.env-ob.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.env-ob.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.env-ob.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .env-ob:disabled{cursor:default}
 @media(max-width:440px){.btn{padding:8px 12px;font-size:.8rem}.ob,.env-ob{padding:7px 8px;font-size:.8rem}.ji,.fi,.ci,.pi{font-size:.88rem}.cont-grid{gap:10px}.frac-ex{gap:6px}}
 </style>
@@ -328,7 +328,7 @@ function newFrac(){
     <div class="fop">=</div>
     <div class="fres">${resBsvg()}
       <input class="fi" id="fi" type="text" inputmode="decimal" placeholder="? ml">
-      <span style="font-size:.72rem;color:#64748b">ml</span>
+      <span style="font-size:.72rem;color:var(--m)">ml</span>
     </div></div>`;
   document.getElementById('frac-fb').textContent='';
   document.getElementById('frac-fb').className='fb';
@@ -477,7 +477,7 @@ function newJar(){
   document.getElementById('jar-ex').innerHTML=`
     ${drawJar(cur,tar)}
     <div class="jar-q">La jarra té <strong>${fmtMl(cur)}</strong>.<br>Quant en falta per arribar a <strong>${fmtMl(tar)}</strong>?</div>
-    <div class="jar-row"><input class="ji" id="ji" type="text" inputmode="decimal" placeholder="?"><span style="font-size:.82rem;color:#64748b">ml</span></div>`;
+    <div class="jar-row"><input class="ji" id="ji" type="text" inputmode="decimal" placeholder="?"><span style="font-size:.82rem;color:var(--m)">ml</span></div>`;
   document.getElementById('fb').textContent='';document.getElementById('fb').className='fb';
 }
 function checkJar(){

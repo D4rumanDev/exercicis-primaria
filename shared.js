@@ -17,8 +17,8 @@ let GAM_ACHS = [
 ];
 
 function _eKey(){return typeof EXER_KEY!=='undefined'&&EXER_KEY?EXER_KEY:null;}
-function gLoad(){try{return JSON.parse(localStorage.getItem(GAM))||{xp:0,ok:0,ko:0,streak:0,best:0,achs:[]};}catch{return{xp:0,ok:0,ko:0,streak:0,best:0,achs:[]};}}
-function gSave(g){localStorage.setItem(GAM,JSON.stringify(g));}
+function gLoad(){const today=new Date().toISOString().slice(0,10);try{const g=JSON.parse(localStorage.getItem(GAM))||{xp:0,ok:0,ko:0,streak:0,best:0,achs:[]};if(g.today!==today){g.today=today;g.todayOk=0;g.todayKo=0;}return g;}catch{return{xp:0,ok:0,ko:0,streak:0,best:0,achs:[],today,todayOk:0,todayKo:0};}}
+function gSave(g){localStorage.setItem(GAM,JSON.stringify(g));if(window.parent!==window)window.parent.postMessage({exGamUpdate:true},'*');}
 function eLoad(){const k=_eKey();if(!k)return{};try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}}
 function eSave(e){const k=_eKey();if(k)localStorage.setItem(k,JSON.stringify(e));}
 function gLv(xp){let l=GAM_LVS[0];for(const v of GAM_LVS)if(xp>=v.x)l=v;return l;}
@@ -72,7 +72,7 @@ function gNotif(text){
 //   hook gExtraAchs(g, tryA) → assoliments addicionals definits al fitxer
 function gCorrect(xp=1,typeOrFn=null){
   const g=gLoad(),prevLv=gLv(g.xp).n;
-  g.xp+=xp;g.ok++;g.streak++;if(g.streak>g.best)g.best=g.streak;
+  g.xp+=xp;g.ok++;g.todayOk=(g.todayOk||0)+1;g.streak++;if(g.streak>g.best)g.best=g.streak;
   const newA=[];
   const tryA=(id,cond)=>{if(!g.achs.includes(id)&&cond){g.achs.push(id);newA.push(id);}};
   tryA('first',g.ok>=1);tryA('s3',g.streak>=3);tryA('s5',g.streak>=5);tryA('s10',g.streak>=10);
@@ -85,7 +85,7 @@ function gCorrect(xp=1,typeOrFn=null){
   newA.forEach(id=>{const a=GAM_ACHS.find(x=>x.id===id);if(a)gNotif(a.s+' '+a.n+'!');});
   boom();
 }
-function gWrong(){const g=gLoad();g.ko++;g.streak=0;gSave(g);gRender();}
+function gWrong(){const g=gLoad();g.ko++;g.todayKo=(g.todayKo||0)+1;g.streak=0;gSave(g);gRender();}
 function boom(){
   const c=['#1d4ed8','#fbbf24','#16a34a','#dc2626','#7c3aed'];
   for(let i=0;i<30;i++){
@@ -149,3 +149,6 @@ function checkInp(inputId,correct,fbId,xp){
 }
 function clrInp(id){const el=document.getElementById(id);if(el){el.value='';el.classList.remove('ok','ko');}}
 let _sid=0;const svgId=()=>++_sid;
+
+function onEnter(inputId,fn){const el=document.getElementById(inputId);if(!el||el._enterBound)return;el._enterBound=true;el.addEventListener('keydown',e=>{if(e.key==='Enter')fn();});}
+document.addEventListener('DOMContentLoaded',()=>{if(window.parent!==window)window.parent.postMessage({exTitle:document.title},'*');});

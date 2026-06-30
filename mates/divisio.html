@@ -10,11 +10,11 @@
 .muted{color:var(--m);font-size:.88rem}
 /* MCQ options */
 .opts-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
-.aopt{padding:10px 22px;border:2px solid var(--b);border-radius:var(--r);background:#fff;cursor:pointer;font-size:1.2rem;font-weight:700;transition:all .15s;font-family:inherit;min-width:64px;text-align:center}
+.aopt{padding:10px 22px;border:2px solid var(--b);border-radius:var(--r);background:var(--bg);cursor:pointer;font-size:1.2rem;font-weight:700;transition:all .15s;font-family:inherit;min-width:64px;text-align:center}
 .aopt:hover:not(:disabled){border-color:var(--a);color:var(--a);background:var(--bg-hi)}
-.aopt.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
-.aopt.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko);pointer-events:none}
-.aopt.show{border-color:var(--ok);background:#f0fdf4;color:var(--ok);pointer-events:none}
+.aopt.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok);pointer-events:none}
+.aopt.ko{border-color:var(--ko);background:var(--er2);color:var(--ko);pointer-events:none}
+.aopt.show{border-color:var(--ok);background:var(--ok2);color:var(--ok);pointer-events:none}
 .aopt:disabled{opacity:.6;pointer-events:none}
 /* Question display */
 .div-q{font-size:2.2rem;font-weight:900;font-family:'Courier New',monospace;text-align:center;margin:14px 0 8px;color:var(--t)}
@@ -51,7 +51,7 @@
 }
 .ceq-sub-row{display:flex;align-items:center;justify-content:flex-end;padding:1px 0;min-width:80px}
 .ceq-minus{color:var(--a);margin-right:6px;flex-shrink:0}
-.ceq-sub-line{height:3px;background:#475569;margin:5px 0;border-radius:1px;width:100%}
+.ceq-sub-line{height:3px;background:var(--m);margin:5px 0;border-radius:1px;width:100%}
 .ceq-quo{display:flex;align-items:flex-start;justify-content:center;padding:4px 16px;align-self:start}
 /* Resta label row (Sec 3) */
 .ceq-resta{text-align:center;font-size:1rem;font-weight:600;margin:4px 0;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--m)}
@@ -66,11 +66,11 @@
 .ldg-inp:focus{border-color:var(--a);background:var(--bg-hi)}
 .ldg-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
 .ldg-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
-.ldg-bd{width:50px;height:52px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--m);background:#f1f5f9;border:3px solid var(--b);border-radius:6px;flex-shrink:0}
+.ldg-bd{width:50px;height:52px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--m);background:var(--bg-hi);border:3px solid var(--b);border-radius:6px;flex-shrink:0}
 .ldg-bd.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
 .ldg-bd.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
 .ldg-minus{position:absolute;left:-22px;font-size:2.2rem;color:var(--a);font-weight:900;line-height:52px}
-.ldg-hline{height:3px;background:#475569;border-radius:1px;margin:6px 0}
+.ldg-hline{height:3px;background:var(--m);border-radius:1px;margin:6px 0}
 .ldiv-right{display:flex;flex-direction:column;align-items:center;min-width:90px}
 .ldiv-div{border-left:3px solid var(--t);width:100%}
 .ldiv-quo-row{display:flex;gap:6px;justify-content:center;padding:4px 10px}
@@ -278,21 +278,21 @@ function gStatsExtra(){
   const tabH=[2,3,4,5,6,7,8,9].map(function(n){
     const s=st['t'+n]||{c:0,e:0},tot=s.c+s.e,p=tot?Math.round(s.c/tot*100):null;
     return '<div class="stat-cell"><div class="stat-label">÷'+n+'</div>'
-      +'<div class="stat-nums"><span class="sc">✓'+s.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+s.e+'</span></div>'
+      +'<div class="stat-nums"><span class="sc">✓'+s.c+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+s.e+'</span></div>'
       +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
       +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div></div>';
   }).join('');
   const exH=[2,3,4,5,6,7,8,9].map(function(n){
     const s=se['t'+n]||{c:0,e:0},tot=s.c+s.e,p=tot?Math.round(s.c/tot*100):null;
     return '<div class="stat-cell"><div class="stat-label">÷'+n+'</div>'
-      +'<div class="stat-nums"><span class="sc">✓'+s.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+s.e+'</span></div>'
+      +'<div class="stat-nums"><span class="sc">✓'+s.c+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+s.e+'</span></div>'
       +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
       +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div></div>';
   }).join('');
   return '<div class="section-lbl">Conjunts visuals</div>'
     +'<div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">'
     +'<div class="stat-cell"><div class="stat-label">ENCERTS</div>'
-    +'<div class="stat-nums"><span class="sc">✓'+(sv.c||0)+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+(sv.e||0)+'</span></div>'
+    +'<div class="stat-nums"><span class="sc">✓'+(sv.c||0)+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+(sv.e||0)+'</span></div>'
     +'<div class="stat-pct">'+(totVis?pVis+'%':'—')+'</div>'
     +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+pVis+'%"></div></div></div></div>'
     +'<div class="section-lbl mt3">Taules de divisió</div>'
@@ -302,7 +302,7 @@ function gStatsExtra(){
     +'<div class="section-lbl mt3">Divisió amb resta</div>'
     +'<div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">'
     +'<div class="stat-cell"><div class="stat-label">ENCERTS</div>'
-    +'<div class="stat-nums"><span class="sc">✓'+(sr.c||0)+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+(sr.e||0)+'</span></div>'
+    +'<div class="stat-nums"><span class="sc">✓'+(sr.c||0)+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+(sr.e||0)+'</span></div>'
     +'<div class="stat-pct">'+(totRest?pRest+'%':'—')+'</div>'
     +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+pRest+'%"></div></div></div></div>';
 }

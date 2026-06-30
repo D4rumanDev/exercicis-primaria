@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Exercicis — 4t</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
 <style>
 :root{
   --bg:#f0f4ff;--s:#fff;--b:#e2e8f0;--t:#1e293b;--m:#64748b;--a:#1d4ed8;--r:12px;
@@ -176,9 +178,9 @@ html[data-theme="light"]{
     <div class="gam-xp-track"><div class="gam-xp-fill" id="gam-xp-fill" style="width:0%"></div></div>
     <div class="gam-stats">
       <div class="gam-stat"><span class="gam-stat-n" id="gam-xp">0</span>⭐ XP</div>
-      <div class="gam-stat"><span class="gam-stat-n" id="gam-ok">0</span>✅ Encerts</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-ok">0</span>✅ Total</div>
+      <div class="gam-stat"><span class="gam-stat-n" id="gam-today">0</span>📅 Avui</div>
       <div class="gam-stat"><span class="gam-stat-n" id="gam-streak">0</span>🔥 Ratxa</div>
-      <div class="gam-stat"><span class="gam-stat-n" id="gam-achs">0</span>🏅 Assolim.</div>
     </div>
   </div>
 </nav>
@@ -189,6 +191,7 @@ html[data-theme="light"]{
   <div class="topbar">
     <button class="tog" onclick="openSidebar()">☰</button>
     <span class="topbar-title" id="topbar-title">Suma amb portant</span>
+    <button class="theme-btn" onclick="goRandom()" title="Exercici aleatori">🎲</button>
     <button class="theme-btn" id="theme-tog" onclick="toggleTheme()" title="Mode fosc/clar">🌙</button>
   </div>
   <iframe id="frame" src="mates/suma_portant.html" title="Exercici"></iframe>
@@ -196,22 +199,27 @@ html[data-theme="light"]{
 
 </div>
 <script>
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.exTitle){const el=document.getElementById('topbar-title');if(el)el.textContent=e.data.exTitle;}
+  if(e.data&&e.data.exGamUpdate){updateGamPanel();updateProgress();}
+});
 const GAM_KEY='ex_gam_v1';
 const LAST_KEY='ex_last_page';
 const NAV_STATE_KEY='ex_nav_groups';
 const GAM_LVS=[{n:'Principiant',x:0},{n:'Aprenent',x:75},{n:'Estudiant',x:200},{n:'Expert',x:450},{n:'Mestre',x:900}];
 
 function updateGamPanel(){
-  const g=JSON.parse(localStorage.getItem(GAM_KEY)||'{"xp":0,"ok":0,"streak":0,"achs":[]}');
+  const today=new Date().toISOString().slice(0,10);
+  const g=JSON.parse(localStorage.getItem(GAM_KEY)||'{"xp":0,"ok":0,"streak":0,"achs":[],"todayOk":0,"today":""}');
   let lv=GAM_LVS[0];for(const v of GAM_LVS)if(g.xp>=v.x)lv=v;
   let nx=null;for(const v of GAM_LVS)if(g.xp<v.x){nx=v;break;}
   const pct=nx?Math.min(100,Math.round((g.xp-lv.x)/(nx.x-lv.x)*100)):100;
-  document.getElementById('gam-lv-name').textContent=lv.n;
+  document.getElementById('gam-lv-name').textContent=lv.n+(g.streak>1?' 🔥'+g.streak:'');
   document.getElementById('gam-xp-fill').style.width=pct+'%';
   document.getElementById('gam-xp').textContent=g.xp;
   document.getElementById('gam-ok').textContent=g.ok||0;
+  document.getElementById('gam-today').textContent=g.today===today?g.todayOk||0:0;
   document.getElementById('gam-streak').textContent=g.streak||0;
-  document.getElementById('gam-achs').textContent=(g.achs||[]).length;
 }
 
 document.getElementById('frame').addEventListener('load',function(){
@@ -289,6 +297,13 @@ function restoreLastPage(){
     });
     if(btn)goTo(btn,s.src,s.title);
   }catch{}
+}
+function goRandom(){
+  const items=[...document.querySelectorAll('.nav-item')];
+  const btn=items[Math.floor(Math.random()*items.length)];
+  const m1=btn.getAttribute('onclick').match(/'([^']+\.html)'/);
+  const m2=btn.getAttribute('onclick').match(/'[^']+\.html','([^']+)'/);
+  if(m1&&m2)goTo(btn,m1[1],m2[1]);
 }
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}

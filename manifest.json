@@ -1,0 +1,13 @@
+{
+  "name": "Exercicis 4t",
+  "short_name": "Exercicis",
+  "description": "Exercicis de matemàtiques, llengua i anglès per a 4t de primària",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f4ff",
+  "theme_color": "#1d4ed8",
+  "lang": "ca",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

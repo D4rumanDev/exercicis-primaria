@@ -24,7 +24,7 @@
 .dcol .sr.mul{height:60px;font-size:2.2rem;font-weight:700}
 .dcol .sr.dv{height:11px;width:100%}
 .dcol .sr.ans{height:66px}
-.dcol .sr.lbl{height:22px;font-family:'Segoe UI',sans-serif;font-size:.7rem;font-weight:800;color:#94a3b8;letter-spacing:.6px}
+.dcol .sr.lbl{height:22px;font-family:'Segoe UI',sans-serif;font-size:.7rem;font-weight:800;color:var(--m);letter-spacing:.6px}
 /* Exercise 2 — table layout */
 .mult-scroll{overflow-x:auto;text-align:center;margin:16px 0;padding:0 4px}
 .op-table{border-collapse:collapse;display:inline-table;table-layout:fixed}
@@ -33,7 +33,7 @@
 .num-td{width:58px;min-width:58px;height:60px;text-align:center;font-size:2.2rem;font-weight:700;font-family:'Courier New',monospace}
 .inp-td{width:58px;min-width:58px;height:66px;padding:4px 3px;text-align:center}
 .blank-td{width:58px;min-width:58px;height:66px;background:#f8fafc}
-.lbl-td{width:58px;min-width:58px;height:22px;text-align:center;font-size:.7rem;font-weight:800;color:#94a3b8;letter-spacing:.6px;font-family:'Segoe UI',sans-serif}
+.lbl-td{width:58px;min-width:58px;height:22px;text-align:center;font-size:.7rem;font-weight:800;color:var(--m);letter-spacing:.6px;font-family:'Segoe UI',sans-serif}
 .row-bb-thin td{border-bottom:2px solid var(--b)}
 .row-bb-thick td{border-bottom:3px solid var(--a)}
 /* Shared answer inputs */
@@ -53,8 +53,8 @@
 .pow10-ans{width:130px;height:66px;text-align:center;font-size:2rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:10px;color:var(--a);background:var(--bg);outline:none;padding:0;transition:border-color .15s,background .15s;-moz-appearance:textfield}
 .pow10-ans::-webkit-inner-spin-button,.pow10-ans::-webkit-outer-spin-button{-webkit-appearance:none}
 .pow10-ans:focus{border-color:var(--a);background:var(--bg-hi)}
-.pow10-ans.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.pow10-ans.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+.pow10-ans.ok{border-color:var(--ok);background:var(--ok2);color:var(--ok)}
+.pow10-ans.ko{border-color:var(--ko);background:var(--er2);color:var(--ko)}
 .pow10-hint{font-size:.9rem;color:var(--m);text-align:center;background:var(--bg-hi);border-radius:var(--r);padding:8px 14px}
 /* Problems */
 </style>
@@ -210,7 +210,7 @@ function gRender(){
       const st=s1['t'+t]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
       return '<div class="stat-cell">'
         +'<div class="stat-label">×'+t+'</div>'
-        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+st.e+'</span></div>'
         +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
         +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
         +'</div>';
@@ -219,7 +219,7 @@ function gRender(){
       const k=km[0],lbl=km[1],st=s1[k]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
       return '<div class="stat-cell">'
         +'<div class="stat-label">'+lbl+'</div>'
-        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+st.e+'</span></div>'
         +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
         +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
         +'</div>';
@@ -228,7 +228,7 @@ function gRender(){
       const st=s2[m.key]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
       return '<div class="stat-cell">'
         +'<div class="stat-label">'+m.label+'</div>'
-        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+        +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+st.e+'</span></div>'
         +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
         +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
         +'</div>';
@@ -251,7 +251,7 @@ function gRender(){
           const st=s3[kl[0]]||{c:0,e:0},tot=st.c+st.e,p=tot?Math.round(st.c/tot*100):null;
           return '<div class="stat-cell">'
             +'<div class="stat-label">'+kl[1]+'</div>'
-            +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:#cbd5e1">/</span> <span class="se">✗'+st.e+'</span></div>'
+            +'<div class="stat-nums"><span class="sc">✓'+st.c+'</span> <span style="color:var(--b)">/</span> <span class="se">✗'+st.e+'</span></div>'
             +'<div class="stat-pct">'+(p!==null?p+'%':'—')+'</div>'
             +'<div class="stat-bar"><div class="stat-bar-fill" style="width:'+(p||0)+'%"></div></div>'
             +'</div>';

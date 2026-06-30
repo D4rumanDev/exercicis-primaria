@@ -32,7 +32,7 @@
 .qdot.correct{background:var(--ok)}
 .qdot.wrong{background:var(--er)}
 .qcard{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:18px;margin-bottom:12px}
-.qcard.fill-card{background:#fafaf8}
+.qcard.fill-card{background:var(--bg-hi)}
 .opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:var(--r);cursor:pointer;border:1.5px solid transparent;margin-bottom:6px;transition:background .1s,border-color .1s;font-size:.88rem;line-height:1.45;user-select:none}
 .opt:hover{background:var(--bg)}
 .opt.on{border-color:var(--a);background:var(--bg-hi)}
@@ -42,7 +42,7 @@
 .blank{display:inline-block;min-width:72px;border-bottom:2px solid var(--a);text-align:center;margin:0 3px;padding:0 8px;cursor:pointer;color:var(--a);font-weight:700;border-radius:3px 3px 0 0;transition:background .1s;font-family:inherit;font-size:inherit}
 .blank:hover{background:var(--bg-hi)}
 .blank.empty{color:transparent;position:relative}
-.blank.empty::after{content:'···';color:#94a3b8;position:absolute;left:50%;transform:translateX(-50%)}
+.blank.empty::after{content:'···';color:var(--m);position:absolute;left:50%;transform:translateX(-50%)}
 .word-pool{display:flex;flex-wrap:wrap;gap:8px;padding-top:4px}
 .chip{padding:6px 16px;border-radius:20px;border:1.5px solid var(--b);cursor:pointer;font-size:.85rem;background:var(--s);transition:all .1s;user-select:none;min-height:36px;display:inline-flex;align-items:center}
 .chip:hover{border-color:var(--a);color:var(--a)}
@@ -692,7 +692,7 @@ function renderHome(){
     achRows+=`<div class="ach-row${e?' earned':' locked'}">
       <div class="ach-sym">${a.sym}</div>
       <div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
-      ${e?'<span style="margin-left:auto;font-size:.75rem;font-weight:700;color:#92400e">Obtingut</span>':''}
+      ${e?'<span style="margin-left:auto;font-size:.75rem;font-weight:700;color:var(--ok)">Obtingut</span>':''}
     </div>`;
   });
 
