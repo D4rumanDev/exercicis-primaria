@@ -93,6 +93,9 @@ h2 { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
 .fb.ok { color: var(--ok); display: block; }
 .fb.ko { color: var(--ko); display: block; }
 
+.letter-ok    { color: var(--ok); font-weight: 900; }
+.letter-focus { color: var(--a);  font-weight: 900; text-decoration: underline; }
+
 .q-top { font-size: .98rem; font-weight: 700; color: var(--t); margin-bottom: 10px; }
 .q-stem { font-size: var(--fm); color: var(--m); margin-bottom: var(--sp-md); line-height: 1.5; }
 

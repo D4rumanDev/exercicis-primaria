@@ -278,7 +278,7 @@ function s1Show() {
   nextBtn.style.display = 'none';
   document.getElementById('s1-wrap').innerHTML = `
     <div style="text-align:center;font-size:2.5rem;margin-bottom:4px">${it.emoji}</div>
-    <div class="vocab-word">${it.display}</div>
+    <div class="vocab-word" id="s1-word">${it.display}</div>
     <div class="vocab-hint">${it.hint}</div>
     <div class="opts-row" id="s1-opts">
       ${opts.map((l, j) => `<button class="aopt" style="font-size:1.1rem;min-width:52px" onclick="s1Ans(this,${j})">${l}</button>`).join('')}
@@ -292,11 +292,16 @@ function s1Ans(btn, j) {
   document.querySelectorAll('#s1-opts .aopt').forEach(b => b.disabled = true);
   const chosen = s1CurOpts[j];
   const it = s1Queue[s1Idx];
-  const ok = chosen === it.correct; btn.classList.add(ok ? 'ok' : 'ko');
+  const ok = chosen === it.correct;
+  btn.classList.add(ok ? 'ok' : 'ko');
   if (!ok) document.querySelectorAll('#s1-opts .aopt').forEach((b, bi) => { if (s1CurOpts[bi] === it.correct) b.classList.add('show'); });
+  const p = it.display.indexOf('_');
+  const full = it.display.replace('_', it.correct);
+  const wordEl = document.getElementById('s1-word');
+  if (wordEl) wordEl.innerHTML = full.slice(0, p) + '<span class="letter-ok">' + it.correct + '</span>' + full.slice(p + 1);
   const fb = document.getElementById('s1-fb');
   fb.className = 'fb ' + (ok ? 'ok' : 'ko');
-  fb.textContent = ok ? pick(ENOK) : 'The answer is: ' + it.display.replace('_', it.correct);
+  fb.textContent = ok ? pick(ENOK) : 'The answer is «' + it.correct + '» → ' + full;
   ok ? descOk(2) : gWrong();
   document.getElementById('s1-next').style.display = 'inline-block';
 }
