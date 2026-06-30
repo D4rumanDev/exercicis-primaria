@@ -122,6 +122,7 @@
 </div>
 
 </div>
+<script src="la_ciutat_data.js"></script>
 <script src="../shared.js"></script>
 <script>
 const ENOK = ["Well done! ⭐","Excellent! 🎉","Great job! 🌟","Perfect! 🏆","Amazing! 💪","Fantastic! 🎊"];
@@ -143,45 +144,6 @@ function cityOk(xp) {
   });
 }
 
-/* ── Places ── */
-const PLACES = [
-  {name:'park',          icon:'🌳', cls:'cb-park'},
-  {name:'school',        icon:'🏫', cls:'cb-school'},
-  {name:'hospital',      icon:'🏥', cls:'cb-hospital'},
-  {name:'museum',        icon:'🏛️', cls:'cb-museum'},
-  {name:'bank',          icon:'🏦', cls:'cb-bank'},
-  {name:'café',          icon:'☕', cls:'cb-cafe'},
-  {name:'cinema',        icon:'🎬', cls:'cb-cinema'},
-  {name:'zoo',           icon:'🦁', cls:'cb-zoo'},
-  {name:'library',       icon:'📚', cls:'cb-library'},
-  {name:'train station', icon:'🚂', cls:'cb-school'},
-  {name:'supermarket',   icon:'🛒', cls:'cb-bank'},
-  {name:'toy shop',      icon:'🧸', cls:'cb-cafe'},
-  {name:'sports centre', icon:'🏊', cls:'cb-school'},
-  {name:'post office',   icon:'📮', cls:'cb-museum'},
-  {name:'fire station',  icon:'🚒', cls:'cb-hospital'},
-  {name:'restaurant',    icon:'🍽️', cls:'cb-cafe'},
-  {name:'pharmacy',      icon:'💊', cls:'cb-hospital'},
-  {name:'bakery',        icon:'🥖', cls:'cb-cafe'},
-];
-
-/* Fixed 3×3 map grid used for sections 2, 3, 4, 6 */
-/* Layout: [row0col0, row0col1, row0col2, row1col0, ...] */
-const MAP_PLACES = [
-  {name:'park',     icon:'🌳', cls:'cb-park'},
-  {name:'bank',     icon:'🏦', cls:'cb-bank'},
-  {name:'hospital', icon:'🏥', cls:'cb-hospital'},
-  {name:'café',     icon:'☕', cls:'cb-cafe'},
-  {name:'museum',   icon:'🏛️', cls:'cb-museum'},
-  {name:'library',  icon:'📚', cls:'cb-library'},
-  {name:'cinema',   icon:'🎬', cls:'cb-cinema'},
-  {name:'school',   icon:'🏫', cls:'cb-school'},
-  {name:'zoo',      icon:'🦁', cls:'cb-zoo'},
-];
-/* Positions: 0=top-left 1=top-mid 2=top-right
-              3=mid-left  4=centre  5=mid-right
-              6=bot-left  7=bot-mid 8=bot-right */
-
 function mapHtml(id) {
   return '<div class="city-map" id="' + id + '">'
     + MAP_PLACES.map(p =>
@@ -196,40 +158,6 @@ function renderMap(elId) {
     ).join('');
 }
 
-/* Adjacency facts derived from the fixed map:
-   next to: share an edge (horizontal/vertical neighbours)
-   opposite: across the grid (rows differ by 2 OR cols differ by 2 in straight line)
-   between: has exactly one place between two others in same row/col
-   in front of / behind: subjective — we use fixed definitions below
-*/
-const PREP_FACTS = [
-  /* next to */
-  {a:'park',     prep:'next to',    b:'bank',     ans:true},
-  {a:'bank',     prep:'next to',    b:'hospital', ans:true},
-  {a:'café',     prep:'next to',    b:'museum',   ans:true},
-  {a:'museum',   prep:'next to',    b:'library',  ans:true},
-  {a:'cinema',   prep:'next to',    b:'school',   ans:true},
-  {a:'school',   prep:'next to',    b:'zoo',      ans:true},
-  {a:'park',     prep:'next to',    b:'café',     ans:true},
-  {a:'bank',     prep:'next to',    b:'museum',   ans:true},
-  {a:'hospital', prep:'next to',    b:'library',  ans:true},
-  /* not next to */
-  {a:'park',     prep:'next to',    b:'hospital', ans:false},
-  {a:'cinema',   prep:'next to',    b:'bank',     ans:false},
-  {a:'zoo',      prep:'next to',    b:'café',     ans:false},
-  /* opposite */
-  {a:'park',     prep:'opposite',   b:'cinema',   ans:true},
-  {a:'bank',     prep:'opposite',   b:'school',   ans:true},
-  {a:'hospital', prep:'opposite',   b:'zoo',      ans:true},
-  {a:'park',     prep:'opposite',   b:'hospital', ans:false},
-  {a:'café',     prep:'opposite',   b:'zoo',      ans:false},
-  /* between */
-  {a:'bank',     prep:'between',    b:'the park and the hospital', ans:true},
-  {a:'museum',   prep:'between',    b:'the café and the library',  ans:true},
-  {a:'school',   prep:'between',    b:'the cinema and the zoo',    ans:true},
-  {a:'café',     prep:'between',    b:'the park and the cinema',   ans:true},
-  {a:'bank',     prep:'between',    b:'the café and the library',  ans:false},
-];
 
 /* ══ SECTION 1 ══ — Vocab fill */
 let s1Items = [];
@@ -296,29 +224,6 @@ function s2Ans(btn, i, choice) {
 }
 
 /* ══ SECTION 3 ══ — Is there / Are there? */
-const S3_POOL = [
-  {q:"Is there a park in the town?",         yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
-  {q:"Is there a hospital in the town?",     yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
-  {q:"Is there a museum in the town?",       yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
-  {q:"Is there a zoo in the town?",          yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
-  {q:"Is there a cinema in the town?",       yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
-  {q:"Is there a supermarket in the town?",  yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
-  {q:"Is there a toy shop in the town?",     yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
-  {q:"Is there a train station in the town?",yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
-  {q:"Are there any shops in the town?",     yes:"Yes, there are.",  no:"No, there aren't.",  ans:false},
-  {q:"Are there any schools in the town?",   yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
-  {q:"Are there any cafés in the town?",     yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
-  {q:"Are there any libraries in the town?", yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
-  {q:"Is there a bank in the town?",         yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
-  {q:"Is there a sports centre in the town?",yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
-  {q:"Is there a post office in the town?",  yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
-  {q:"Is there a fire station in the town?", yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
-  {q:"Is there a restaurant in the town?",   yes:"Yes, there is.",   no:"No, there isn't.",   ans:false},
-  {q:"Is there a library in the town?",      yes:"Yes, there is.",   no:"No, there isn't.",   ans:true},
-  {q:"Are there any banks in the town?",     yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
-  {q:"Are there any museums in the town?",   yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
-  {q:"Are there any zoos in the town?",      yes:"Yes, there are.",  no:"No, there aren't.",  ans:true},
-];
 let s3Current = [];
 function s3Init() {
   s3Current = sh([...S3_POOL]).slice(0, 4).map(q => ({
@@ -378,24 +283,6 @@ function s4Ans(btn, i, j) {
 }
 
 /* ══ SECTION 5 ══ — Word order */
-const S5_POOL = [
-  {words:["Is","there","a","park","in","the","town?"],              correct:"Is there a park in the town?"},
-  {words:["There","is","a","museum","next","to","the","bank."],     correct:"There is a museum next to the bank."},
-  {words:["Is","there","a","supermarket","near","here?"],           correct:"Is there a supermarket near here?"},
-  {words:["There","isn't","a","train","station","in","the","town."],correct:"There isn't a train station in the town."},
-  {words:["Are","there","any","shops","in","the","town?"],          correct:"Are there any shops in the town?"},
-  {words:["The","café","is","opposite","the","zoo."],               correct:"The café is opposite the zoo."},
-  {words:["The","bank","is","between","the","park","and","the","hospital."], correct:"The bank is between the park and the hospital."},
-  {words:["There","are","a","lot","of","places","in","the","town."],correct:"There are a lot of places in the town."},
-  {words:["The","cinema","is","next","to","the","school."],         correct:"The cinema is next to the school."},
-  {words:["There","isn't","a","zoo","opposite","the","park."],      correct:"There isn't a zoo opposite the park."},
-  {words:["Is","there","a","library","in","the","town?"],             correct:"Is there a library in the town?"},
-  {words:["The","zoo","is","opposite","the","cinema."],               correct:"The zoo is opposite the cinema."},
-  {words:["There","isn't","a","sports","centre","in","the","town."],  correct:"There isn't a sports centre in the town."},
-  {words:["The","museum","is","between","the","café","and","the","library."], correct:"The museum is between the café and the library."},
-  {words:["Is","there","a","post","office","near","here?"],           correct:"Is there a post office near here?"},
-  {words:["There","are","two","parks","in","the","town."],            correct:"There are two parks in the town."},
-];
 let s5State = [];
 function s5Init() {
   const sel = sh([...S5_POOL]).slice(0, 3);

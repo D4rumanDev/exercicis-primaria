@@ -81,6 +81,7 @@
 </div>
 <div class="gam-toast" id="gam-toast"></div>
 
+<script src="crosswords_data.js"></script>
 <script src="../shared.js"></script>
 <script>
 const EXER_KEY = 'ex_ang_cword_v1';
@@ -100,49 +101,6 @@ function gExtraAchs(g, tryA){
   tryA('cw5',  (e.cword||0) >= 5);
   tryA('cw10', (e.cword||0) >= 10);
 }
-
-// Vocabulary selected from Timetable, Town, Jobs and Activities (Level: 4th Grade)
-const CWORD_POOL = [
-  {w:'art',        c:"School subject where you draw and paint pictures"},
-  {w:'music',      c:"School subject where you sing songs and play instruments"},
-  {w:'drama',      c:"School subject where you act like an actor"},
-  {w:'maths',      c:"School subject where you count numbers and do sums"},
-  {w:'science',    c:"School subject where you learn about nature and plants"},
-  {w:'history',    c:"School subject where you study things from the past"},
-  {w:'geography',  c:"School subject where you study maps and different countries"},
-  {w:'monday',     c:"The very first day of the school week"},
-  {w:'tuesday',    c:"The day of the week after Monday"},
-  {w:'wednesday',  c:"The middle day of the school week"},
-  {w:'thursday',   c:"The day of the week before Friday"},
-  {w:'friday',     c:"The last day of the school week"},
-  {w:'week',       c:"A period of seven days from Monday to Sunday"},
-  {w:'park',       c:"A green area in town where children play and run"},
-  {w:'school',     c:"The big building where kids go to learn every morning"},
-  {w:'bank',       c:"A place in town where people keep their money safe"},
-  {w:'hospital',   c:"The place you go when you are sick or hurt"},
-  {w:'museum',     c:"A building where you look at old objects or dinosaurs"},
-  {w:'cafe',       c:"A small restaurant where you drink hot chocolate or eat cake"},
-  {w:'home',       c:"The house or flat where you live with your family"},
-  {w:'teacher',    c:"The person who teaches you new lessons at school"},
-  {w:'student',    c:"A boy or a girl who goes to school to learn"},
-  {w:'doctor',     c:"A professional person who fixes your body when it hurts"},
-  {w:'nurse',      c:"A person who helps the doctor and looks after sick people"},
-  {w:'chef',       c:"A professional cook who makes food in a restaurant"},
-  {w:'football',   c:"A sport where two teams kick a ball into a big net"},
-  {w:'basketball', c:"A sport where you bounce and throw a ball into a high hoop"},
-  {w:'tennis',     c:"A sport where you hit a yellow ball with a racket"},
-  {w:'swimming',   c:"An activity you do inside a pool filled with water"},
-  {w:'running',    c:"Moving very fast on your feet for exercise"},
-  {w:'cycling',    c:"An activity or sport where you ride a bicycle"},
-  {w:'play',       c:"To have fun with games or sports with your friends"},
-  {w:'read',       c:"To look at words in a book and understand them"},
-  {w:'write',      c:"To use a pencil to make words on a piece of paper"},
-  {w:'watch',      c:"To look at a film on the television or cinema screen"},
-  {w:'speak',      c:"To use your mouth to say words and talk to someone"},
-  {w:'like',       c:"To enjoy something or find it nice"},
-  {w:'love',       c:"To like something or someone very, very much"},
-  {w:'hate',       c:"To dislike something very much"}
-];
 
 const GSIZ = 19;
 let currentGridCols = 0;

@@ -81,6 +81,7 @@
 </div>
 <div class="gam-toast" id="gam-toast"></div>
 
+<script src="mots_encreuats_data.js"></script>
 <script src="../shared.js"></script>
 <script>
 const EXER_KEY = 'ex_cat_cword_v1';
@@ -98,162 +99,6 @@ function gExtraAchs(g, tryA){
   tryA('cw10', (e.cword||0) >= 10);
 }
 
-// ── WORD POOL (AMPLIAT I ORGANITZAT · 150 MOTS) ──
-const CWORD_POOL = [
-  // 3 lletres (14 mots)
-  {w:'gat',     c:"Animal domèstic que miaula"},
-  {w:'gos',     c:"Animal domèstic que borda"},
-  {w:'nas',     c:"Part de la cara per olorar"},
-  {w:'sol',     c:"Astre que dona llum de dia"},
-  {w:'neu',     c:"Precipitació blanca i freda"},
-  {w:'mar',     c:"Gran massa d'aigua salada"},
-  {w:'cel',     c:"Volta blava sobre nosaltres"},
-  {w:'riu',     c:"Corrent d'aigua dolça que desemboca al mar"},
-  {w:'cap',     c:"Part superior del cos humà"},
-  {w:'pa',      c:"Aliment bàsic fet amb farina, aigua i llevat"},
-  {w:'mel',     c:"Substància dolça feta per les abelles"},
-  {w:'ull',     c:"Òrgan de la visió"},
-  {w:'nen',     c:"Infant de sexe masculí"},
-  {w:'fum',     c:"Gas gris que surt del foc o d'una xemeneia"},
-
-  // 4 lletres (34 mots)
-  {w:'boca',    c:"Part de la cara per menjar i parlar"},
-  {w:'poma',    c:"Fruita rodona, vermella o verda"},
-  {w:'casa',    c:"Edifici on vivim"},
-  {w:'home',    c:"Persona adulta del sexe masculí (porta H!)"},
-  {w:'hora',    c:"Seixanta minuts (porta H!)"},
-  {w:'bota',    c:"Calçat alt que puja per sobre del turmell"},
-  {w:'vida',    c:"L'existència dels éssers vius"},
-  {w:'verd',    c:"Color de les fulles i els camps"},
-  {w:'flor',    c:"Part acolorida de la planta"},
-  {w:'parc',    c:"Jardí gran i públic on la gent passeja"},
-  {w:'peix',    c:"Animal aquàtic que respira per brànquies"},
-  {w:'grup',    c:"Conjunt de persones o coses"},
-  {w:'llum',    c:"Claredat que permet veure les coses"},
-  {w:'creu',    c:"Dues línies que es tallen perpendicularment"},
-  {w:'pont',    c:"Construcció per passar sobre un riu o fossa"},
-  {w:'bosc',    c:"Gran extensió de terra poblada d'arbres"},
-  {w:'amic',    c:"Persona amb qui es té un vincle d'afecte"},
-  {w:'foc',     c:"Calor i llum produïts per la combustió"},
-  {w:'groc',    c:"Color de la llimona i de l'or"},
-  {w:'blau',    c:"Color del cel clar i del mar profund"},
-  {w:'paret',   c:"Obra de paleta vertical que tanca un espai"},
-  {w:'tren',    c:"Conjunt de vagons arrossegats per una locomotora"},
-  {w:'peus',    c:"Part final de les potes o cames per caminar"},
-  {w:'mans',    c:"Parts del cos amb cinc dits que serveixen per agafar"},
-  {w:'format',  c:"Mida, forma o estructura d'una publicació"},
-  {w:'lleó',    c:"El rei de la selva, té una gran melena"},
-  {w:'llop',    c:"Animal salvatge de bosc que udola a la lluna"},
-  {w:'nena',    c:"Infant de sexe femení"},
-  {w:'dau',     c:"Cubet amb punts de l'un al sis per jugar a jocs de taula"},
-  {w:'mapa',    c:"Dibuix que representa la Terra o un país"},
-  {w:'raig',    c:"Línia de llum que ve del sol o d'un llamp"},
-  {w:'dofí',    c:"Animal marí molt intel·ligent que fa salts i somriu"},
-  {w:'pati',    c:"Espai obert de l'escola on juguem a l'hora del descans"},
-  {w:'trist',   c:"L'estat d'ànim de quien té ganes de plorar"},
-
-  // 5 lletres (34 mots)
-  {w:'arbre',   c:"Planta gran amb tronc de fusta"},
-  {w:'herba',   c:"Planta baixa dels prats i jardins (porta H!)"},
-  {w:'blanc',   c:"Color de la neu i la llet"},
-  {w:'barca',   c:"Embarcació petita de fusta o metall"},
-  {w:'cotxe',   c:"Vehicle de quatre rodes per circular per la carretera"},
-  {w:'heroi',   c:"Personatge valent que salva els altres (porta H!)"},
-  {w:'taula',   c:"Moble on mengem, escrivim o treballem"},
-  {w:'porta',   c:"S'obre i es tanca per entrar o sortir d'un lloc"},
-  {w:'canvi',   c:"Modificació d'una cosa per una altra"},
-  {w:'humit',   c:"Que conté molta humitat o aigua (porta H!)"},
-  {w:'pluja',   c:"Aigua que cau dels núvols en gotes"},
-  {w:'lluna',   c:"Satèl·lit natural de la Terra"},
-  {w:'poble',   c:"Població petita, menor que una ciutat"},
-  {w:'camí',    c:"Franja de terra per on es passa d'un lloc a un altre"},
-  {w:'ferro',   c:"Metall de color gris, molt dur i resistent"},
-  {w:'llibre',  c:"Conjunt de fulls de paper cosits o enquadernats"},
-  {w:'pedra',   c:"Substància mineral sòlida i dura"},
-  {w:'sorra',   c:"Conjunt de partícules rocoses a la platja o desert"},
-  {w:'ratllat', c:"Que té línies o ratlles marcades"},
-  {w:'teatre',  c:"Edifici destinat a la representació d'obres dramàtiques"},
-  {w:'camp',    c:"Gran extensió de terra fora de les poblacions"},
-  {w:'plat',    c:"Recipient rodó i pla on se serveix el menjar"},
-  {w:'fruita',  c:"Producte comestible de certes plantes i arbres"},
-  {w:'feina',   c:"Activitat física o mental que es fa per un sou"},
-  {w:'viatge',  c:"Acció d'anar d'un lloc a un altre, generalment lluny"},
-  {w:'recreu',  c:"Estona de descans per jugar al pati"},
-  {w:'goma',    c:"Serveix per esborrar el llapis quan ens equivoquem"},
-  {w:'regla',   c:"Estri de plàstic recte per mesurar centímetres"},
-  {w:'taure',   c:"Peix carnívor gran amb moltes dents esmolades"},
-  {w:'dents',   c:"Peixes blanques de la boca que serveixen per mastegar"},
-  {w:'ossos',   c:"Parts dures i blanques que formen el nostre esquelet"},
-  {w:'cor',     c:"Òrgan que batega dins el pit i bomba la sang"},
-  {w:'balma',   c:"Cova a la roca de la muntanya"},
-  {w:'estel',   c:"Punt de llum a la nit o joguina que vola amb el vent"},
-
-  // 6 lletres (31 mots)
-  {w:'escola',  c:"Lloc on anem a aprendre cada dia"},
-  {w:'llapis',  c:"Estri de fusta per escriure i dibuixar"},
-  {w:'ovella',  c:"Animal de granja que dona llana"},
-  {w:'cadira',  c:"Moble comú amb quatre potes per seure"},
-  {w:'hivern',  c:"Estació més freda de l'any (porta H!)"},
-  {w:'pilota',  c:"Objecte rodó que fem servir per jugar"},
-  {w:'conill',  c:"Animal de llarga orella i pèl suau"},
-  {w:'ciutat',  c:"Població gran on viuen milers de persones"},
-  {w:'finestra',c:"Obertura a la paret per deixar entrar llum i aire"},
-  {w:'metge',   c:"Persona que cura els malalts i té el títol de medicina"},
-  {w:'cuina',   c:"Espai de la casa destinat a preparar els aliments"},
-  {w:'música',  c:"Art de combinar els sons de manera agradable"},
-  {w:'formatge',c:"Aliment sòlid fet amb la llet coagulada"},
-  {w:'ocell',   c:"Animal amb plomes i ales que neix d'un ou"},
-  {w:'estiu',   c:"L'estació de l'any on fa més calor"},
-  {w:'sabata',  c:"Calçat que cobreix el peu sense passar del turmell"},
-  {w:'platja',  c:"Ribera de la mar o d'un riu gran, plana i sorrenca"},
-  {w:'glaçó',   c:"Tross de llet o aigua congelada"},
-  {w:'classe',  c:"Grup d'alumnes que aprenen junts a l'escola"},
-  {w:'balena',  c:"El mamífer més gran del mar, respira per un forat"},
-  {w:'dormir',  c:"Acció de descansar al llit durant la nit"},
-  {w:'saltar',  c:"Aixecar-se de terra fent força amb les cames"},
-  {w:'córrer',  c:"Anar molt ràpid a peu"},
-  {w:'jugar',   c:"Fer una activitat divertida sols o amb amics"},
-  {w:'coet',    c:"Vehicle espacial per viatjar a la Lluna"},
-  {w:'llegir',  c:"Mirar les lletres d'un llibre i entendre-les"},
-  {w:'pintar',  c:"Donar color a un dibuix amb llapis o pinzell"},
-  {w:'dibuix',  c:"Imatge feta amb ratlles i colors en un paper"},
-  {w:'germà',   c:"Fill dels mateixos pares respecte a un altre fill"},
-  {w:'mestre',  c:"Persona que ens ensenya coses noues a l'escola"},
-  {w:'deures',  c:"Feina de l'escola que es fa a casa per practicar"},
-
-  // 7 lletres o més (37 mots)
-  {w:'vehicle', c:"Cotxe, moto, camió... (porta H interna!)"},
-  {w:'alcohol', c:"Líquid transparent que desinfecta ferides (porta H interna!)"},
-  {w:'ordinador',c:"Màquina electrònica per processar dades i programar"},
-  {w:'estudiant',c:"Persona que cursa estudis en un centre d'ensenyament"},
-  {w:'telèfon', c:"Aparell per parlar amb persones de lluny"},
-  {w:'guitarra',c:"Instrument musical de corda amb caixa de fusta"},
-  {w:'bicicleta',c:"Vehicle de dues rodes que es mou pedalant"},
-  {w:'farmàcia',c:"Botiga on es venen medicaments"},
-  {w:'hospital',c:"Centre on es curen els malalts (porta H!)"},
-  {w:'professor',c:"Persona que es dedica a l'ensenyament professional"},
-  {w:'biblioteca',c:"Edifici o sala on es guarden col·leccions de llibres"},
-  {w:'escriptor',c:"Persona que compon obres literàries o llibres"},
-  {w:'muntanya',c:"Gran elevació natural del terreny"},
-  {w:'fàbrica', c:"Establiment industrial amb màquines per produir béns"},
-  {w:'setmana',  c:"Espai de temps format per set dies seguits"},
-  {w:'revista',  c:"Publicació periòdica il·lustrada amb articles"},
-  {w:'quadern',  c:"Conjunt de fulls de paper relligats per escriure-hi"},
-  {w:'somriure',c:"Gest de la boca que fem quan estem feliços"},
-  {w:'planeta', c:"Cos rodó com la Terra que gira voltant el Sol"},
-  {w:'quadre',  c:"Pintura feta en una tela que es penja a la paret"},
-  {w:'pissarra',c:"Superfície de la classe on escriu el mestre"},
-  {w:'escriure',c:"Fer lletres i paraules amb el llapis"},
-  {w:'família', c:"Grup de persones que viuen juntes i s'estimen"},
-  {w:'col·legi',c:"Lloc on anem a aprendre i estar amb els amics"},
-  {w:'dinosaure',c:"Animal gegant que va viure fa milions d'anys"},
-  {w:'tortuga', c:"Animal lent que porta una closca dura a l'esquena"},
-  {w:'formiga', c:"Insecte molt petit i treballador que viu en grup"},
-  {w:'papallona',c:"Insecte amb ales de colors que vola entre les flors"},
-  {w:'història',c:"Explicació de fets que van passar en el passat"},
-  {w:'natura',  c:"Conjunt dels arbres, plantes, animals i muntanyes"},
-  {w:'univers', c:"Tot l'espai que inclou els planetes i estrelles"}
-];
 
 // ── CROSSWORD ENGINE ──
 const GSIZ = 19;
@@ -484,7 +329,6 @@ function checkAll(){
     fb.className='fb ok mt2';
     document.getElementById('comprova-btn').style.display='none';
     gCorrect(20,'cword');
-    boom();
   } else {
     fb.textContent=`${ok} de ${tot} lletres correctes. Continua!`;
     fb.className='fb ko mt2';
