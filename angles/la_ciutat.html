@@ -27,20 +27,24 @@
 .q-sent{font-size:.93rem;font-weight:500;margin-bottom:8px;line-height:1.5}
 .blank{color:var(--a);font-weight:800}
 
-/* ── Vocab fill ── */
-.voc-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b)}
-.voc-row:last-child{border-bottom:none}
-.voc-icon{font-size:1.8rem;min-width:2.2rem;text-align:center}
-.voc-input{flex:1;padding:6px 10px;border:2px solid var(--b);border-radius:8px;font-size:.9rem;font-family:inherit}
-.voc-input.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.voc-input.ko{border-color:var(--ko);background:#fff0f0}
-.voc-fb{font-size:.82rem;min-width:90px}
-
-/* ── Word bank (section 1 hint) ── */
-.word-bank-hint{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 12px;padding:8px;
-  background:var(--bg-lo);border-radius:8px;border:1.5px dashed var(--b)}
-.wb-chip{padding:3px 9px;background:#fff;border:1.5px solid var(--a);border-radius:6px;
-  font-size:.8rem;font-weight:600;color:var(--a)}
+/* ── Section 1: matching game ── */
+.s1-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.s1-card{padding:14px 6px;border-radius:10px;text-align:center;cursor:pointer;
+  border:2.5px solid var(--b);background:var(--s);
+  transition:border-color .12s,background .12s,box-shadow .12s;
+  -webkit-tap-highlight-color:transparent;user-select:none}
+.s1-card .ci{font-size:2rem;display:block;margin-bottom:3px}
+.s1-card .cn{font-size:.7rem;font-weight:700;color:var(--m);letter-spacing:.3px}
+.s1-card.sel{border-color:var(--a);background:var(--bg-hi);box-shadow:0 0 0 3px var(--bg-hi2)}
+.s1-card.matched{border-color:var(--ok)!important;background:var(--ok2)!important;box-shadow:none!important;cursor:default}
+.s1-card.matched .cn{color:var(--ok)}
+.s1-card.wrong{border-color:var(--ko)!important;background:var(--er2)!important;box-shadow:none!important}
+.s1-wbank{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 4px}
+.s1-wchip{padding:7px 14px;border-radius:8px;border:2px solid var(--a);background:var(--s);
+  color:var(--a);font-size:.88rem;font-weight:700;cursor:pointer;
+  transition:background .1s,border-color .1s;-webkit-tap-highlight-color:transparent}
+.s1-wchip:hover{background:var(--bg-hi)}
+.s1-wchip.wrong{border-color:var(--ko)!important;background:var(--er2)!important;color:var(--ko)!important}
 
 .done-banner{text-align:center;background:#f0fdf4;color:var(--ok);padding:10px 14px;
   border-radius:8px;margin-top:8px;font-weight:600;font-size:.9rem}
@@ -57,12 +61,13 @@
 </div>
 <div id="gam-bar"></div>
 
-<!-- ── 1: Vocabulary ── -->
+<!-- ── 1: Vocabulary matching ── -->
 <div class="card">
   <h2><span class="num">1</span> Name the place</h2>
-  <p class="card-sub">Look at each emoji and type the correct place. Use the word bank!</p>
-  <div class="word-bank-hint" id="s1-wb"></div>
-  <div id="s1-list"></div>
+  <p class="card-sub">Click an emoji to select it 🔵, then click its name in the word bank.</p>
+  <div class="s1-grid" id="s1-grid"></div>
+  <div class="s1-wbank" id="s1-wbank"></div>
+  <div class="fb mt2" id="s1-fb"></div>
   <div class="btn-row" style="margin-top:10px">
     <button class="btn btn-outline btn-sm" onclick="s1Init()">New places ▶</button>
   </div>
@@ -159,32 +164,69 @@ function renderMap(elId) {
 }
 
 
-/* ══ SECTION 1 ══ — Vocab fill */
-let s1Items = [];
+/* ══ SECTION 1 ══ — Matching game */
+let s1Items = [], s1SelIdx = null, s1Matched = new Set(), s1Busy = false;
+
 function s1Init() {
   s1Items = sh([...PLACES]).slice(0, 6);
-  const wb = document.getElementById('s1-wb');
-  const shuffledNames = sh(s1Items.map(p => p.name));
-  wb.innerHTML = shuffledNames.map(n => `<span class="wb-chip">${n}</span>`).join('');
-  document.getElementById('s1-list').innerHTML = s1Items.map((p, i) => `
-    <div class="voc-row">
-      <span class="voc-icon">${p.icon}</span>
-      <input class="voc-input" id="s1i${i}" placeholder="Type the place…" autocomplete="off">
-      <button class="btn btn-dark btn-sm" onclick="s1Check(${i})">✓</button>
-      <span class="voc-fb" id="s1fb${i}"></span>
-    </div>
-  `).join('');
+  s1SelIdx = null;
+  s1Matched = new Set();
+  s1Busy = false;
+  document.getElementById('s1-fb').className = 'fb mt2';
+  document.getElementById('s1-fb').textContent = '';
+  s1Render();
 }
-function s1Check(i) {
-  const inp = document.getElementById('s1i'+i);
-  if (inp.disabled) return;
-  const val = inp.value.trim().toLowerCase();
-  const ok = val === s1Items[i].name.toLowerCase();
-  inp.className = 'voc-input ' + (ok ? 'ok' : 'ko');
-  const fb = document.getElementById('s1fb'+i);
-  fb.style.color = ok ? 'var(--ok)' : 'var(--ko)';
-  fb.textContent = ok ? pick(ENOK) : s1Items[i].name;
-  if (ok) { inp.disabled = true; cityOk(3); } else gWrong();
+
+function s1Render() {
+  document.getElementById('s1-grid').innerHTML = s1Items.map((p, i) => {
+    if (s1Matched.has(i))
+      return `<div class="s1-card matched"><span class="ci">${p.icon}</span><span class="cn">${p.name} ✓</span></div>`;
+    const sel = s1SelIdx === i ? ' sel' : '';
+    return `<div class="s1-card${sel}" onclick="s1PickEmoji(${i})"><span class="ci">${p.icon}</span><span class="cn">?</span></div>`;
+  }).join('');
+
+  const remaining = s1Items.filter((_, i) => !s1Matched.has(i)).map(p => p.name);
+  document.getElementById('s1-wbank').innerHTML = sh([...remaining])
+    .map(n => `<button class="s1-wchip" onclick="s1PickWord('${n.replace(/'/g,"\\'")}'">${n}</button>`)
+    .join('');
+}
+
+function s1PickEmoji(i) {
+  if (s1Busy || s1Matched.has(i)) return;
+  s1SelIdx = (s1SelIdx === i) ? null : i;
+  s1Render();
+}
+
+function s1PickWord(name) {
+  if (s1Busy || s1SelIdx === null) {
+    if (!s1Busy && s1SelIdx === null) {
+      const fb = document.getElementById('s1-fb');
+      fb.className = 'fb ko mt2';
+      fb.textContent = 'Select an emoji first!';
+      setTimeout(() => { if (fb.textContent === 'Select an emoji first!') fb.className = 'fb mt2'; }, 1200);
+    }
+    return;
+  }
+  const i = s1SelIdx;
+  const ok = s1Items[i].name === name;
+  if (ok) {
+    s1Matched.add(i);
+    s1SelIdx = null;
+    cityOk(3);
+    s1Render();
+    if (s1Matched.size === s1Items.length) {
+      const fb = document.getElementById('s1-fb');
+      fb.className = 'fb ok mt2';
+      fb.textContent = '✓ ' + pick(ENOK) + ' All places matched!';
+    }
+  } else {
+    s1Busy = true;
+    const grid = document.getElementById('s1-grid');
+    grid.querySelectorAll('.s1-card')[i]?.classList.add('wrong');
+    [...document.querySelectorAll('.s1-wchip')].find(b => b.textContent === name)?.classList.add('wrong');
+    gWrong();
+    setTimeout(() => { s1Busy = false; s1SelIdx = null; s1Render(); }, 650);
+  }
 }
 
 /* ══ SECTION 2 ══ — There's / There isn't → T/F */
