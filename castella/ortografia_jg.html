@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ortografía: J y G</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.word-big{font-size:2rem;font-weight:900;text-align:center;padding:14px 0;color:var(--t);letter-spacing:.03em;font-family:'Courier New',monospace}
+.jg-blank{display:inline-block;min-width:22px;border-bottom:3px solid var(--a);color:var(--a)}
+.letter-ok{color:var(--ok);font-weight:900}
+.ctx-frase{font-size:.92rem;color:var(--m);text-align:center;margin-top:4px;margin-bottom:8px;min-height:1.4em}
+.hint-rule{font-size:.78rem;font-weight:600;color:var(--m);text-align:center;margin-top:6px;min-height:1.2em}
+.rules-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.rules-list li{font-size:.88rem;padding:8px 12px;border-radius:8px;background:var(--bg-hi);border:1px solid var(--bd-hi)}
+.syl-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.syl-pill{padding:6px 14px;border-radius:20px;font-size:.88rem;font-weight:700;font-family:'Courier New',monospace;background:var(--bg-hi);border:1px solid var(--bd-hi);color:var(--t)}
+.syl-pill.j-syl{background:#fef3c7;border-color:#fbbf24;color:#92400e}
+.syl-pill.g-syl{background:#dbeafe;border-color:#93c5fd;color:#1e40af}
+html[data-theme="dark"] .syl-pill.j-syl{background:#422006;border-color:#d97706;color:#fde68a}
+html[data-theme="dark"] .syl-pill.g-syl{background:#0f2d4a;border-color:#3b82f6;color:#bfdbfe}
+@media(prefers-color-scheme:dark){
+  .syl-pill.j-syl{background:#422006;border-color:#d97706;color:#fde68a}
+  .syl-pill.g-syl{background:#0f2d4a;border-color:#3b82f6;color:#bfdbfe}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Ortografía: J y G</h1>
+    <div class="muted">Castellano · Ortografía</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: ¿J o G? -->
+<div class="card">
+  <h2><span class="num">1</span> ¿J o G?</h2>
+  <div class="card-sub">¿Qué letra falta para completar la sílaba?</div>
+  <div class="diff-row mt3">
+    <button class="dbtn active" onclick="setDiff(0,this)">Fácil</button>
+    <button class="dbtn" onclick="setDiff(1,this)">Medio</button>
+    <button class="dbtn" onclick="setDiff(2,this)">Difícil</button>
+  </div>
+  <div id="jg-word" class="word-big mt3"></div>
+  <div id="jg-ctx" class="ctx-frase"></div>
+  <div id="jg-opts" class="opts-row"></div>
+  <div id="jg-hint" class="hint-rule"></div>
+  <div id="jg-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextJG()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- 2: Reglas -->
+<div class="card">
+  <h2><span class="num">2</span> Reglas para recordar</h2>
+  <ul class="rules-list mt3">
+    <li>🟡 <strong>ja / jo / ju</strong> → siempre <strong>j</strong>: <u>j</u>abón, <u>j</u>oven, <u>j</u>ugar</li>
+    <li>🔵 <strong>ga / go / gu</strong> → siempre <strong>g</strong>: <u>g</u>ato, <u>g</u>ota, <u>g</u>usano</li>
+    <li>🟡 <strong>-aje / -eje</strong> → siempre <strong>j</strong>: via<u>j</u>e, pasa<u>j</u>e, here<u>j</u>e</li>
+    <li>🔵 <strong>ge / gi</strong> → <strong>g</strong> cuando suena suave: <u>g</u>ente, <u>g</u>irafa, <u>g</u>irasol</li>
+    <li>🟡 <strong>je / ji</strong> → <strong>j</strong> en el resto de casos: <u>j</u>efe, <u>j</u>irafa, <u>j</u>inete</li>
+  </ul>
+  <div class="card-sub mt3">Sílabas con <strong>J</strong> y con <strong>G</strong>:</div>
+  <div class="syl-row">
+    <span class="syl-pill j-syl">ja</span>
+    <span class="syl-pill j-syl">je/je</span>
+    <span class="syl-pill j-syl">ji/ji</span>
+    <span class="syl-pill j-syl">jo</span>
+    <span class="syl-pill j-syl">ju</span>
+    <span class="syl-pill g-syl">ga</span>
+    <span class="syl-pill g-syl">ge/gue</span>
+    <span class="syl-pill g-syl">gi/gui</span>
+    <span class="syl-pill g-syl">go</span>
+    <span class="syl-pill g-syl">gu</span>
+  </div>
+</div>
+
+<!-- 3: Escribe la letra -->
+<div class="card">
+  <h2><span class="num">3</span> Escribe la letra</h2>
+  <div class="card-sub">Lee la frase y escribe <strong>j</strong> o <strong>g</strong> en el recuadro.</div>
+  <div id="inp-ctx" class="ctx-frase mt3" style="font-size:.95rem;color:var(--t)"></div>
+  <div id="inp-word" class="word-big" style="font-size:1.6rem;padding:8px 0"></div>
+  <div style="text-align:center;margin-top:8px">
+    <input id="inp-ans" class="ans-inp" type="text" maxlength="1" placeholder="?"
+      style="width:64px;height:64px;font-size:2.2rem"
+      oninput="this.value=this.value.toLowerCase().replace(/[^jg]/g,'')"
+      onkeydown="if(event.key==='Enter')checkJGInp()">
+  </div>
+  <div id="inp-hint" class="hint-rule"></div>
+  <div id="inp-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn" onclick="checkJGInp()">Comprobar</button>
+    <button class="btn btn-outline btn-sm" onclick="nextInp()">Siguiente →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cast_jg_v1';
+
+GAM_ACHS = [
+  {id:'first', s:'⭐', n:'¡Primera respuesta!', d:'Tu primer acierto'},
+  {id:'s3',    s:'🔥', n:'Racha x3',            d:'3 aciertos seguidos'},
+  {id:'s5',    s:'⚡', n:'Racha x5',            d:'5 aciertos seguidos'},
+  {id:'s10',   s:'💥', n:'Racha x10',           d:'10 aciertos seguidos'},
+  {id:'jg20',  s:'✏️', n:'Experto en J y G',    d:'20 respuestas en ¿J o G?'},
+  {id:'inp10', s:'🖊️', n:'Escritura perfecta',  d:'10 letras escritas correctamente'},
+  {id:'ok50',  s:'🥉', n:'50 aciertos',         d:'50 respuestas correctas en total'},
+  {id:'ok200', s:'🥈', n:'200 aciertos',        d:'200 respuestas correctas'},
+  {id:'ok500', s:'🏆', n:'500 aciertos',        d:'500 respuestas correctas'},
+];
+
+function gExtraAchs(g, tryA) {
+  const e = eLoad();
+  tryA('jg20',  (e.jg  || 0) >= 20);
+  tryA('inp10', (e.inp || 0) >= 10);
+}
+
+const OK = ['¡Muy bien!', '¡Correcto!', '¡Perfecto!', '¡Genial!', '¡Así se hace!'];
+
+// Pool: w = palabra con _ donde va j/g, full = palabra completa, ctx = frase con {w}
+const POOL = [
+  // ja / jo / ju → siempre j
+  {w:'_abón',    ans:'j', full:'jabón',    ctx:'Se lavó las manos con {w}.',                        hint:'ja → siempre j'},
+  {w:'_oven',    ans:'j', full:'joven',    ctx:'El {w} corría muy rápido.',                         hint:'jo → siempre j'},
+  {w:'_ugar',    ans:'j', full:'jugar',    ctx:'Le encantaba {w} al fútbol.',                       hint:'ju → siempre j'},
+  {w:'_ardín',   ans:'j', full:'jardín',   ctx:'Las flores del {w} eran muy bonitas.',              hint:'ja → siempre j'},
+  {w:'_irafa',   ans:'j', full:'jirafa',   ctx:'La {w} tenía el cuello muy largo.',                 hint:'ji → siempre j (animal de origen africano)'},
+  {w:'_efe',     ans:'j', full:'jefe',     ctx:'El {w} dio las instrucciones al equipo.',           hint:'je → j en palabras de origen no latino'},
+  {w:'_inete',   ans:'j', full:'jinete',   ctx:'El {w} montaba el caballo con elegancia.',          hint:'ji → siempre j'},
+  // -aje / -eje → siempre j
+  {w:'via_e',    ans:'j', full:'viaje',    ctx:'El {w} en tren fue muy divertido.',                 hint:'-aje → siempre j'},
+  {w:'pasa_e',   ans:'j', full:'pasaje',   ctx:'Compró el {w} del barco.',                          hint:'-aje → siempre j'},
+  {w:'persona_e',ans:'j', full:'personaje',ctx:'El {w} principal era un héroe valiente.',           hint:'-aje → siempre j'},
+  {w:'mensa_e',  ans:'j', full:'mensaje',  ctx:'Le envió un {w} por el teléfono.',                  hint:'-aje → siempre j'},
+  // ga / go / gu → siempre g
+  {w:'_ato',     ans:'g', full:'gato',     ctx:'El {w} dormía en el sofá.',                         hint:'ga → siempre g'},
+  {w:'_usano',   ans:'g', full:'gusano',   ctx:'Un {w} salió de la manzana.',                       hint:'gu → siempre g'},
+  {w:'_ota',     ans:'g', full:'gota',     ctx:'Una {w} de agua cayó en su nariz.',                 hint:'go → siempre g'},
+  {w:'_oma',     ans:'g', full:'goma',     ctx:'Necesitaba una {w} para borrar.',                   hint:'go → siempre g'},
+  {w:'_alleta',  ans:'g', full:'galleta',  ctx:'Comió una {w} de chocolate.',                       hint:'ga → siempre g'},
+  // ge / gi → g (sonido suave)
+  {w:'_ente',    ans:'g', full:'gente',    ctx:'Había mucha {w} en la plaza.',                      hint:'ge → g cuando suena suave'},
+  {w:'_irasol',  ans:'g', full:'girasol',  ctx:'El {w} siempre mira hacia el sol.',                 hint:'gi → g cuando suena suave'},
+  {w:'_enio',    ans:'g', full:'genio',    ctx:'Era un {w} de las matemáticas.',                    hint:'ge → g cuando suena suave'},
+  {w:'_igante',  ans:'g', full:'gigante',  ctx:'El castillo del {w} era enorme.',                   hint:'gi → g cuando suena suave'},
+  // je / ji → j (sonido fuerte con e/i)
+  {w:'_eringa',  ans:'j', full:'jeringa',  ctx:'La enfermera usó una {w}.',                         hint:'je → j cuando suena fuerte'},
+  {w:'_itomate', ans:'j', full:'jitomate', ctx:'Añadió {w} a la ensalada.',                         hint:'ji → j cuando suena fuerte'},
+  // Mixto — repàs
+  {w:'_ugo',     ans:'j', full:'jugo',     ctx:'Bebió un {w} de naranja.',                          hint:'ju → siempre j'},
+  {w:'_imnasia', ans:'g', full:'gimnasia', ctx:'Hacía {w} cada mañana.',                            hint:'gi → g (préstamo del griego: gymnos)'},
+];
+
+// ── Helpers (mateixa API que ortografia_byv) ──
+function wHtml(w) {
+  return w.replace('_', '<span class="jg-blank">_</span>');
+}
+function wFullHtml(w, full) {
+  const p = w.indexOf('_');
+  return full.slice(0, p) + '<span class="letter-ok">' + full[p] + '</span>' + full.slice(p + 1);
+}
+function ctxFill(ctx, replacement) {
+  return ctx.replace('{w}', replacement);
+}
+
+// ── Secció 1: J o G? ──
+let diff = 0, jgPrev = -1;
+
+function setDiff(d, btn) {
+  diff = d;
+  document.querySelectorAll('.dbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  nextJG();
+}
+
+function nextJG() {
+  let idx;
+  do { idx = ri(0, POOL.length - 1); } while (idx === jgPrev && POOL.length > 1);
+  jgPrev = idx;
+  const e = POOL[idx];
+
+  const wordEl = document.getElementById('jg-word');
+  const ctxEl  = document.getElementById('jg-ctx');
+  const hintEl = document.getElementById('jg-hint');
+  const fbEl   = document.getElementById('jg-fb');
+
+  hintEl.textContent = '';
+  fbEl.textContent   = '';
+  fbEl.className     = 'fb mt2';
+
+  if (diff === 0) {
+    wordEl.innerHTML  = wHtml(e.w);
+    ctxEl.textContent = ctxFill(e.ctx, '___');
+  } else if (diff === 1) {
+    wordEl.innerHTML = '';
+    ctxEl.innerHTML  = ctxFill(e.ctx, wHtml(e.w));
+  } else {
+    wordEl.innerHTML  = '';
+    ctxEl.textContent = ctxFill(e.ctx, '___');
+  }
+
+  const onOk = () => {
+    wordEl.innerHTML = wFullHtml(e.w, e.full);
+    ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
+    if (diff < 2) hintEl.textContent = e.hint;
+    setFb('jg-fb', true, pick(OK));
+    gCorrect(8, 'jg');
+  };
+  const onKo = () => {
+    wordEl.innerHTML = wFullHtml(e.w, e.full);
+    ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
+    if (diff < 2) hintEl.textContent = e.hint;
+    setFb('jg-fb', false, 'Era «' + e.ans.toUpperCase() + '» → ' + e.full);
+    gWrong();
+  };
+  renderOpts('jg-opts', ['J', 'G'], e.ans.toUpperCase(), onOk, onKo);
+}
+
+// ── Secció 3: Escribe la letra ──
+let inpPrev = -1, inpE = null;
+
+function nextInp() {
+  let idx;
+  do { idx = ri(0, POOL.length - 1); } while (idx === inpPrev && POOL.length > 1);
+  inpPrev = idx;
+  inpE = POOL[idx];
+
+  document.getElementById('inp-ctx').innerHTML  = ctxFill(inpE.ctx, wHtml(inpE.w));
+  document.getElementById('inp-word').innerHTML = wHtml(inpE.w);
+  document.getElementById('inp-hint').textContent = '';
+  document.getElementById('inp-fb').textContent   = '';
+  document.getElementById('inp-fb').className     = 'fb mt2';
+
+  const inp = document.getElementById('inp-ans');
+  inp.value     = '';
+  inp.className = 'ans-inp';
+  inp.disabled  = false;
+  inp.focus();
+}
+
+function checkJGInp() {
+  if (!inpE) return;
+  const inp = document.getElementById('inp-ans');
+  const val = inp.value.toLowerCase().trim();
+  if (!val) return;
+
+  inp.disabled = true;
+  const e = inpE;
+  inpE = null;
+
+  document.getElementById('inp-word').innerHTML = wFullHtml(e.w, e.full);
+  document.getElementById('inp-ctx').innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
+  document.getElementById('inp-hint').textContent = e.hint;
+
+  if (val === e.ans) {
+    inp.className = 'ans-inp ok';
+    setFb('inp-fb', true, pick(OK));
+    gCorrect(12, 'inp');
+  } else {
+    inp.className = 'ans-inp ko';
+    setFb('inp-fb', false, 'Era «' + e.ans + '» → ' + e.full);
+    gWrong();
+  }
+}
+
+// ── Init ──
+gRender();
+nextJG();
+nextInp();
+</script>
+</body>
+</html>
