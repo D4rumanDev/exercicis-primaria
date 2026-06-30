@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ortografía: B y V</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.word-big{font-size:2rem;font-weight:900;text-align:center;padding:14px 0;color:var(--t);letter-spacing:.03em;font-family:'Courier New',monospace}
+.vb-blank{display:inline-block;min-width:22px;border-bottom:3px solid var(--a);color:var(--a)}
+.letter-ok{color:var(--ok);font-weight:900}
+.ctx-frase{font-size:.92rem;color:var(--m);text-align:center;margin-top:4px;margin-bottom:8px;min-height:1.4em}
+.hint-rule{font-size:.78rem;font-weight:600;color:var(--m);text-align:center;margin-top:6px;min-height:1.2em}
+.rules-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.rules-list li{font-size:.88rem;padding:8px 12px;border-radius:8px;background:var(--bg-hi);border:1px solid var(--bd-hi)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Ortografía: B y V</h1>
+    <div class="muted">Castellano · Ortografía</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: ¿B o V? -->
+<div class="card">
+  <h2><span class="num">1</span> ¿B o V?</h2>
+  <div class="card-sub">¿Qué letra falta para completar la palabra?</div>
+  <div class="diff-row mt3">
+    <button class="dbtn active" onclick="setDiff(0,this)">Fácil</button>
+    <button class="dbtn" onclick="setDiff(1,this)">Medio</button>
+    <button class="dbtn" onclick="setDiff(2,this)">Difícil</button>
+  </div>
+  <div id="bv-word" class="word-big mt3"></div>
+  <div id="bv-ctx" class="ctx-frase"></div>
+  <div id="bv-opts" class="opts-row"></div>
+  <div id="bv-hint" class="hint-rule"></div>
+  <div id="bv-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextBV()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- 2: Reglas -->
+<div class="card">
+  <h2><span class="num">2</span> Reglas para recordar</h2>
+  <ul class="rules-list mt3">
+    <li>🔵 <strong>-mb-</strong> → siempre <strong>b</strong>: tam<u>b</u>ién, som<u>b</u>ra, ham<u>b</u>re</li>
+    <li>🔵 <strong>-nv-</strong> → siempre <strong>v</strong>: in<u>v</u>ierno, en<u>v</u>iar, in<u>v</u>itar</li>
+    <li>🔵 Imperfecto <strong>-aba / -abas</strong> → siempre <strong>b</strong>: canta<u>b</u>a, juga<u>b</u>a</li>
+    <li>🔵 <strong>haber</strong> y sus formas → siempre <strong>b</strong>: ha<u>b</u>ía, ha<u>b</u>rá</li>
+    <li>🟣 <strong>venir, ver, vivir, volar, volver</strong> → siempre <strong>v</strong></li>
+  </ul>
+</div>
+
+<!-- 3: Escribe la letra -->
+<div class="card">
+  <h2><span class="num">3</span> Escribe la letra</h2>
+  <div class="card-sub">Lee la frase y escribe <strong>b</strong> o <strong>v</strong> en el recuadro.</div>
+  <div id="inp-ctx" class="ctx-frase mt3" style="font-size:.95rem;color:var(--t)"></div>
+  <div id="inp-word" class="word-big" style="font-size:1.6rem;padding:8px 0"></div>
+  <div style="text-align:center;margin-top:8px">
+    <input id="inp-ans" class="ans-inp" type="text" maxlength="1" placeholder="?"
+      style="width:64px;height:64px;font-size:2.2rem"
+      oninput="this.value=this.value.toLowerCase().replace(/[^bv]/g,'')"
+      onkeydown="if(event.key==='Enter')checkBVInp()">
+  </div>
+  <div id="inp-hint" class="hint-rule"></div>
+  <div id="inp-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn" onclick="checkBVInp()">Comprobar</button>
+    <button class="btn btn-outline btn-sm" onclick="nextInp()">Siguiente →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cast_byv_v1';
+
+GAM_ACHS = [
+  {id:'first', s:'⭐', n:'¡Primera respuesta!', d:'Tu primer acierto'},
+  {id:'s3',    s:'🔥', n:'Racha x3',            d:'3 aciertos seguidos'},
+  {id:'s5',    s:'⚡', n:'Racha x5',            d:'5 aciertos seguidos'},
+  {id:'s10',   s:'💥', n:'Racha x10',           d:'10 aciertos seguidos'},
+  {id:'bv20',  s:'✏️', n:'Experto en B y V',    d:'20 respuestas en ¿B o V?'},
+  {id:'inp10', s:'🖊️', n:'Escritura perfecta',  d:'10 letras escritas correctamente'},
+  {id:'ok50',  s:'🥉', n:'50 aciertos',         d:'50 respuestas correctas en total'},
+  {id:'ok200', s:'🥈', n:'200 aciertos',        d:'200 respuestas correctas'},
+  {id:'ok500', s:'🏆', n:'500 aciertos',        d:'500 respuestas correctas'},
+];
+
+function gExtraAchs(g, tryA) {
+  const e = eLoad();
+  tryA('bv20',  (e.bv  || 0) >= 20);
+  tryA('inp10', (e.inp || 0) >= 10);
+}
+
+const OK = ['¡Muy bien!', '¡Correcto!', '¡Perfecto!', '¡Genial!', '¡Así se hace!'];
+
+// Pool: w = palabra con _ donde va b/v, full = palabra completa, ctx = frase con {w}
+const POOL = [
+  {w:'_arco',     ans:'b', full:'barco',     ctx:'El {w} navegaba lentamente por el río.',             hint:'Sustantivo: barco → b'},
+  {w:'_osque',    ans:'b', full:'bosque',    ctx:'Los animales vivían en el {w}.',                     hint:'Sustantivo: bosque → b'},
+  {w:'_icicleta', ans:'b', full:'bicicleta', ctx:'Le regalaron una {w} roja para su cumpleaños.',      hint:'Sustantivo: bicicleta → b'},
+  {w:'_allena',   ans:'b', full:'ballena',   ctx:'La {w} azul saltó muy alto fuera del agua.',         hint:'Animal: ballena → b'},
+  {w:'_úho',      ans:'b', full:'búho',      ctx:'Un {w} vivía en el árbol más viejo del bosque.',     hint:'Animal: búho → b'},
+  {w:'_aca',      ans:'v', full:'vaca',      ctx:'La {w} pastaba tranquila en el prado.',              hint:'Animal: vaca → v'},
+  {w:'_iento',    ans:'v', full:'viento',    ctx:'El {w} soplaba con mucha fuerza.',                   hint:'Sustantivo: viento → v'},
+  {w:'_erano',    ans:'v', full:'verano',    ctx:'En {w} hace mucho calor en la playa.',               hint:'Estación del año: verano → v'},
+  {w:'_olcán',    ans:'v', full:'volcán',    ctx:'El {w} echaba humo y cenizas.',                      hint:'Sustantivo: volcán → v'},
+  {w:'_estido',   ans:'v', full:'vestido',   ctx:'Llevaba un bonito {w} azul.',                        hint:'Sustantivo: vestido → v'},
+  {w:'canta_a',   ans:'b', full:'cantaba',   ctx:'Ella {w} canciones mientras cocinaba.',              hint:'Imperfecto -aba: siempre b'},
+  {w:'juga_a',    ans:'b', full:'jugaba',    ctx:'Pedro {w} en el parque con sus amigos.',             hint:'Imperfecto -aba: siempre b'},
+  {w:'esta_a',    ans:'b', full:'estaba',    ctx:'El niño {w} muy cansado después del partido.',       hint:'Imperfecto -aba: siempre b'},
+  {w:'mira_a',    ans:'b', full:'miraba',    ctx:'María {w} por la ventana cada tarde.',               hint:'Imperfecto -aba: siempre b'},
+  {w:'ha_ía',     ans:'b', full:'había',     ctx:'Una vez {w} un dragón muy amable.',                  hint:'Imperfecto de «haber»: siempre b'},
+  {w:'tam_ién',   ans:'b', full:'también',   ctx:'El niño {w} quería venir al parque.',                hint:'mb → siempre b'},
+  {w:'som_ra',    ans:'b', full:'sombra',    ctx:'Descansaron bajo la {w} del árbol.',                 hint:'mb → siempre b'},
+  {w:'ham_re',    ans:'b', full:'hambre',    ctx:'Tenía mucha {w} después de clase.',                  hint:'mb → siempre b'},
+  {w:'am_iente',  ans:'b', full:'ambiente',  ctx:'El {w} de la fiesta era muy alegre.',                hint:'mb → siempre b'},
+  {w:'in_ierno',  ans:'v', full:'invierno',  ctx:'En {w} nieva mucho en la montaña.',                  hint:'nv → siempre v'},
+  {w:'en_iar',    ans:'v', full:'enviar',    ctx:'Quiero {w} una carta a mi abuela.',                  hint:'nv → siempre v'},
+  {w:'in_itar',   ans:'v', full:'invitar',   ctx:'Quiere {w} a todos sus amigos a la fiesta.',         hint:'nv → siempre v'},
+  {w:'_ivía',     ans:'v', full:'vivía',     ctx:'La niña {w} en un castillo muy lejano.',             hint:'Verbo vivir → v'},
+  {w:'_olver',    ans:'v', full:'volver',    ctx:'Prometió {w} a casa antes de las ocho.',             hint:'Verbo volver → v'},
+];
+
+// ── Helpers ──
+function wHtml(w) {
+  return w.replace('_', '<span class="vb-blank">_</span>');
+}
+function wFullHtml(w, full) {
+  const p = w.indexOf('_');
+  return full.slice(0, p) + '<span class="letter-ok">' + full[p] + '</span>' + full.slice(p + 1);
+}
+function ctxFill(ctx, replacement) {
+  return ctx.replace('{w}', replacement);
+}
+
+// ── Secció 1: B o V? ──
+let diff = 0, bvPrev = -1;
+
+function setDiff(d, btn) {
+  diff = d;
+  document.querySelectorAll('.dbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  nextBV();
+}
+
+function nextBV() {
+  let idx;
+  do { idx = ri(0, POOL.length - 1); } while (idx === bvPrev && POOL.length > 1);
+  bvPrev = idx;
+  const e = POOL[idx];
+
+  const wordEl = document.getElementById('bv-word');
+  const ctxEl  = document.getElementById('bv-ctx');
+  const hintEl = document.getElementById('bv-hint');
+  const fbEl   = document.getElementById('bv-fb');
+
+  hintEl.textContent = '';
+  fbEl.textContent   = '';
+  fbEl.className     = 'fb mt2';
+
+  if (diff === 0) {
+    // Fácil: palabra grande + frase con ___ (palabra ocultada)
+    wordEl.innerHTML  = wHtml(e.w);
+    ctxEl.textContent = ctxFill(e.ctx, '___');
+  } else if (diff === 1) {
+    // Medio: solo frase con _ en posición b/v (sin palabra grande)
+    wordEl.innerHTML = '';
+    ctxEl.innerHTML  = ctxFill(e.ctx, wHtml(e.w));
+  } else {
+    // Difícil: solo frase con ___ (sin palabra ni pista)
+    wordEl.innerHTML  = '';
+    ctxEl.textContent = ctxFill(e.ctx, '___');
+  }
+
+  const onOk = () => {
+    wordEl.innerHTML = wFullHtml(e.w, e.full);
+    ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
+    if (diff < 2) hintEl.textContent = e.hint;
+    setFb('bv-fb', true, pick(OK));
+    gCorrect(8, 'bv');
+  };
+  const onKo = () => {
+    wordEl.innerHTML = wFullHtml(e.w, e.full);
+    ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
+    if (diff < 2) hintEl.textContent = e.hint;
+    setFb('bv-fb', false, 'Era «' + e.ans.toUpperCase() + '» → ' + e.full);
+    gWrong();
+  };
+  renderOpts('bv-opts', ['B', 'V'], e.ans.toUpperCase(), onOk, onKo);
+}
+
+// ── Secció 3: Escribe la letra ──
+let inpPrev = -1, inpE = null;
+
+function nextInp() {
+  let idx;
+  do { idx = ri(0, POOL.length - 1); } while (idx === inpPrev && POOL.length > 1);
+  inpPrev = idx;
+  inpE = POOL[idx];
+
+  document.getElementById('inp-ctx').innerHTML  = ctxFill(inpE.ctx, wHtml(inpE.w));
+  document.getElementById('inp-word').innerHTML = wHtml(inpE.w);
+  document.getElementById('inp-hint').textContent = '';
+  document.getElementById('inp-fb').textContent   = '';
+  document.getElementById('inp-fb').className     = 'fb mt2';
+
+  const inp = document.getElementById('inp-ans');
+  inp.value     = '';
+  inp.className = 'ans-inp';
+  inp.disabled  = false;
+  inp.focus();
+}
+
+function checkBVInp() {
+  if (!inpE) return;
+  const inp = document.getElementById('inp-ans');
+  const val = inp.value.toLowerCase().trim();
+  if (!val) return;
+
+  inp.disabled = true;
+  const e = inpE;
+  inpE = null;
+
+  document.getElementById('inp-word').innerHTML = wFullHtml(e.w, e.full);
+  document.getElementById('inp-ctx').innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
+  document.getElementById('inp-hint').textContent = e.hint;
+
+  if (val === e.ans) {
+    inp.className = 'ans-inp ok';
+    setFb('inp-fb', true, pick(OK));
+    gCorrect(12, 'inp');
+  } else {
+    inp.className = 'ans-inp ko';
+    setFb('inp-fb', false, 'Era «' + e.ans + '» → ' + e.full);
+    gWrong();
+  }
+}
+
+// ── Init ──
+gRender();
+nextBV();
+nextInp();
+</script>
+</body>
+</html>

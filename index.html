@@ -9,7 +9,7 @@
 <style>
 :root{
   --bg:#f0f4ff;--s:#fff;--b:#e2e8f0;--t:#1e293b;--m:#64748b;--a:#1d4ed8;--r:12px;
-  --mates:#1d4ed8;--llengua:#059669;--angles:#7c3aed;
+  --mates:#1d4ed8;--llengua:#059669;--angles:#7c3aed;--castella:#d97706;
   --a-light:#dbeafe;color-scheme:light dark;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -35,6 +35,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidde
 .nav-lbl-mates{color:var(--mates)}
 .nav-lbl-llengua{color:var(--llengua)}
 .nav-lbl-angles{color:var(--angles)}
+.nav-lbl-castella{color:var(--castella)}
 .nav-chevron{display:inline-block;font-style:normal;font-size:.58rem;opacity:.5;transition:transform .18s;line-height:1;margin-left:auto;flex-shrink:0}
 .nav-group.collapsed .nav-chevron{transform:rotate(-90deg)}
 .nav-items{overflow:hidden}
@@ -84,18 +85,18 @@ iframe{flex:1;border:none;width:100%;background:var(--bg)}
 @media(prefers-color-scheme:dark){
   :root{
     --bg:#0f172a;--s:#1e293b;--b:#334155;--t:#f1f5f9;--m:#94a3b8;--a:#60a5fa;
-    --mates:#60a5fa;--llengua:#34d399;--angles:#a78bfa;
+    --mates:#60a5fa;--llengua:#34d399;--angles:#a78bfa;--castella:#f59e0b;
     --a-light:#1e3a5f;
   }
 }
 html[data-theme="dark"]{
   --bg:#0f172a;--s:#1e293b;--b:#334155;--t:#f1f5f9;--m:#94a3b8;--a:#60a5fa;
-  --mates:#60a5fa;--llengua:#34d399;--angles:#a78bfa;
+  --mates:#60a5fa;--llengua:#34d399;--angles:#a78bfa;--castella:#f59e0b;
   --a-light:#1e3a5f;color-scheme:dark;
 }
 html[data-theme="light"]{
   --bg:#f0f4ff;--s:#fff;--b:#e2e8f0;--t:#1e293b;--m:#64748b;--a:#1d4ed8;
-  --mates:#1d4ed8;--llengua:#059669;--angles:#7c3aed;
+  --mates:#1d4ed8;--llengua:#059669;--angles:#7c3aed;--castella:#d97706;
   --a-light:#dbeafe;color-scheme:light;
 }
 </style>
@@ -108,7 +109,7 @@ html[data-theme="light"]{
     <span class="sidebar-logo">🎒</span>
     <div class="sidebar-txt">
       <div class="sidebar-title">Exercicis — 4t</div>
-      <div class="sidebar-sub">Matemàtiques · Llengua · Anglès</div>
+      <div class="sidebar-sub">Matemàtiques · Llengua · Anglès · Castellano</div>
     </div>
   </div>
 
@@ -165,6 +166,17 @@ html[data-theme="light"]{
         <button class="nav-item" data-ekey="ex_ang_desc_v1" onclick="goTo(this,'angles/descripcio.html','Physical Description')"><span class="nav-icon">👤</span>Physical Description</button>
         <button class="nav-item" data-ekey="ex_ang_wsearch_v1" onclick="goTo(this,'angles/word_search.html','Word Search')"><span class="nav-icon">🔎</span>Word Search</button>
         <button class="nav-item" data-ekey="ex_ang_cword_v1" onclick="goTo(this,'angles/crosswords.html','Crossword Puzzle')"><span class="nav-icon">🔤</span>Crossword Puzzle</button>
+      </div>
+    </div>
+
+    <div class="nav-sep" data-topic="castella"></div>
+
+    <div class="nav-group" data-topic="castella">
+      <button class="nav-lbl nav-lbl-castella" type="button" onclick="toggleGroup(this)" aria-expanded="true">
+        <span>📝 Castellano</span><span class="nav-chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="nav-items">
+        <button class="nav-item" data-ekey="ex_cast_byv_v1" onclick="goTo(this,'castella/ortografia_byv.html','Ortografía: B y V')"><span class="nav-icon">✏️</span>Ortografía: B y V</button>
       </div>
     </div>
 
