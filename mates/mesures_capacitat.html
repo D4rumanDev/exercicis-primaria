@@ -183,6 +183,7 @@ function fmtMl(ml){
 }
 
 // ── EXERCICI 1 — Recipients ────────────────────────────────
+let _bId=0;
 const CAPS=[500,1000,2000];
 function buildConts(){
   const g=document.getElementById('cont-grid');g.innerHTML='';
@@ -270,7 +271,6 @@ const FPOOL=[
   {a:'800 ml',b:'¼ L',am:800,bm:250,res:550,op:'-'},
   {a:'750 ml',b:'½ L',am:750,bm:500,res:250,op:'-'},
 ];
-let _bId=0;
 let FC=null;
 // Bottle geometry constants (W=44, H=100)
 // Cap: y=0..8, neck x=[17..27], shoulder curves to body x=[5..39], body y=19..96, rounded bottom y=100
