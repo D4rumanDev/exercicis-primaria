@@ -132,20 +132,63 @@ function fmtMoney(cents){
   return c===0?e+' €':e+','+(c<10?'0':'')+c+' €';
 }
 
-function coinSVG(val,big=false){
-  const m=MONEDES.find(x=>x.val===val);
-  if(!m)return '';
-  const lbl=fmtMoney(val);
-  if(m.type==='coin'){
-    const S=big?82:64;
-    const cx=S/2,cy=S/2,r=S/2-3;
-    const ir=m.inner?Math.round(r*0.52):0;
-    const fs=big?13:11;
-    const inner=m.inner?`<circle cx="${cx}" cy="${cy}" r="${ir}" fill="${m.inner}" stroke="${m.stroke}" stroke-width="1.5"/>`:'';
-    return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${m.fill}" stroke="${m.stroke}" stroke-width="2.5"/>${inner}<text x="${cx}" y="${cy}" font-size="${fs}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="#1e293b">${lbl}</text></svg>`;
-  }else{
-    const W=big?130:100,H=big?66:52;
-    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect x="2" y="2" width="${W-4}" height="${H-4}" rx="6" fill="${m.fill}" stroke="${m.stroke}" stroke-width="2"/><rect x="7" y="7" width="${W-14}" height="${H-14}" rx="3" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><text x="${W/2}" y="${H/2}" font-size="${big?18:14}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="#fff">${lbl}</text></svg>`;
+let _svgId = 0;
+function coinSVG(val, big = false) {
+  const m = MONEDES.find(x => x.val === val);
+  if (!m) return '';
+  const id = `g${++_svgId}`;
+
+  if (m.type === 'coin') {
+    const S = big ? 90 : 74;
+    const cx = S / 2, cy = S / 2;
+    const ro = S / 2 - 2;
+    const rf = ro - 4;
+    const ir = m.inner ? Math.round(rf * 0.52) : 0;
+    let numTxt, unitTxt;
+    if (val < 100) { numTxt = val; unitTxt = 'ct'; }
+    else { numTxt = val / 100; unitTxt = '€'; }
+    const nfs = big ? 17 : 14, ufs = big ? 10 : 8;
+    const nY = (cy - (big ? 4 : 3)).toFixed(1);
+    const uY = (cy + (big ? 10 : 8)).toFixed(1);
+    const inner = m.inner
+      ? `<circle cx="${cx}" cy="${cy}" r="${ir+2}" fill="${m.inner}" stroke="${m.stroke}" stroke-width="1.2"/>` +
+        `<circle cx="${cx}" cy="${cy}" r="${ir}" fill="${m.inner}"/>` +
+        `<circle cx="${cx}" cy="${cy}" r="${ir}" fill="url(#h${id})" opacity="0.55"/>`
+      : '';
+    return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">` +
+      `<defs><radialGradient id="h${id}" cx="33%" cy="26%" r="66%">` +
+      `<stop offset="0%" stop-color="rgba(255,255,255,0.72)"/>` +
+      `<stop offset="65%" stop-color="rgba(255,255,255,0)"/>` +
+      `<stop offset="100%" stop-color="rgba(0,0,0,0.3)"/>` +
+      `</radialGradient></defs>` +
+      `<circle cx="${cx}" cy="${cy}" r="${ro}" fill="${m.stroke}"/>` +
+      `<circle cx="${cx}" cy="${cy}" r="${rf}" fill="${m.fill}"/>` +
+      inner +
+      `<circle cx="${cx}" cy="${cy}" r="${rf}" fill="url(#h${id})" opacity="${m.inner ? 0.4 : 1}"/>` +
+      `<text x="${cx}" y="${nY}" font-size="${nfs}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="rgba(0,0,0,0.78)">${numTxt}</text>` +
+      `<text x="${cx}" y="${uY}" font-size="${ufs}" font-weight="700" text-anchor="middle" fill="rgba(0,0,0,0.62)">${unitTxt}</text>` +
+      `</svg>`;
+  } else {
+    const W = big ? 150 : 118, H = big ? 80 : 62;
+    const euros = val / 100;
+    const lfs = big ? 22 : 17;
+    const cm = big ? 14 : 12, cr = big ? 5.5 : 4.5, cdot = big ? 2 : 1.5;
+    const orn = [[cm,cm],[W-cm,cm],[cm,H-cm],[W-cm,H-cm]].map(([x,y]) =>
+      `<circle cx="${x}" cy="${y}" r="${cr}" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>` +
+      `<circle cx="${x}" cy="${y}" r="${cdot}" fill="rgba(255,255,255,0.4)"/>`
+    ).join('');
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+      `<defs><linearGradient id="h${id}" x1="0%" y1="0%" x2="100%" y2="100%">` +
+      `<stop offset="0%" stop-color="rgba(255,255,255,0.24)"/>` +
+      `<stop offset="100%" stop-color="rgba(0,0,0,0.14)"/>` +
+      `</linearGradient></defs>` +
+      `<rect x="2" y="2" width="${W-4}" height="${H-4}" rx="7" fill="${m.fill}" stroke="${m.stroke}" stroke-width="2.5"/>` +
+      `<rect x="2" y="2" width="${W-4}" height="${H-4}" rx="7" fill="url(#h${id})"/>` +
+      `<rect x="7" y="7" width="${W-14}" height="${H-14}" rx="4" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"/>` +
+      orn +
+      `<text x="${(W*0.22).toFixed(1)}" y="${(H*0.62).toFixed(1)}" font-size="${big?30:23}" font-weight="900" text-anchor="middle" fill="rgba(255,255,255,0.13)">€</text>` +
+      `<text x="${(W*0.62).toFixed(1)}" y="${(H/2).toFixed(1)}" font-size="${lfs}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="rgba(255,255,255,0.95)">${euros} €</text>` +
+      `</svg>`;
   }
 }
 
@@ -240,7 +283,7 @@ function nextCanvi(){
   const q=CANVI_POOL[idx];
   // Show bill for "paid" and price tag
   const paidMon=MONEDES.find(m=>m.val===q.paid)||MONEDES.find(m=>m.type==='bill'&&m.val<=q.paid);
-  const billSVG=paidMon?coinSVG(q.paid,false):`<span style="font-size:1.2rem;font-weight:900">${fmtMoney(q.paid)}</span>`;
+  const billSVG=paidMon?coinSVG(q.paid,true):`<span style="font-size:1.2rem;font-weight:900">${fmtMoney(q.paid)}</span>`;
   document.getElementById('d4-scene').innerHTML=
     `<div class="canvi-box"><div class="canvi-lbl">Preu</div><div class="canvi-val">${fmtMoney(q.price)}</div></div>`+
     `<div class="canvi-arrow">→</div>`+
