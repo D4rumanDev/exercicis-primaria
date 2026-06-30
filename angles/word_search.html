@@ -15,10 +15,10 @@
 .ws-cell{width:var(--ws);height:var(--ws);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;text-transform:uppercase;border-radius:4px;background:var(--bg);color:var(--t);transition:background .07s,color .07s}
 .ws-cell.sel{background:var(--bd-hi);color:var(--a)}
 .ws-cell.found{background:var(--a);color:#fff}
-.ws-cell.miss{background:#fee2e2;color:#dc2626}
+.ws-cell.miss{background:var(--er2);color:var(--ko)}
 .ws-word-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .ws-word{font-size:.88rem;font-weight:600;color:var(--t);padding:4px 10px;border-radius:6px;border:1.5px solid var(--b);background:var(--s);white-space:nowrap;transition:all .2s}
-.ws-word.done{text-decoration:line-through;color:#166534;border-color:#4ade80;background:#dcfce7}
+.ws-word.done{text-decoration:line-through;color:var(--ok);border-color:var(--ok);background:var(--ok2)}
 @media(max-width:480px){:root{--ws:24px}.ws-cell{font-size:.8rem}}
 </style>
 </head>
