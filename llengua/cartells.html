@@ -100,11 +100,8 @@
 .type-accent{background:#fce7f3;color:#831843}
 .type-castella{background:#dcfce7;color:#14532d}
 
-/* Answer input */
-.ans-inp{padding:8px 14px;border:2px solid var(--b);border-radius:8px;font-size:1.05rem;font-weight:700;font-family:inherit;outline:none;transition:border-color .15s;text-align:center;width:200px}
-.ans-inp:focus{border-color:var(--a)}
-.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+/* Answer input — overrides shared.css .ans-inp for text (not digit) input */
+.ans-inp{padding:8px 14px;border:2px solid var(--b);border-radius:8px;font-size:1.05rem;font-family:inherit;color:var(--t);width:200px}
 </style>
 </head>
 <body>

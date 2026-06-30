@@ -35,14 +35,11 @@
 .sup-r,.sup-b{font-size:1.1rem;font-weight:900;color:var(--ko);line-height:1;margin-right:2px;padding-top:2px;display:none}
 .main-d{font-size:2.2rem;font-weight:700;line-height:1.25}
 .main-d.crossed{text-decoration:line-through;color:var(--m)}
-.ans-inp{width:52px;height:58px;text-align:center;font-size:2rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:10px;color:var(--a);background:var(--bg);outline:none;padding:0;transition:border-color .15s,background .15s;-moz-appearance:textfield}
-.ans-inp::-webkit-inner-spin-button,.ans-inp::-webkit-outer-spin-button{-webkit-appearance:none}
-.ans-inp:focus{border-color:var(--a);background:var(--bg-hi)}
-.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+/* answer input — sizing only; base styles from shared.css */
+.ans-inp{width:52px;height:58px;font-size:2rem;padding:0}
 #feedback{text-align:center;font-size:1rem;font-weight:600;padding:10px 14px;border-radius:10px;margin:10px 0;display:none}
-#feedback.ok{background:#f0fdf4;color:var(--ok)}
-#feedback.ko{background:#fef2f2;color:var(--ko)}
+#feedback.ok{background:var(--ok2);color:var(--ok)}
+#feedback.ko{background:var(--er2);color:var(--ko)}
 .btn-primary{background:var(--a);color:#fff}
 .btn-danger{background:transparent;color:var(--ko);border:1.5px solid var(--ko);font-size:.82rem;padding:8px 14px;min-height:38px;opacity:.6}
 .btn-danger:hover{background:var(--er2);opacity:1}

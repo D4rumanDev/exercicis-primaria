@@ -17,9 +17,9 @@ let GAM_ACHS = [
 ];
 
 function _eKey(){return typeof EXER_KEY!=='undefined'&&EXER_KEY?EXER_KEY:null;}
-function gLoad(){const today=new Date().toISOString().slice(0,10);try{const g=JSON.parse(localStorage.getItem(GAM))||{xp:0,ok:0,ko:0,streak:0,best:0,achs:[]};if(g.today!==today){g.today=today;g.todayOk=0;g.todayKo=0;}return g;}catch{return{xp:0,ok:0,ko:0,streak:0,best:0,achs:[],today,todayOk:0,todayKo:0};}}
+function gLoad(){const today=new Date().toISOString().slice(0,10);try{const g=JSON.parse(localStorage.getItem(GAM))||{xp:0,ok:0,ko:0,streak:0,best:0,achs:[]};if(g.today!==today){g.today=today;g.todayOk=0;g.todayKo=0;}return g;}catch(_){return{xp:0,ok:0,ko:0,streak:0,best:0,achs:[],today,todayOk:0,todayKo:0};}}
 function gSave(g){localStorage.setItem(GAM,JSON.stringify(g));if(window.parent!==window)window.parent.postMessage({exGamUpdate:true},'*');}
-function eLoad(){const k=_eKey();if(!k)return{};try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}}
+function eLoad(){const k=_eKey();if(!k)return{};try{return JSON.parse(localStorage.getItem(k))||{};}catch(_){return{};}}
 function eSave(e){const k=_eKey();if(k)localStorage.setItem(k,JSON.stringify(e));}
 function gLv(xp){let l=GAM_LVS[0];for(const v of GAM_LVS)if(xp>=v.x)l=v;return l;}
 function gNext(xp){for(const v of GAM_LVS)if(xp<v.x)return v;return null;}
@@ -121,13 +121,13 @@ function renderProbs(pool,containerId,n,xp,onOk,onKo){
     const id='blc'+(i+1),p=pool[qi],opts=sh([...p.opts]);
     return `<div class="prob" id="${id}"><div class="prob-t">${p.text}</div>`
       +`<div class="prob-opts" id="${id}opts">`
-      +opts.map(o=>`<button class="popt" onclick="ansBlc('${id}',${qi})">${o}</button>`).join('')
+      +opts.map(o=>`<button class="popt" onclick="ansBlc('${id}',${qi},event)">${o}</button>`).join('')
       +`</div><div class="fb" id="${id}fb"></div></div>`;
   }).join('');
   renderProbs._s={pool,xp,onOk:onOk||null,onKo:onKo||null};
 }
-function ansBlc(id,qi){
-  const {pool,xp,onOk,onKo}=renderProbs._s,p=pool[qi],btn=event.target;
+function ansBlc(id,qi,e){
+  const {pool,xp,onOk,onKo}=renderProbs._s,p=pool[qi],btn=e.target;
   document.querySelectorAll(`#${id}opts .popt`).forEach(b=>b.disabled=true);
   const fb=document.getElementById(id+'fb');
   if(btn.textContent===p.ans){

@@ -32,20 +32,15 @@
 .sign-td{width:30px;min-width:30px;text-align:right;padding-right:5px;font-size:2.2rem;font-weight:700;color:var(--a);font-family:'Courier New',monospace}
 .num-td{width:58px;min-width:58px;height:60px;text-align:center;font-size:2.2rem;font-weight:700;font-family:'Courier New',monospace}
 .inp-td{width:58px;min-width:58px;height:66px;padding:4px 3px;text-align:center}
-.blank-td{width:58px;min-width:58px;height:66px;background:#f8fafc}
+.blank-td{width:58px;min-width:58px;height:66px;background:var(--s)}
 .lbl-td{width:58px;min-width:58px;height:22px;text-align:center;font-size:.7rem;font-weight:800;color:var(--m);letter-spacing:.6px;font-family:'Segoe UI',sans-serif}
 .row-bb-thin td{border-bottom:2px solid var(--b)}
 .row-bb-thick td{border-bottom:3px solid var(--a)}
-/* Shared answer inputs */
-.ans-inp{width:52px;height:58px;text-align:center;font-size:2rem;font-weight:700;font-family:'Courier New',monospace;border:3px solid var(--b);border-radius:10px;color:var(--a);background:var(--bg);outline:none;padding:0;transition:border-color .15s,background .15s;-moz-appearance:textfield}
-.ans-inp::-webkit-inner-spin-button,.ans-inp::-webkit-outer-spin-button{-webkit-appearance:none}
-.ans-inp:focus{border-color:var(--a);background:var(--bg-hi)}
-.ans-inp.ok{border-color:var(--ok);background:#f0fdf4;color:var(--ok)}
-.ans-inp.ko{border-color:var(--ko);background:#fef2f2;color:var(--ko)}
+/* Shared answer inputs — sizing only; base styles from shared.css */
+.ans-inp{width:52px;height:58px;font-size:2rem;padding:0}
 #feedback1,#feedback2,#feedback3{text-align:center;font-size:1rem;font-weight:600;padding:10px 14px;border-radius:10px;margin:10px 0;display:none}
-#feedback1.ok,#feedback2.ok,#feedback3.ok{background:#f0fdf4;color:var(--ok)}
-#feedback1.ko,#feedback2.ko,#feedback3.ko{background:#fef2f2;color:var(--ko)}
-.muted{color:var(--m);font-size:.88rem}
+#feedback1.ok,#feedback2.ok,#feedback3.ok{background:var(--ok2);color:var(--ok)}
+#feedback1.ko,#feedback2.ko,#feedback3.ko{background:var(--er2);color:var(--ko)}
 /* Exercise 3 — Power of 10 */
 .pow10-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:16px 0}
 .pow10-q{font-size:2.4rem;font-weight:900;font-family:'Courier New',monospace;color:var(--t);display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
