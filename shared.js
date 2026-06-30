@@ -148,3 +148,4 @@ function checkInp(inputId,correct,fbId,xp){
   return ok;
 }
 function clrInp(id){const el=document.getElementById(id);if(el){el.value='';el.classList.remove('ok','ko');}}
+let _sid=0;const svgId=()=>++_sid;

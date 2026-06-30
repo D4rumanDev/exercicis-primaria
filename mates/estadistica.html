@@ -162,8 +162,8 @@ function buildBarSVG(labels, vals, colors){
   for(let s = 0; s <= ySteps; s++){
     const v = s * 10;
     const y = PT + chartH - (v / yTop) * chartH;
-    svg += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e2e8f0" stroke-width="${s===0?1.5:.8}"/>`;
-    svg += `<text x="${PL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="#64748b" font-family="'Segoe UI',sans-serif">${v}</text>`;
+    svg += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="var(--b)" stroke-width="${s===0?1.5:.8}"/>`;
+    svg += `<text x="${PL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--m)" font-family="'Segoe UI',sans-serif">${v}</text>`;
   }
 
   // Bars + labels
@@ -183,16 +183,16 @@ function buildBarSVG(labels, vals, colors){
       const mid = Math.ceil(labels[i].length/2);
       const l1  = labels[i].slice(0,mid);
       const l2  = labels[i].slice(mid);
-      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9" fill="#1e293b" font-family="'Segoe UI',sans-serif">${l1}</text>`;
-      svg += `<text x="${lx}" y="${ly+11}" text-anchor="middle" font-size="9" fill="#1e293b" font-family="'Segoe UI',sans-serif">${l2}</text>`;
+      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9" fill="var(--t)" font-family="'Segoe UI',sans-serif">${l1}</text>`;
+      svg += `<text x="${lx}" y="${ly+11}" text-anchor="middle" font-size="9" fill="var(--t)" font-family="'Segoe UI',sans-serif">${l2}</text>`;
     } else {
-      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9.5" fill="#1e293b" font-family="'Segoe UI',sans-serif">${labels[i]}</text>`;
+      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9.5" fill="var(--t)" font-family="'Segoe UI',sans-serif">${labels[i]}</text>`;
     }
   }
 
   // Axes
-  svg += `<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+chartH}" stroke="#94a3b8" stroke-width="1.5"/>`;
-  svg += `<line x1="${PL}" y1="${PT+chartH}" x2="${W-PR}" y2="${PT+chartH}" stroke="#94a3b8" stroke-width="1.5"/>`;
+  svg += `<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+chartH}" stroke="var(--m)" stroke-width="1.5"/>`;
+  svg += `<line x1="${PL}" y1="${PT+chartH}" x2="${W-PR}" y2="${PT+chartH}" stroke="var(--m)" stroke-width="1.5"/>`;
 
   svg += '</svg>';
   return svg;

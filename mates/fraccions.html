@@ -73,7 +73,7 @@
 .grid-vis-wrap{display:flex;justify-content:center;margin:12px 0;padding:2px}
 .grid-vis-wrap svg{overflow:visible}
 .grid-cell{cursor:pointer;transition:fill .15s,stroke .15s}
-.grid-cell[data-a="1"]{stroke:#2563eb;stroke-width:2.5}
+.grid-cell[data-a="1"]{stroke:var(--a);stroke-width:2.5}
 </style>
 </head>
 <body>
@@ -389,7 +389,7 @@ function chkSigne(chose,correct){
 }
 
 // ── SEC 4: PINTA ──
-let ptQ=null,ptEmptyC='#e2e8f0';
+let ptQ=null,ptEmptyC='var(--b)';
 function nextPinta(){
   const th=randTheme(),{n,d}=randFrac();
   ptQ={n,d,th};
@@ -397,7 +397,7 @@ function nextPinta(){
   area.innerHTML='';
   const target=document.createElement('div');target.className='paint-target';
   target.innerHTML=`Pinta <strong>${n}/${d}</strong> de la figura`;
-  const interTh={...th,empty:ptEmptyC,stroke:'#94a3b8'};
+  const interTh={...th,empty:ptEmptyC,stroke:'var(--m)'};
   const vis=document.createElement('div');vis.id='pt-vis';vis.innerHTML=autoVis(0,d,interTh,175,true);
   const cnt=document.createElement('div');cnt.className='color-counter';cnt.id='pt-cnt';cnt.innerHTML='Parts pintades: <span id="pt-num">0</span>';
   const sbtn=document.createElement('button');sbtn.className='submit-btn';sbtn.textContent='Comprovat!';sbtn.disabled=true;sbtn.onclick=submitPinta;
@@ -561,7 +561,7 @@ function gridSVG(d){
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
       const i=r*cols+c,x=c*(G_CW+G_GAP),y=r*(G_CH+G_GAP);
-      s+=`<rect class="grid-cell" onclick="gridCellClick(this)" data-a="0" data-i="${i}" x="${x}" y="${y}" width="${G_CW}" height="${G_CH}" rx="5" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>`;
+      s+=`<rect class="grid-cell" onclick="gridCellClick(this)" data-a="0" data-i="${i}" x="${x}" y="${y}" width="${G_CW}" height="${G_CH}" rx="5" fill="var(--b)" stroke="var(--m)" stroke-width="2"/>`;
     }
   }
   return`<svg viewBox="-2 -2 ${W+4} ${H+4}" style="max-width:100%;width:${W}px;height:${H}px">${s}</svg>`;
@@ -578,7 +578,7 @@ function nextFracGrid(){
 function gridCellClick(el){
   const on=el.dataset.a==='1';
   el.dataset.a=on?'0':'1';
-  el.setAttribute('fill',on?'#e2e8f0':'#60a5fa');
+  el.setAttribute('fill',on?'var(--b)':'var(--a)');
   const painted=document.getElementById('grd-vis').querySelectorAll('[data-a="1"]').length;
   document.getElementById('grd-num').textContent=painted;
   document.getElementById('grd-cnt').className='color-counter'+(painted===gridQ.n?' ok':'');

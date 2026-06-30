@@ -59,8 +59,8 @@
 /* Interactive clock */
 .i-target{font-size:1rem;font-weight:600;line-height:1.5;text-align:center;margin-bottom:6px}
 .i-hint{font-size:.78rem;color:var(--m);text-align:center;margin-bottom:10px;line-height:1.5}
-.i-hint b{color:#1d4ed8}
-.i-hint span{color:#1e293b}
+.i-hint b{color:var(--a)}
+.i-hint span{color:var(--t)}
 .hr-line{height:2px;background:var(--b);margin:4px 0}
 @media(max-width:480px){.two-col{grid-template-columns:1fr}.chain-u{font-size:.8rem}.dig-display{font-size:1.8rem}}
 /* Fraction clocks grid */
@@ -265,15 +265,15 @@ const MINS=[0,5,10,15,20,25,30,35,40,45,50,55];
 
 // ── CLOCK SVG FACE ──
 function clockFace(cx,cy,R){
-  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>`;
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--s)" stroke="var(--b)" stroke-width="3"/>`;
   for(let i=0;i<60;i++){
     const a=(i*6-90)*Math.PI/180,isH=i%5===0;
     const r1=R-(isH?8:5),r2=R-(isH?19:12);
-    s+=`<line x1="${(cx+r1*Math.cos(a)).toFixed(1)}" y1="${(cy+r1*Math.sin(a)).toFixed(1)}" x2="${(cx+r2*Math.cos(a)).toFixed(1)}" y2="${(cy+r2*Math.sin(a)).toFixed(1)}" stroke="${isH?'#475569':'#94a3b8'}" stroke-width="${isH?2.5:1.2}"/>`;
+    s+=`<line x1="${(cx+r1*Math.cos(a)).toFixed(1)}" y1="${(cy+r1*Math.sin(a)).toFixed(1)}" x2="${(cx+r2*Math.cos(a)).toFixed(1)}" y2="${(cy+r2*Math.sin(a)).toFixed(1)}" stroke="${isH?'var(--t)':'var(--m)'}" stroke-width="${isH?2.5:1.2}"/>`;
   }
   ['12','1','2','3','4','5','6','7','8','9','10','11'].forEach((n,i)=>{
     const a=(i*30-90)*Math.PI/180,nr=R-28;
-    s+=`<text x="${(cx+nr*Math.cos(a)).toFixed(1)}" y="${(cy+nr*Math.sin(a)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="#1e293b" font-family="Segoe UI,sans-serif">${n}</text>`;
+    s+=`<text x="${(cx+nr*Math.cos(a)).toFixed(1)}" y="${(cy+nr*Math.sin(a)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="var(--t)" font-family="Segoe UI,sans-serif">${n}</text>`;
   });
   return s;
 }
@@ -282,9 +282,9 @@ function drawClock(el,h,m){
   const hA=((h%12)+m/60)*30-90,mA=m*6-90;
   const hr=hA*Math.PI/180,mr=mA*Math.PI/180;
   let s=clockFace(cx,cy,R);
-  s+=`<line x1="${cx}" y1="${cy}" x2="${(cx+52*Math.cos(hr)).toFixed(1)}" y2="${(cy+52*Math.sin(hr)).toFixed(1)}" stroke="#1e293b" stroke-width="5.5" stroke-linecap="round"/>`;
-  s+=`<line x1="${cx}" y1="${cy}" x2="${(cx+70*Math.cos(mr)).toFixed(1)}" y2="${(cy+70*Math.sin(mr)).toFixed(1)}" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/>`;
-  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="#1e293b"/>`;
+  s+=`<line x1="${cx}" y1="${cy}" x2="${(cx+52*Math.cos(hr)).toFixed(1)}" y2="${(cy+52*Math.sin(hr)).toFixed(1)}" stroke="var(--t)" stroke-width="5.5" stroke-linecap="round"/>`;
+  s+=`<line x1="${cx}" y1="${cy}" x2="${(cx+70*Math.cos(mr)).toFixed(1)}" y2="${(cy+70*Math.sin(mr)).toFixed(1)}" stroke="var(--a)" stroke-width="3" stroke-linecap="round"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="var(--t)"/>`;
   el.innerHTML=s;
 }
 
@@ -402,25 +402,25 @@ const FRACS_DATA=[
 ];
 function fracClockSVG(pct){
   const cx=100,cy=100,R=88;
-  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>`;
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--s)" stroke="var(--b)" stroke-width="3"/>`;
   if(pct===1){
-    s+=`<circle cx="${cx}" cy="${cy}" r="${R-3}" fill="#bfdbfe" opacity=".65"/>`;
+    s+=`<circle cx="${cx}" cy="${cy}" r="${R-3}" fill="var(--bd-hi)" opacity=".65"/>`;
   } else {
     const a0=-Math.PI/2,a1=a0+pct*2*Math.PI;
     const x1=(cx+(R-3)*Math.cos(a0)).toFixed(1),y1=(cy+(R-3)*Math.sin(a0)).toFixed(1);
     const x2=(cx+(R-3)*Math.cos(a1)).toFixed(1),y2=(cy+(R-3)*Math.sin(a1)).toFixed(1);
-    s+=`<path d="M${cx},${cy} L${x1},${y1} A${R-3},${R-3} 0 ${pct>.5?1:0},1 ${x2},${y2} Z" fill="#bfdbfe" opacity=".65"/>`;
+    s+=`<path d="M${cx},${cy} L${x1},${y1} A${R-3},${R-3} 0 ${pct>.5?1:0},1 ${x2},${y2} Z" fill="var(--bd-hi)" opacity=".65"/>`;
   }
   for(let i=0;i<12;i++){
     const a=(i*30-90)*Math.PI/180;
-    s+=`<line x1="${(cx+(R-4)*Math.cos(a)).toFixed(1)}" y1="${(cy+(R-4)*Math.sin(a)).toFixed(1)}" x2="${(cx+(R-16)*Math.cos(a)).toFixed(1)}" y2="${(cy+(R-16)*Math.sin(a)).toFixed(1)}" stroke="#475569" stroke-width="2.5"/>`;
+    s+=`<line x1="${(cx+(R-4)*Math.cos(a)).toFixed(1)}" y1="${(cy+(R-4)*Math.sin(a)).toFixed(1)}" x2="${(cx+(R-16)*Math.cos(a)).toFixed(1)}" y2="${(cy+(R-16)*Math.sin(a)).toFixed(1)}" stroke="var(--m)" stroke-width="2.5"/>`;
   }
   [{n:'12',a:-90},{n:'3',a:0},{n:'6',a:90},{n:'9',a:180}].forEach(({n,a})=>{
     const ar=a*Math.PI/180,nr=R-28;
-    s+=`<text x="${(cx+nr*Math.cos(ar)).toFixed(1)}" y="${(cy+nr*Math.sin(ar)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="800" fill="#1e293b" font-family="Segoe UI,sans-serif">${n}</text>`;
+    s+=`<text x="${(cx+nr*Math.cos(ar)).toFixed(1)}" y="${(cy+nr*Math.sin(ar)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="800" fill="var(--t)" font-family="Segoe UI,sans-serif">${n}</text>`;
   });
-  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="#1e293b"/>`;
-  s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#cbd5e1" stroke-width="3"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="var(--t)"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--b)" stroke-width="3"/>`;
   return `<svg viewBox="0 0 200 200" width="110" height="110">${s}</svg>`;
 }
 let fracAData=[];
@@ -607,13 +607,13 @@ function drawInteractive(){
   let s=clockFace(cx,cy,R);
   // Hour hand (dark, shorter)
   const hx=(cx+52*Math.cos(hr)).toFixed(1),hy=(cy+52*Math.sin(hr)).toFixed(1);
-  s+=`<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>`;
-  s+=`<circle cx="${hx}" cy="${hy}" r="8" fill="#1e293b" opacity=".7"/>`;
+  s+=`<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="var(--t)" stroke-width="6" stroke-linecap="round"/>`;
+  s+=`<circle cx="${hx}" cy="${hy}" r="8" fill="var(--t)" opacity=".7"/>`;
   // Minute hand (blue, longer)
   const mx=(cx+70*Math.cos(mr)).toFixed(1),my=(cy+70*Math.sin(mr)).toFixed(1);
-  s+=`<line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round"/>`;
-  s+=`<circle cx="${mx}" cy="${my}" r="8" fill="#1d4ed8" opacity=".8"/>`;
-  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="#1e293b"/>`;
+  s+=`<line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="var(--a)" stroke-width="3.5" stroke-linecap="round"/>`;
+  s+=`<circle cx="${mx}" cy="${my}" r="8" fill="var(--a)" opacity=".8"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="5" fill="var(--t)"/>`;
   el.innerHTML=s;
 }
 
