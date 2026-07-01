@@ -102,6 +102,7 @@
 
 <script src="problemes.js"></script>
 <script src="estadistica_data.js"></script>
+<script src="../svg.js"></script>
 <script src="../shared.js"></script>
 <script>
 const EXER_KEY = 'ex_est_v1';
@@ -144,59 +145,7 @@ function genChartData(nBars){
   return {title: theme.title, labels, colors, vals};
 }
 
-function buildBarSVG(labels, vals, colors){
-  const n     = labels.length;
-  const W     = 320, H = 160;
-  const PL    = 32, PR = 8, PT = 10, PB = 36;
-  const chartW= W - PL - PR;
-  const chartH= H - PT - PB;
-  const maxV  = Math.max(...vals);
-  const yTop  = Math.ceil(maxV / 10) * 10;
-  const barW  = Math.floor((chartW / n) * 0.55);
-  const gap   = chartW / n;
-
-  let svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" preserveAspectRatio="xMidYMin meet">`;
-
-  // Y axis lines + labels
-  const ySteps = yTop / 10;
-  for(let s = 0; s <= ySteps; s++){
-    const v = s * 10;
-    const y = PT + chartH - (v / yTop) * chartH;
-    svg += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="var(--b)" stroke-width="${s===0?1.5:.8}"/>`;
-    svg += `<text x="${PL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--m)" font-family="'Segoe UI',sans-serif">${v}</text>`;
-  }
-
-  // Bars + labels
-  for(let i = 0; i < n; i++){
-    const bh = (vals[i] / yTop) * chartH;
-    const bx = PL + gap * i + (gap - barW) / 2;
-    const by = PT + chartH - bh;
-    svg += `<rect x="${bx}" y="${by}" width="${barW}" height="${bh}" rx="3" fill="${colors[i]}"/>`;
-    // value on top
-    svg += `<text x="${bx + barW/2}" y="${by - 3}" text-anchor="middle" font-size="9.5" fill="${colors[i]}" font-weight="700" font-family="'Segoe UI',sans-serif">${vals[i]}</text>`;
-    // x label
-    const lx = PL + gap * i + gap / 2;
-    const ly = H - PB + 14;
-    // wrap long labels
-    const words = labels[i].split('');
-    if(labels[i].length > 7){
-      const mid = Math.ceil(labels[i].length/2);
-      const l1  = labels[i].slice(0,mid);
-      const l2  = labels[i].slice(mid);
-      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9" fill="var(--t)" font-family="'Segoe UI',sans-serif">${l1}</text>`;
-      svg += `<text x="${lx}" y="${ly+11}" text-anchor="middle" font-size="9" fill="var(--t)" font-family="'Segoe UI',sans-serif">${l2}</text>`;
-    } else {
-      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="9.5" fill="var(--t)" font-family="'Segoe UI',sans-serif">${labels[i]}</text>`;
-    }
-  }
-
-  // Axes
-  svg += `<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+chartH}" stroke="var(--m)" stroke-width="1.5"/>`;
-  svg += `<line x1="${PL}" y1="${PT+chartH}" x2="${W-PR}" y2="${PT+chartH}" stroke="var(--m)" stroke-width="1.5"/>`;
-
-  svg += '</svg>';
-  return svg;
-}
+// buildBarSVG → svg.js
 
 // ── SEC 1: llegir valor ──
 let _s1data;

@@ -495,16 +495,7 @@ const POLIGS = [
   {name:'hexàgon',     sides:6, verts:6, pts:[[110,20],[185,60],[185,120],[110,160],[35,120],[35,60]]},
 ];
 const POL_CLR=['#60a5fa','#34d399','#f472b6','#fbbf24','#a78bfa','#f87171'];
-function polygonSVG(pts, clr, W=220, H=180){
-  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
-  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
-  const pad=18, avW=W-2*pad, avH=H-2*pad;
-  const sc=Math.min(avW/((x1-x0)||1), avH/((y1-y0)||1));
-  const ox=pad+(avW-(x1-x0)*sc)/2, oy=pad+(avH-(y1-y0)*sc)/2;
-  const mp=pts.map(p=>[(ox+(p[0]-x0)*sc).toFixed(1),(oy+(p[1]-y0)*sc).toFixed(1)]);
-  const pointsStr=mp.map(p=>p.join(',')).join(' ');
-  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto"><polygon points="${pointsStr}" fill="${clr}" fill-opacity=".22" stroke="${clr}" stroke-width="2.5" stroke-linejoin="round"/></svg>`;
-}
+// polygonSVG → svg.js
 const POL_QUESTIONS=['name','sides','verts'];
 let polPrev=-1, polQMode=0;
 function nextPolig(){
@@ -550,58 +541,7 @@ const SOLIDS=[
   {name:'Piràmide quadrada',    faces:5, edges:8,  verts:5,  draw:'sq_pyramid'},
   {name:'Tetraedre',            faces:4, edges:6,  verts:4,  draw:'tetra'},
 ];
-function solidSVG(type, W=200, H=170){
-  const clr='#60a5fa', fill='rgba(96,165,250,0.18)', stroke=clr;
-  const sw=2.5;
-  // isometric helpers
-  const iso=(x,y,z,ox,oy,s)=>{
-    const px=ox+(x-z)*s*Math.cos(Math.PI/6);
-    const py=oy-(y*s)+(x+z)*s*Math.sin(Math.PI/6);
-    return [px.toFixed(1),py.toFixed(1)];
-  };
-  const poly=(pts,f,s,sw2)=>`<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${f}" stroke="${s}" stroke-width="${sw2}" stroke-linejoin="round"/>`;
-  const line=(p1,p2,s,sw2,dash='')=>`<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="${s}" stroke-width="${sw2}" stroke-dasharray="${dash}" stroke-linecap="round"/>`;
-  if(type==='cube'||type==='box'){
-    const [sx,sy,sz]=type==='cube'?[1,1,1]:[1.5,1,1];
-    const ox=W/2, oy=H*.55, s=50;
-    const A=iso(0,0,sz,ox,oy,s),B=iso(sx,0,sz,ox,oy,s),C=iso(sx,0,0,ox,oy,s),D=iso(0,0,0,ox,oy,s);
-    const E=iso(0,sy,sz,ox,oy,s),F=iso(sx,sy,sz,ox,oy,s),G=iso(sx,sy,0,ox,oy,s),H2=iso(0,sy,0,ox,oy,s);
-    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">`
-      +poly([E,F,B,A],fill,stroke,sw)+poly([F,G,C,B],fill,stroke,sw)+poly([E,H2,G,F],fill,stroke,sw)
-      +line(D,A,stroke,sw,'4 3')+line(D,C,stroke,sw,'4 3')+line(D,H2,stroke,sw,'4 3')
-      +'</svg>';
-  }
-  if(type==='triprism'){
-    const ox=W/2, oy=H*.6, s=45;
-    const A=iso(0,0,1,ox,oy,s),B=iso(1,0,1,ox,oy,s),C=iso(0.5,0,0,ox,oy,s);
-    const D=iso(0,1,1,ox,oy,s),E=iso(1,1,1,ox,oy,s),F=iso(0.5,1,0,ox,oy,s);
-    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">`
-      +poly([D,E,B,A],fill,stroke,sw)+poly([E,F,C,B],fill,stroke,sw)+poly([D,E,F],fill,stroke,sw)
-      +line(A,C,stroke,sw,'4 3')+line(C,F,stroke,sw,'4 3')
-      +'</svg>';
-  }
-  if(type==='sq_pyramid'){
-    const ox=W/2, oy=H*.65, s=48;
-    const A=iso(0,0,1,ox,oy,s),B=iso(1,0,1,ox,oy,s),C=iso(1,0,0,ox,oy,s),D=iso(0,0,0,ox,oy,s);
-    const apex=iso(0.5,1.2,0.5,ox,oy,s);
-    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">`
-      +poly([apex,B,A],fill,stroke,sw)+poly([apex,C,B],fill,stroke,sw)+poly([apex,D,C],fill,stroke,sw)
-      +line(A,B,stroke,sw)+line(B,C,stroke,sw)+line(D,A,stroke,sw,'4 3')+line(D,C,stroke,sw,'4 3')
-      +line(A,apex,stroke,sw)+line(B,apex,stroke,sw)+line(C,apex,stroke,sw)+line(D,apex,stroke,sw,'4 3')
-      +'</svg>';
-  }
-  if(type==='tetra'){
-    const ox=W/2, oy=H*.62, s=60;
-    const A=iso(0,0,1,ox,oy,s),B=iso(1,0,1,ox,oy,s),C=iso(0.5,0,0,ox,oy,s);
-    const apex=iso(0.5,1.1,0.5,ox,oy,s);
-    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">`
-      +poly([apex,B,A],fill,stroke,sw)+poly([apex,C,B],fill,stroke,sw)
-      +line(A,B,stroke,sw)+line(B,C,stroke,sw)+line(A,C,stroke,sw,'4 3')
-      +line(A,apex,stroke,sw)+line(B,apex,stroke,sw)+line(C,apex,stroke,sw,'4 3')
-      +'</svg>';
-  }
-  return '';
-}
+// solidSVG → svg.js
 const SOL_PROPS=['faces','edges','verts'];
 const SOL_PROP_LBL={faces:'cares',edges:'arestes',verts:'vèrtexs'};
 let solPrev=-1;
@@ -639,29 +579,7 @@ const FIGS=[
   {name:'octàgon',        type:'octagon'},
 ];
 const FIG_CLR=['#60a5fa','#34d399','#f87171','#fbbf24','#a78bfa','#f472b6'];
-function figSVG(type,W=200,H=170){
-  const cx=W/2,cy=H/2,r=65;
-  const c=pick(FIG_CLR);
-  const fill=c+'38';const sw=2.5;
-  const reg=(n,sa=-Math.PI/2)=>{
-    const pts=[];
-    for(let i=0;i<n;i++){const a=sa+i*2*Math.PI/n;pts.push([(cx+r*Math.cos(a)).toFixed(1),(cy+r*Math.sin(a)).toFixed(1)]);}
-    return `<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${fill}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>`;
-  };
-  const svg=inner=>`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">${inner}</svg>`;
-  if(type==='circle')return svg(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${c}" stroke-width="${sw}"/>`);
-  if(type==='ellipse')return svg(`<ellipse cx="${cx}" cy="${cy}" rx="${r}" ry="${Math.round(r*.58)}" fill="${fill}" stroke="${c}" stroke-width="${sw}"/>`);
-  if(type==='triangle')return svg(reg(3));
-  if(type==='square'){const hs=Math.round(r*.72);return svg(`<rect x="${cx-hs}" y="${cy-hs}" width="${hs*2}" height="${hs*2}" fill="${fill}" stroke="${c}" stroke-width="${sw}"/>`);}
-  if(type==='rectangle'){const hw=Math.round(r*.95),hh=Math.round(r*.52);return svg(`<rect x="${cx-hw}" y="${cy-hh}" width="${hw*2}" height="${hh*2}" fill="${fill}" stroke="${c}" stroke-width="${sw}"/>`);}
-  if(type==='rhombus'){const rw=Math.round(r*.72);return svg(`<polygon points="${cx},${cy-r} ${cx+rw},${cy} ${cx},${cy+r} ${cx-rw},${cy}" fill="${fill}" stroke="${c}" stroke-width="${sw}"/>`);}
-  if(type==='trapezoid'){const y1=(cy-r*.48).toFixed(1),y2=(cy+r*.48).toFixed(1);return svg(`<polygon points="${(cx-r*.5).toFixed(1)},${y1} ${(cx+r*.5).toFixed(1)},${y1} ${(cx+r*.9).toFixed(1)},${y2} ${(cx-r*.9).toFixed(1)},${y2}" fill="${fill}" stroke="${c}" stroke-width="${sw}"/>`);}
-  if(type==='parallelogram'){const off=28,hh=Math.round(r*.45),hw=Math.round(r*.82);return svg(`<polygon points="${cx-hw+off},${cy-hh} ${cx+hw+off},${cy-hh} ${cx+hw-off},${cy+hh} ${cx-hw-off},${cy+hh}" fill="${fill}" stroke="${c}" stroke-width="${sw}"/>`);}
-  if(type==='pentagon')return svg(reg(5));
-  if(type==='hexagon')return svg(reg(6,0));
-  if(type==='octagon')return svg(reg(8));
-  return '';
-}
+// figSVG → svg.js
 let figPrev=-1;
 function nextFig(){
   let idx;do{idx=ri(0,FIGS.length-1);}while(idx===figPrev&&FIGS.length>1);
