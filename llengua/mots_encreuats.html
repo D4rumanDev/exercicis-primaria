@@ -85,6 +85,7 @@
 <script src="../shared.js"></script>
 <script>
 const EXER_KEY = 'ex_cat_cword_v1';
+const CW_GAME_KEY = 'ex_cat_cword_game_v1';
 
 GAM_ACHS = [
   ...GAM_ACHS,
@@ -197,6 +198,7 @@ function tryGen(words){
 
 // ── STATE ──
 let diff='S';
+let currentRes=null;
 
 function setDiff(d){
   diff=d;
@@ -231,6 +233,8 @@ function newGame(){
     g.textContent=''; g.appendChild(p);
     return;
   }
+  currentRes=res;
+  saveGame();
   renderCW(res);
 }
 
@@ -293,6 +297,7 @@ function onInp(e){
     const all=allInps(), i=all.indexOf(inp);
     if(i+1<all.length) all[i+1].focus();
   }
+  saveGame();
 }
 
 function onKd(e){
@@ -341,9 +346,29 @@ function revealAll(){
   document.getElementById('cw-fb').className='fb mt2';
 }
 
+function saveGame(){
+  if(!currentRes) return;
+  localStorage.setItem(CW_GAME_KEY, JSON.stringify({
+    diff, res:currentRes, inputs:allInps().map(i=>i.value)
+  }));
+}
+
+function loadGame(){
+  try{
+    const s=JSON.parse(localStorage.getItem(CW_GAME_KEY)||'null');
+    if(!s||!s.res) return false;
+    diff=s.diff; currentRes=s.res;
+    document.querySelectorAll('.size-btn').forEach(b=>b.classList.toggle('active',b.dataset.d===diff));
+    renderCW(currentRes);
+    const inps=allInps();
+    (s.inputs||[]).forEach((v,i)=>{ if(inps[i]&&v) inps[i].value=v; });
+    return true;
+  }catch{return false;}
+}
+
 // Init
 gRender();
-newGame();
+if(!loadGame()) newGame();
 </script>
 </body>
 </html>

@@ -88,10 +88,20 @@ function gCorrect(xp=1,typeOrFn=null){
 function gWrong(){const g=gLoad();g.ko++;g.todayKo=(g.todayKo||0)+1;g.streak=0;gSave(g);gRender();}
 function boom(){
   const c=['#1d4ed8','#fbbf24','#16a34a','#dc2626','#7c3aed'];
+  const vh=window.innerHeight;
   for(let i=0;i<30;i++){
     const e=document.createElement('div');e.className='cp';
-    e.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${c[i%c.length]};border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.6}s;animation-duration:${.8+Math.random()*.8}s`;
-    document.body.appendChild(e);setTimeout(()=>e.remove(),2200);
+    e.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${c[i%c.length]};border-radius:${Math.random()>.5?'50%':'2px'};animation:none`;
+    document.body.appendChild(e);
+    const delay=Math.random()*600, dur=800+Math.random()*800, rot=360+Math.random()*720;
+    const t0=performance.now()+delay;
+    (function frame(now){
+      if(now<t0){requestAnimationFrame(frame);return;}
+      const p=Math.min((now-t0)/dur,1);
+      e.style.transform=`translateY(${p*(vh+20)}px) rotate(${p*rot}deg)`;
+      e.style.opacity=String(1-Math.max(0,(p-.5)*2));
+      if(p<1)requestAnimationFrame(frame);else e.remove();
+    })(performance.now());
   }
 }
 

@@ -72,6 +72,7 @@
 <script src="../shared.js"></script>
 <script>
 const EXER_KEY = 'ex_cast_ws_v1';
+const WS_GAME_KEY = 'ex_cast_ws_game_v1';
 
 GAM_ACHS = [
   ...GAM_ACHS,
@@ -146,6 +147,7 @@ function newGame() {
   document.getElementById('ws-fb').className = 'fb mt2';
   renderGrid(res.G, size);
   renderWordList(res.placed);
+  saveGame();
 }
 
 // ── RENDER ──
@@ -221,6 +223,7 @@ function checkSel(cells) {
     foundWords.add(match.w);
     document.querySelector(`.ws-word[data-w="${match.w}"]`)?.classList.add('done');
     gCorrect(5, 'wsearch');
+    saveGame();
     if (foundWords.size >= currentPlaced.length) onAllFound();
   } else if (!alreadyDone) {
     cells.forEach(({r, c}) => {
@@ -245,6 +248,35 @@ function showSol() {
     foundWords.add(p.w);
   });
   document.getElementById('ws-fb').textContent = 'Solución mostrada.';
+}
+
+function saveGame() {
+  localStorage.setItem(WS_GAME_KEY, JSON.stringify({
+    diff, grid: currentGrid, placed: currentPlaced, found: [...foundWords], size: gridSize
+  }));
+}
+
+function loadGame() {
+  try {
+    const s = JSON.parse(localStorage.getItem(WS_GAME_KEY) || 'null');
+    if (!s) return false;
+    diff = s.diff; currentGrid = s.grid; currentPlaced = s.placed;
+    foundWords = new Set(s.found); gridSize = s.size;
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.toggle('active', b.dataset.d === diff));
+    renderGrid(currentGrid, gridSize);
+    renderWordList(currentPlaced);
+    currentPlaced.filter(p => foundWords.has(p.w)).forEach(p => {
+      for (let i = 0; i < p.w.length; i++)
+        document.querySelector(`#ws-grid .ws-cell[data-r="${p.row + p.dr * i}"][data-c="${p.col + p.dc * i}"]`)?.classList.add('found');
+      document.querySelector(`.ws-word[data-w="${p.w}"]`)?.classList.add('done');
+    });
+    if (foundWords.size >= currentPlaced.length) {
+      const fb = document.getElementById('ws-fb');
+      fb.textContent = '✓ ¡Perfecto! ¡Todas las palabras encontradas!';
+      fb.className = 'fb ok mt2';
+    }
+    return true;
+  } catch { return false; }
 }
 
 // ── EVENTOS — Ratón ──
@@ -315,7 +347,7 @@ document.addEventListener('touchend', e => {
 
 // Init
 gRender();
-newGame();
+if (!loadGame()) newGame();
 </script>
 </body>
 </html>
