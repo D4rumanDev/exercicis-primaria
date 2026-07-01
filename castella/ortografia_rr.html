@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ortografía: LL e Y</title>
+<title>Ortografía: R y RR</title>
 <link rel="stylesheet" href="../shared.css">
 <style>
 .word-big{font-size:2rem;font-weight:900;text-align:center;padding:14px 0;color:var(--t);letter-spacing:.03em;font-family:'Courier New',monospace}
-.ll-blank{display:inline-block;min-width:22px;border-bottom:3px solid var(--a);color:var(--a)}
-.letter-ok{color:var(--ok);font-weight:900;text-decoration:underline}
+.rr-blank{display:inline-block;min-width:22px;border-bottom:3px solid var(--a);color:var(--a)}
 .ctx-frase{font-size:.92rem;color:var(--m);text-align:center;margin-top:4px;margin-bottom:8px;min-height:1.4em}
 .hint-rule{font-size:.78rem;font-weight:600;color:var(--m);text-align:center;margin-top:6px;min-height:1.2em}
 .rules-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
@@ -20,24 +19,24 @@
 
 <div class="hdr">
   <div>
-    <h1>Ortografía: LL e Y</h1>
+    <h1>Ortografía: R y RR</h1>
     <div class="muted">Castellano · Ortografía</div>
   </div>
 </div>
 
 <div id="gam-bar"></div>
 
-<!-- 1: ¿LL o Y? -->
+<!-- 1: ¿R o RR? -->
 <div class="card">
-  <h2><span class="num">1</span> ¿LL o Y?</h2>
+  <h2><span class="num">1</span> ¿R o RR?</h2>
   <div class="card-sub">¿Qué letras faltan para completar la palabra?</div>
-  <div id="lly-word" class="word-big mt3"></div>
-  <div id="lly-ctx" class="ctx-frase"></div>
-  <div id="lly-opts" class="opts-row"></div>
-  <div id="lly-hint" class="hint-rule"></div>
-  <div id="lly-fb" class="fb mt2" style="text-align:center"></div>
+  <div id="rr-word" class="word-big mt3"></div>
+  <div id="rr-ctx" class="ctx-frase"></div>
+  <div id="rr-opts" class="opts-row"></div>
+  <div id="rr-hint" class="hint-rule"></div>
+  <div id="rr-fb" class="fb mt2" style="text-align:center"></div>
   <div class="btn-row mt4">
-    <button class="btn btn-outline btn-sm" onclick="nextLLY()">Siguiente →</button>
+    <button class="btn btn-outline btn-sm" onclick="nextRR()">Siguiente →</button>
   </div>
 </div>
 
@@ -45,48 +44,47 @@
 <div class="card">
   <h2><span class="num">2</span> Reglas para recordar</h2>
   <ul class="rules-list mt3">
-    <li>📘 Palabras que <strong>empiezan por ll-</strong> → siempre <strong>ll</strong>: <u>ll</u>amar, <u>ll</u>over, <u>ll</u>ave</li>
-    <li>📘 Terminaciones <strong>-illa / -illo / -alle / -ollo</strong> → <strong>ll</strong>: si<u>ll</u>a, ca<u>ll</u>e, po<u>ll</u>o, ro<u>ll</u>o</li>
-    <li>📘 <strong>ella, ellos, ellas, aquella</strong> → siempre <strong>ll</strong></li>
-    <li>📗 Palabras que <strong>terminan en -y</strong> → <strong>y</strong>: ho<u>y</u>, re<u>y</u>, le<u>y</u></li>
-    <li>📗 Al inicio de palabra <strong>antes de vocal</strong> → <strong>y</strong>: <u>y</u>ema, <u>y</u>eso, <u>y</u>ate</li>
-    <li>📗 <strong>Y en el interior</strong> de sílaba → <strong>y</strong>: a<u>y</u>er, ma<u>y</u>o, ra<u>y</u>o, pla<u>y</u>a</li>
+    <li>🔴 <strong>RR entre vocales</strong> → siempre <strong>rr</strong>: ca<u>rr</u>o, pe<u>rr</u>o, to<u>rr</u>e</li>
+    <li>🔵 <strong>R al inicio de palabra</strong> → siempre <strong>r</strong> (suena fuerte): <u>r</u>osa, <u>r</u>atón, <u>r</u>ío</li>
+    <li>🔵 <strong>R tras consonante</strong> (n, l, s) → <strong>r</strong> (suena fuerte): son<u>r</u>isa, al<u>r</u>ededor, hon<u>r</u>ado</li>
+    <li>🟢 <strong>R entre vocales</strong> → <strong>r</strong> (sonido suave): pe<u>r</u>a, ca<u>r</u>a, fa<u>r</u>o</li>
+    <li>🔵 <strong>R al final de sílaba o palabra</strong> → siempre <strong>r</strong>: co<u>r</u>tar, árbol, come<u>r</u></li>
   </ul>
 </div>
 
 <!-- 3: Escribe las letras -->
 <div class="card">
   <h2><span class="num">3</span> Escribe las letras</h2>
-  <div class="card-sub">Lee la frase y escribe <strong>ll</strong> o <strong>y</strong> en el recuadro.</div>
+  <div class="card-sub">Lee la frase y escribe <strong>r</strong> o <strong>rr</strong> en el recuadro.</div>
   <div id="inp-ctx" class="ctx-frase mt3" style="font-size:.95rem;color:var(--t)"></div>
   <div id="inp-word" class="word-big" style="font-size:1.6rem;padding:8px 0"></div>
   <div style="text-align:center;margin-top:8px">
     <input id="inp-ans" class="ans-inp" type="text" maxlength="2" placeholder="?"
-      style="width:64px;height:64px;font-size:2.2rem"
-      oninput="this.value=this.value.toLowerCase().replace(/[^ly]/g,'')"
-      onkeydown="if(event.key==='Enter')checkLLYInp()">
+      style="width:80px;height:64px;font-size:2.2rem"
+      oninput="this.value=this.value.toLowerCase().replace(/[^r]/g,'')"
+      onkeydown="if(event.key==='Enter')checkRRInp()">
   </div>
   <div id="inp-hint" class="hint-rule"></div>
   <div id="inp-fb" class="fb mt2" style="text-align:center"></div>
   <div class="btn-row mt4">
-    <button class="btn" onclick="checkLLYInp()">Comprobar</button>
+    <button class="btn" onclick="checkRRInp()">Comprobar</button>
     <button class="btn btn-outline btn-sm" onclick="nextInp()">Siguiente →</button>
   </div>
 </div>
 
 </div>
 <div class="gam-toast" id="gam-toast"></div>
-<script src="ortografia_lly_data.js"></script>
+<script src="ortografia_rr_data.js"></script>
 <script src="../shared.js"></script>
 <script>
-const EXER_KEY = 'ex_cast_lly_v1';
+const EXER_KEY = 'ex_cast_rr_v1';
 
 GAM_ACHS = [
   {id:'first', s:'⭐', n:'¡Primera respuesta!', d:'Tu primer acierto'},
   {id:'s3',    s:'🔥', n:'Racha x3',            d:'3 aciertos seguidos'},
   {id:'s5',    s:'⚡', n:'Racha x5',            d:'5 aciertos seguidos'},
   {id:'s10',   s:'💥', n:'Racha x10',           d:'10 aciertos seguidos'},
-  {id:'lly20', s:'✏️', n:'Experto en LL e Y',   d:'20 respuestas en ¿LL o Y?'},
+  {id:'rr20',  s:'✏️', n:'Experto en R y RR',   d:'20 respuestas en ¿R o RR?'},
   {id:'inp10', s:'🖊️', n:'Escritura perfecta',  d:'10 letras escritas correctamente'},
   {id:'ok50',  s:'🥉', n:'50 aciertos',         d:'50 respuestas correctas en total'},
   {id:'ok200', s:'🥈', n:'200 aciertos',        d:'200 respuestas correctas'},
@@ -95,37 +93,37 @@ GAM_ACHS = [
 
 function gExtraAchs(g, tryA) {
   const e = eLoad();
-  tryA('lly20', (e.lly || 0) >= 20);
+  tryA('rr20',  (e.rr  || 0) >= 20);
   tryA('inp10', (e.inp || 0) >= 10);
 }
 
 // ── Helpers ──
 function wHtml(w, ans) {
-  const blank = ans === 'll' ? '__' : '_';
-  return w.replace('_', '<span class="ll-blank">' + blank + '</span>');
+  const blank = ans === 'rr' ? '__' : '_';
+  return w.replace('_', '<span class="rr-blank">' + blank + '</span>');
 }
 function wFullHtml(w, full, ans) {
   const p = w.indexOf('_');
-  const len = ans === 'll' ? 2 : 1;
+  const len = ans === 'rr' ? 2 : 1;
   return full.slice(0, p) + '<span class="letter-ok">' + full.slice(p, p + len) + '</span>' + full.slice(p + len);
 }
 function ctxFill(ctx, replacement) {
   return ctx.replace('{w}', replacement);
 }
 
-// ── Secció 1: LL o Y? ──
-let llyPrev = -1;
+// ── Secció 1: R o RR? ──
+let rrPrev = -1;
 
-function nextLLY() {
+function nextRR() {
   let idx;
-  do { idx = ri(0, LLY_POOL.length - 1); } while (idx === llyPrev && LLY_POOL.length > 1);
-  llyPrev = idx;
-  const e = LLY_POOL[idx];
+  do { idx = ri(0, RR_POOL.length - 1); } while (idx === rrPrev && RR_POOL.length > 1);
+  rrPrev = idx;
+  const e = RR_POOL[idx];
 
-  const wordEl = document.getElementById('lly-word');
-  const ctxEl  = document.getElementById('lly-ctx');
-  const hintEl = document.getElementById('lly-hint');
-  const fbEl   = document.getElementById('lly-fb');
+  const wordEl = document.getElementById('rr-word');
+  const ctxEl  = document.getElementById('rr-ctx');
+  const hintEl = document.getElementById('rr-hint');
+  const fbEl   = document.getElementById('rr-fb');
 
   hintEl.textContent = '';
   fbEl.textContent   = '';
@@ -138,17 +136,17 @@ function nextLLY() {
     wordEl.innerHTML = wFullHtml(e.w, e.full, e.ans);
     ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full, e.ans) + '</strong>');
     hintEl.textContent = e.hint;
-    setFb('lly-fb', true, pick(OK));
-    gCorrect(8, 'lly');
+    setFb('rr-fb', true, pick(OK));
+    gCorrect(8, 'rr');
   };
   const onKo = () => {
     wordEl.innerHTML = wFullHtml(e.w, e.full, e.ans);
     ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full, e.ans) + '</strong>');
     hintEl.textContent = e.hint;
-    setFb('lly-fb', false, 'Era «' + e.ans.toUpperCase() + '» → ' + e.full);
+    setFb('rr-fb', false, 'Era «' + e.ans.toUpperCase() + '» → ' + e.full);
     gWrong();
   };
-  renderOpts('lly-opts', ['LL', 'Y'], e.ans.toUpperCase(), onOk, onKo);
+  renderOpts('rr-opts', ['R', 'RR'], e.ans.toUpperCase(), onOk, onKo);
 }
 
 // ── Secció 3: Escribe las letras ──
@@ -156,9 +154,9 @@ let inpPrev = -1, inpE = null;
 
 function nextInp() {
   let idx;
-  do { idx = ri(0, LLY_POOL.length - 1); } while (idx === inpPrev && LLY_POOL.length > 1);
+  do { idx = ri(0, RR_POOL.length - 1); } while (idx === inpPrev && RR_POOL.length > 1);
   inpPrev = idx;
-  inpE = LLY_POOL[idx];
+  inpE = RR_POOL[idx];
 
   document.getElementById('inp-ctx').innerHTML  = ctxFill(inpE.ctx, wHtml(inpE.w, inpE.ans));
   document.getElementById('inp-word').innerHTML = wHtml(inpE.w, inpE.ans);
@@ -173,11 +171,11 @@ function nextInp() {
   inp.focus();
 }
 
-function checkLLYInp() {
+function checkRRInp() {
   if (!inpE) return;
   const inp = document.getElementById('inp-ans');
   const val = inp.value.toLowerCase().trim();
-  if (val !== 'll' && val !== 'y') return;
+  if (val !== 'r' && val !== 'rr') return;
 
   inp.disabled = true;
   const e = inpE;
@@ -200,7 +198,7 @@ function checkLLYInp() {
 
 // ── Init ──
 gRender();
-nextLLY();
+nextRR();
 nextInp();
 </script>
 </body>

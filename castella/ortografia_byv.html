@@ -30,11 +30,6 @@
 <div class="card">
   <h2><span class="num">1</span> ¿B o V?</h2>
   <div class="card-sub">¿Qué letra falta para completar la palabra?</div>
-  <div class="diff-row mt3">
-    <button class="dbtn active" onclick="setDiff(0,this)">Fácil</button>
-    <button class="dbtn" onclick="setDiff(1,this)">Medio</button>
-    <button class="dbtn" onclick="setDiff(2,this)">Difícil</button>
-  </div>
   <div id="bv-word" class="word-big mt3"></div>
   <div id="bv-ctx" class="ctx-frase"></div>
   <div id="bv-opts" class="opts-row"></div>
@@ -115,14 +110,7 @@ function ctxFill(ctx, replacement) {
 }
 
 // ── Secció 1: B o V? ──
-let diff = 0, bvPrev = -1;
-
-function setDiff(d, btn) {
-  diff = d;
-  document.querySelectorAll('.dbtn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  nextBV();
-}
+let bvPrev = -1;
 
 function nextBV() {
   let idx;
@@ -139,31 +127,20 @@ function nextBV() {
   fbEl.textContent   = '';
   fbEl.className     = 'fb mt2';
 
-  if (diff === 0) {
-    // Fácil: palabra grande + frase con ___ (palabra ocultada)
-    wordEl.innerHTML  = wHtml(e.w);
-    ctxEl.textContent = ctxFill(e.ctx, '___');
-  } else if (diff === 1) {
-    // Medio: solo frase con _ en posición b/v (sin palabra grande)
-    wordEl.innerHTML = '';
-    ctxEl.innerHTML  = ctxFill(e.ctx, wHtml(e.w));
-  } else {
-    // Difícil: solo frase con ___ (sin palabra ni pista)
-    wordEl.innerHTML  = '';
-    ctxEl.textContent = ctxFill(e.ctx, '___');
-  }
+  wordEl.innerHTML  = wHtml(e.w);
+  ctxEl.textContent = ctxFill(e.ctx, '___');
 
   const onOk = () => {
     wordEl.innerHTML = wFullHtml(e.w, e.full);
     ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
-    if (diff < 2) hintEl.textContent = e.hint;
+    hintEl.textContent = e.hint;
     setFb('bv-fb', true, pick(OK));
     gCorrect(8, 'bv');
   };
   const onKo = () => {
     wordEl.innerHTML = wFullHtml(e.w, e.full);
     ctxEl.innerHTML  = ctxFill(e.ctx, '<strong>' + wFullHtml(e.w, e.full) + '</strong>');
-    if (diff < 2) hintEl.textContent = e.hint;
+    hintEl.textContent = e.hint;
     setFb('bv-fb', false, 'Era «' + e.ans.toUpperCase() + '» → ' + e.full);
     gWrong();
   };
