@@ -563,3 +563,72 @@ function buildBarSVG(labels, vals, colors, W=320, H=160){
   svg+='</svg>';
   return svg;
 }
+
+// ── FRACCIONS ─────────────────────────────────────────────────
+// th = {fill, empty, stroke}
+function circleSVG(n, d, th, size=175, inter=false){
+  const cx=size/2,cy=size/2,r=size/2-7;
+  if(d===1)return`<svg width="${size}" height="${size}" class="${inter?'isv':''}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${th.fill}" stroke="${th.stroke}" stroke-width="3"/></svg>`;
+  const ang=2*Math.PI/d;let paths='';
+  for(let i=0;i<d;i++){
+    const a0=-Math.PI/2+i*ang,a1=a0+ang;
+    const x1=(cx+r*Math.cos(a0)).toFixed(3),y1=(cy+r*Math.sin(a0)).toFixed(3);
+    const x2=(cx+r*Math.cos(a1)).toFixed(3),y2=(cy+r*Math.sin(a1)).toFixed(3);
+    const la=ang>Math.PI?1:0,fill=i<n?th.fill:th.empty;
+    const ic=inter?`onclick="sliceClick(this)" data-a="${i<n?1:0}" style="cursor:pointer"`:'';
+    paths+=`<path ${ic} data-i="${i}" d="M${cx},${cy}L${x1},${y1}A${r},${r} 0 ${la} 1 ${x2},${y2}Z" fill="${fill}" stroke="white" stroke-width="3"/>`;
+  }
+  return`<svg width="${size}" height="${size}" class="${inter?'isv':''}">${paths}<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${th.stroke}" stroke-width="3"/></svg>`;
+}
+
+function barSVG(n, d, th, W=260, H=72, inter=false){
+  const cw=Math.floor(W/d),tw=cw*d,rx=6;
+  const cid=`sv${_uid()}`;
+  let cells='';
+  for(let i=0;i<d;i++){
+    const fill=i<n?th.fill:th.empty;
+    const ic=inter?`onclick="cellClick(this)" data-a="${i<n?1:0}" style="cursor:pointer"`:'';
+    cells+=`<rect ${ic} data-i="${i}" x="${i*cw}" y="0" width="${cw}" height="${H}" fill="${fill}"/>`;
+  }
+  let divs='';
+  for(let i=1;i<d;i++) divs+=`<line x1="${i*cw}" y1="0" x2="${i*cw}" y2="${H}" stroke="${th.stroke}" stroke-width="1.5"/>`;
+  return`<svg width="${tw}" height="${H}" class="${inter?'isv':''}">`
+    +`<defs><clipPath id="${cid}"><rect width="${tw}" height="${H}" rx="${rx}"/></clipPath></defs>`
+    +`<g clip-path="url(#${cid})">${cells}${divs}</g>`
+    +`<rect x="1" y="1" width="${tw-2}" height="${H-2}" rx="${rx-1}" fill="none" stroke="${th.stroke}" stroke-width="2"/>`
+    +`</svg>`;
+}
+
+function dominoSVG(n, d, th, W=88){
+  const cH=26,gap=5,px=8,py=4,cW=W-px*2;
+  const H=py*2+d*cH+(d-1)*gap;
+  let s='';
+  for(let i=0;i<d;i++){
+    const y=py+i*(cH+gap);
+    s+=`<rect data-i="${i}" x="${px}" y="${y}" width="${cW}" height="${cH}" rx="6" fill="${i<n?th.fill:th.empty}" stroke="${th.stroke}" stroke-width="${i<n?'1.8':'1.2'}"/>`;
+  }
+  return`<svg width="${W}" height="${H}">${s}</svg>`;
+}
+
+function autoVis(n, d, th, size=175, inter=false){
+  if(inter)return d<=6?circleSVG(n,d,th,size,true):barSVG(n,d,th,260,80,true);
+  const r=Math.random();
+  if(r<0.35)return circleSVG(n,d,th,size);
+  if(r<0.70)return barSVG(n,d,th,260,72);
+  return dominoSVG(n,d,th);
+}
+
+function gridSVG(d){
+  const layout={2:[1,2],3:[1,3],4:[2,2],5:[1,5],6:[2,3],8:[2,4]};
+  const cW=50,cH=50,gap=6;
+  const [rows,cols]=layout[d]||[1,d];
+  const W=cols*cW+(cols-1)*gap,H=rows*cH+(rows-1)*gap;
+  let s='';
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const i=r*cols+c,x=c*(cW+gap),y=r*(cH+gap);
+      s+=`<rect class="grid-cell" onclick="gridCellClick(this)" data-a="0" data-i="${i}" x="${x}" y="${y}" width="${cW}" height="${cH}" rx="5" fill="var(--b)" stroke="var(--m)" stroke-width="2"/>`;
+    }
+  }
+  return`<svg viewBox="-2 -2 ${W+4} ${H+4}" style="max-width:100%;width:${W}px;height:${H}px">${s}</svg>`;
+}
