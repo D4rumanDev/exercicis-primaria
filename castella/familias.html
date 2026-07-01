@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Familias de palabras</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.root-word{font-size:2rem;font-weight:900;text-align:center;padding:14px 0;color:var(--a);letter-spacing:.04em;font-family:'Courier New',monospace}
+.hint-rule{font-size:.78rem;font-weight:600;color:var(--m);text-align:center;margin-top:6px;min-height:1.2em}
+.odd-words{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0}
+.odd-lbl{font-size:.88rem;color:var(--m);text-align:center;margin-top:4px;min-height:1.2em}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Familias de palabras</h1>
+    <div class="muted">Castellano · Vocabulario</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: Elige la palabra de la misma familia -->
+<div class="card">
+  <h2><span class="num">1</span> ¿Qué palabra es de la misma familia?</h2>
+  <div class="card-sub">Elige la palabra que pertenece a la misma familia que la palabra raíz.</div>
+  <div class="card-sub mt2" style="font-size:.8rem;color:var(--m)">La familia de:</div>
+  <div id="fam-root" class="root-word"></div>
+  <div id="fam-opts" class="opts-row"></div>
+  <div id="fam-hint" class="hint-rule"></div>
+  <div id="fam-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextFam()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- 2: ¿Cuál no pertenece? -->
+<div class="card">
+  <h2><span class="num">2</span> ¿Cuál no pertenece?</h2>
+  <div class="card-sub">Tres palabras son de la misma familia. ¡Encuentra la intrusa!</div>
+  <div id="odd-opts" class="opts-row mt3"></div>
+  <div id="odd-hint" class="hint-rule"></div>
+  <div id="odd-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextOdd()">Siguiente →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+<script src="familias_data.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cast_fam_v1';
+
+GAM_ACHS = [
+  {id:'first', s:'⭐', n:'¡Primera respuesta!', d:'Tu primer acierto'},
+  {id:'s3',    s:'🔥', n:'Racha x3',            d:'3 aciertos seguidos'},
+  {id:'s5',    s:'⚡', n:'Racha x5',            d:'5 aciertos seguidos'},
+  {id:'s10',   s:'💥', n:'Racha x10',           d:'10 aciertos seguidos'},
+  {id:'fam20', s:'🌳', n:'Experto en familias', d:'20 palabras de la misma familia'},
+  {id:'odd10', s:'🔍', n:'Ojo de lince',        d:'10 intrusas descubiertas'},
+  {id:'ok50',  s:'🥉', n:'50 aciertos',         d:'50 respuestas correctas en total'},
+  {id:'ok200', s:'🥈', n:'200 aciertos',        d:'200 respuestas correctas'},
+  {id:'ok500', s:'🏆', n:'500 aciertos',        d:'500 respuestas correctas'},
+];
+
+function gExtraAchs(g, tryA) {
+  const e = eLoad();
+  tryA('fam20', (e.fam || 0) >= 20);
+  tryA('odd10', (e.odd || 0) >= 10);
+}
+
+// ── Secció 1: Família ──
+let famPrev = -1;
+
+function nextFam() {
+  let idx;
+  do { idx = ri(0, FAM_POOL.length - 1); } while (idx === famPrev && FAM_POOL.length > 1);
+  famPrev = idx;
+  const e = FAM_POOL[idx];
+
+  document.getElementById('fam-root').textContent = e.root;
+  document.getElementById('fam-hint').textContent = '';
+  const fbEl = document.getElementById('fam-fb');
+  fbEl.textContent = '';
+  fbEl.className   = 'fb mt2';
+
+  const opts = sh([e.w, e.wrong[0], e.wrong[1], e.wrong[2]]);
+  const onOk = () => {
+    document.getElementById('fam-hint').textContent = e.hint;
+    setFb('fam-fb', true, pick(OK));
+    gCorrect(8, 'fam');
+  };
+  const onKo = () => {
+    document.getElementById('fam-hint').textContent = e.hint;
+    setFb('fam-fb', false, 'Era «' + e.w + '»');
+    gWrong();
+  };
+  renderOpts('fam-opts', opts, e.w, onOk, onKo);
+}
+
+// ── Secció 2: Intrusa ──
+let oddPrev = -1;
+
+function nextOdd() {
+  let idx;
+  do { idx = ri(0, FAM_ODD.length - 1); } while (idx === oddPrev && FAM_ODD.length > 1);
+  oddPrev = idx;
+  const e = FAM_ODD[idx];
+
+  document.getElementById('odd-hint').textContent = '';
+  const fbEl = document.getElementById('odd-fb');
+  fbEl.textContent = '';
+  fbEl.className   = 'fb mt2';
+
+  const opts = sh([...e.words]);
+  const onOk = () => {
+    document.getElementById('odd-hint').textContent = e.hint;
+    setFb('odd-fb', true, pick(OK));
+    gCorrect(10, 'odd');
+  };
+  const onKo = () => {
+    document.getElementById('odd-hint').textContent = e.hint;
+    setFb('odd-fb', false, 'La intrusa era «' + e.intruder + '»');
+    gWrong();
+  };
+  renderOpts('odd-opts', opts, e.intruder, onOk, onKo);
+}
+
+// ── Init ──
+gRender();
+nextFam();
+nextOdd();
+</script>
+</body>
+</html>

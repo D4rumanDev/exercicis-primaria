@@ -1,0 +1,41 @@
+// Section 1: donat el root, tria la paraula de la mateixa família
+const FAM_POOL = [
+  {root:'libro',   w:'librería',    wrong:['libre','lluvia','limón'],      hint:'Comparten la raíz "libr-": libro, librero, librería'},
+  {root:'mar',     w:'marinero',    wrong:['mármol','madre','miel'],       hint:'Comparten la raíz "mar-": mar, marino, marinero, marea'},
+  {root:'pan',     w:'panadero',    wrong:['patio','pluma','pared'],       hint:'Comparten la raíz "pan-": pan, panadero, panadería'},
+  {root:'flor',    w:'florero',     wrong:['flauta','fruta','fábrica'],    hint:'Comparten la raíz "flor-": flor, florero, florista'},
+  {root:'leche',   w:'lechería',    wrong:['lechuga','lento','lección'],   hint:'Comparten la raíz "lech-": leche, lechero, lechería'},
+  {root:'tierra',  w:'terrestre',   wrong:['techo','tigre','tela'],        hint:'Comparten la raíz "terr-": tierra, terreno, terrestre'},
+  {root:'sol',     w:'soleado',     wrong:['sala','sopa','semilla'],       hint:'Comparten la raíz "sol-": sol, solar, soleado, solear'},
+  {root:'árbol',   w:'arboleda',    wrong:['ardilla','arco','arena'],      hint:'Comparten la raíz "árbol-": árbol, arboleda, arbolito'},
+  {root:'nieve',   w:'nevada',      wrong:['nido','niño','nivel'],         hint:'Comparten la raíz "niev-/nev-": nieve, nevar, nevada'},
+  {root:'pez',     w:'pescador',    wrong:['pelo','pena','pecho'],         hint:'Comparten la raíz "pesc-": pez, pescado, pescador'},
+  {root:'casa',    w:'caserío',     wrong:['campo','cosa','copa'],         hint:'Comparten la raíz "cas-": casa, casero, caserío'},
+  {root:'luz',     w:'luminoso',    wrong:['luna','lobo','loma'],          hint:'Comparten la raíz "lum-": luz, luminoso, alumbrar'},
+  {root:'calor',   w:'calentar',    wrong:['calle','cama','campo'],        hint:'Comparten la raíz "calor-/cali-": calor, caliente, calentar'},
+  {root:'boca',    w:'bocadillo',   wrong:['bolso','bosque','boda'],       hint:'Comparten la raíz "boc-": boca, bocado, bocadillo'},
+  {root:'mano',    w:'manotazo',    wrong:['manta','máscara','mapa'],      hint:'Comparten la raíz "man-": mano, manopla, manotazo'},
+  {root:'hierro',  w:'herrería',    wrong:['hilo','hielo','hierba'],       hint:'Comparten la raíz "hierr-/herr-": hierro, herrería, herrero'},
+  {root:'fuego',   w:'fogata',      wrong:['fuerza','fuente','funda'],     hint:'Comparten la raíz "fueg-/fog-": fuego, fogata, fogón'},
+  {root:'tiempo',  w:'temporal',    wrong:['tímido','título','tinta'],     hint:'Comparten la raíz "tiemp-/temp-": tiempo, temporal, temporada'},
+  {root:'piedra',  w:'pedrada',     wrong:['piel','pierna','pieza'],       hint:'Comparten la raíz "piedr-/pedr-": piedra, pedrada, pedrero'},
+  {root:'agua',    w:'aguacero',    wrong:['aguja','ajo','alma'],          hint:'Comparten la raíz "agua-": agua, aguacero, aguado'},
+];
+
+// Section 2: quina paraula no pertany a la família?
+const FAM_ODD = [
+  {words:['librero','librería','libre','libresco'],      intruder:'libre',      hint:'"libre" viene de "liber" (libertad), no de "libro"'},
+  {words:['marinero','marino','marisma','mármol'],       intruder:'mármol',     hint:'"mármol" no tiene relación con "mar"'},
+  {words:['panadero','panadería','panera','pantalla'],   intruder:'pantalla',   hint:'"pantalla" no comparte raíz con "pan"'},
+  {words:['florero','florista','flauta','florecer'],     intruder:'flauta',     hint:'"flauta" es un instrumento, no viene de "flor"'},
+  {words:['lechero','lechería','lechuga','lechal'],      intruder:'lechuga',    hint:'"lechuga" es una planta, no viene de "leche"'},
+  {words:['terreno','terrestre','territorio','techo'],   intruder:'techo',      hint:'"techo" no comparte raíz con "tierra"'},
+  {words:['soleado','solar','solear','sala'],            intruder:'sala',       hint:'"sala" no tiene relación con "sol"'},
+  {words:['arboleda','arbolito','árbol','ardilla'],      intruder:'ardilla',    hint:'"ardilla" es un animal, no viene de "árbol"'},
+  {words:['nevada','nevar','nevado','nido'],             intruder:'nido',       hint:'"nido" es donde viven los pájaros, no viene de "nieve"'},
+  {words:['pescador','pesca','pescar','peinar'],         intruder:'peinar',     hint:'"peinar" no tiene relación con "pez" ni "pescar"'},
+  {words:['casero','caserío','casita','campo'],          intruder:'campo',      hint:'"campo" no comparte raíz con "casa"'},
+  {words:['bocado','bocadillo','boca','bolso'],          intruder:'bolso',      hint:'"bolso" no viene de "boca"'},
+  {words:['calentar','caliente','calefacción','calle'], intruder:'calle',      hint:'"calle" no tiene relación con "calor"'},
+  {words:['manopla','manotazo','mano','manta'],          intruder:'manta',      hint:'"manta" no comparte raíz con "mano"'},
+];
