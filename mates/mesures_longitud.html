@@ -154,6 +154,7 @@
 <div class="gam-toast" id="gam-toast"></div>
 
 <script src="problemes.js"></script>
+<script src="../svg.js"></script>
 <script src="../shared.js"></script>
 <script>
 const EXER_KEY = 'ex_long_v1';
@@ -181,35 +182,13 @@ function gExtraAchs(g,tryA){
 // ════════════════════════════════════════════════════════════
 // SECCIÓ 1 — QUINA UNITAT?
 // ════════════════════════════════════════════════════════════
-const UNIT_POOL = [
-  {obj:"El gruix d'una moneda",           ans:"mm"},
-  {obj:"L'amplada d'un dit",              ans:"cm"},
-  {obj:"La llargada d'un llapis",          ans:"cm"},
-  {obj:"L'alçada d'una porta",            ans:"m"},
-  {obj:"La distància entre dues ciutats",  ans:"km"},
-  {obj:"El gruix d'un full de paper",     ans:"mm"},
-  {obj:"L'amplada d'una taula",           ans:"cm"},
-  {obj:"L'altura d'un edifici de pisos",  ans:"m"},
-  {obj:"El diàmetre d'un botó",           ans:"mm"},
-  {obj:"La llargada d'una piscina",       ans:"m"},
-  {obj:"La distància d'una marató",       ans:"km"},
-  {obj:"L'alçada d'una cadira",           ans:"cm"},
-  {obj:"El llarg d'un camp de futbol",    ans:"m"},
-  {obj:"L'amplada d'una ungla",           ans:"mm"},
-  {obj:"La distància Terra-Lluna",        ans:"km"},
-  {obj:"La llargada d'un cotxe",          ans:"m"},
-  {obj:"El gruix d'una targeta de crèdit",ans:"mm"},
-  {obj:"L'alçada d'una muntanya",         ans:"m"},
-  {obj:"La llargada d'una formiga",       ans:"mm"},
-  {obj:"L'amplada d'una finestra",        ans:"cm"},
-];
-
 function nextSec1(){
-  const item=pick(UNIT_POOL);
+  const item=pick(SVG_LONGITUD);
   document.getElementById('sec1-vis').innerHTML=
-    `<div class="mes-vis">${item.obj}</div>`;
+    item.standalone()
+    +`<div class="mes-vis" style="font-size:1rem;padding:8px 0">${item.art} <strong>${item.nom}</strong></div>`;
   document.getElementById('sec1-fb').textContent='';
-  renderOpts('sec1-opts', sh(['mm','cm','m','km']), item.ans,
+  renderOpts('sec1-opts', sh(['mm','cm','m','km']), item.cat,
     ()=>{ setFb('sec1-fb',true,pick(OK));  gCorrect(5,'unit'); },
     ()=>{ setFb('sec1-fb',false,pick(KO)); gWrong(); }
   );
@@ -429,11 +408,15 @@ function buildRulerSVG(objs, unit){
     const w = o.len * R_PX_CM;
     const oy = objYs[i];
     const col = o.color || COLS[i % COLS.length];
-    bars += `<rect x="${x}" y="${oy}" width="${w}" height="${R_OBJ_H}" rx="3" fill="${col}" opacity="0.9"/>`;
-    if(o.label)
-      bars += `<text x="${x + w/2}" y="${oy + 13}" text-anchor="middle" `
-            + `font-size="10" fill="white" font-weight="700" `
-            + `font-family="'Segoe UI',sans-serif">${o.label}</text>`;
+    if(o.svgObj && o.svgObj.embed){
+      bars += o.svgObj.embed(x, oy, w, R_OBJ_H, col);
+    } else {
+      bars += `<rect x="${x}" y="${oy}" width="${w}" height="${R_OBJ_H}" rx="3" fill="${col}" opacity="0.9"/>`;
+      if(o.label)
+        bars += `<text x="${x + w/2}" y="${oy + 13}" text-anchor="middle" `
+              + `font-size="10" fill="white" font-weight="700" `
+              + `font-family="'Segoe UI',sans-serif">${o.label}</text>`;
+    }
   }
 
   return `<svg viewBox="0 0 ${SVG_W} ${SH}" style="width:100%;height:auto;display:block" `
@@ -462,7 +445,9 @@ function setRulerUnit(unit){
 
   // En mode mesura, si encara no s'ha respost, reconstruïm l'input amb la nova unitat
   if(_rulerMode === 'measure' && !_rulerLocked){
-    document.getElementById('sec6-q').textContent = `Quant mesura l'objecte? (en ${unit})`;
+    const curObj = _rulerObjs[0]?.svgObj;
+    const qName  = curObj ? `${curObj.art} ${curObj.nom}` : `l'objecte`;
+    document.getElementById('sec6-q').textContent = `Quant mesura ${qName}? (en ${unit})`;
     document.getElementById('sec6-ans').innerHTML =
       `<div class="inp-row">`
       + `<input class="geo-inp" id="ruler-inp" type="number" min="0" placeholder="?" `
@@ -504,12 +489,14 @@ function nextSec6(){
       ()=>{ setFb('sec6-fb',false,pick(KO)); gWrong(); if(nxtRcmp)nxtRcmp.style.display=''; }
     );
   } else {
-    // ── Measure mode: 1 objecte ──
+    // ── Measure mode: 1 objecte real ──
     _rulerMode = 'measure';
-    _rulerAns  = ri(1, 12);
-    _rulerObjs = [{start:0, len:_rulerAns, color:'#1d4ed8'}];
+    const cmObjs = SVG_LONGITUD.filter(o=>o.cat==='cm'&&o.embed);
+    const rObj   = pick(cmObjs);
+    _rulerAns  = ri(Math.max(1, rObj.min), Math.min(12, rObj.max));
+    _rulerObjs = [{start:0, len:_rulerAns, color:'#1d4ed8', svgObj:rObj}];
     document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, _rulerUnit);
-    document.getElementById('sec6-q').textContent = `Quant mesura l'objecte? (en cm)`;
+    document.getElementById('sec6-q').textContent = `Quant mesura ${rObj.art} ${rObj.nom}? (en cm)`;
     document.getElementById('sec6-ans').innerHTML =
       `<div class="inp-row">`
       + `<input class="geo-inp" id="ruler-inp" type="number" min="0" placeholder="?" `
