@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vocabulario</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.def-box{background:var(--bg-hi);border:1px solid var(--bd-hi);border-radius:10px;padding:16px 18px;font-size:1rem;color:var(--t);text-align:center;line-height:1.6;margin:12px 0}
+.voc-word{font-size:1.5rem;font-weight:900;color:var(--a);text-align:center;letter-spacing:.04em;min-height:1.8em;margin-top:8px}
+.ctx-frase{font-size:.97rem;color:var(--t);text-align:center;margin:10px 0 4px;line-height:1.6;min-height:2.4em}
+.hint-rule{font-size:.78rem;font-weight:600;color:var(--m);text-align:center;margin-top:6px;min-height:1.2em}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Vocabulario</h1>
+    <div class="muted">Castellano · Vocabulario</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: ¿Qué palabra significa...? -->
+<div class="card">
+  <h2><span class="num">1</span> ¿Qué palabra significa…?</h2>
+  <div class="card-sub">Lee la definición y elige la palabra correcta.</div>
+  <div id="def-box" class="def-box mt3"></div>
+  <div id="def-opts" class="opts-row"></div>
+  <div id="def-word" class="voc-word"></div>
+  <div id="def-hint" class="hint-rule"></div>
+  <div id="def-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextDef()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- 2: Completa la frase -->
+<div class="card">
+  <h2><span class="num">2</span> Completa la frase</h2>
+  <div class="card-sub">Elige la palabra que encaja mejor en la frase.</div>
+  <div id="ctx-frase" class="ctx-frase mt3"></div>
+  <div id="ctx-opts" class="opts-row"></div>
+  <div id="ctx-hint" class="hint-rule"></div>
+  <div id="ctx-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextCtx()">Siguiente →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+<script src="vocabulario_data.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cast_voc_v1';
+
+GAM_ACHS = [
+  {id:'first', s:'⭐', n:'¡Primera respuesta!', d:'Tu primer acierto'},
+  {id:'s3',    s:'🔥', n:'Racha x3',            d:'3 aciertos seguidos'},
+  {id:'s5',    s:'⚡', n:'Racha x5',            d:'5 aciertos seguidos'},
+  {id:'s10',   s:'💥', n:'Racha x10',           d:'10 aciertos seguidos'},
+  {id:'voc20', s:'📖', n:'Vocabulario rico',    d:'20 definiciones reconocidas'},
+  {id:'ctx10', s:'✍️', n:'En contexto',         d:'10 frases completadas'},
+  {id:'ok50',  s:'🥉', n:'50 aciertos',         d:'50 respuestas correctas en total'},
+  {id:'ok200', s:'🥈', n:'200 aciertos',        d:'200 respuestas correctas'},
+  {id:'ok500', s:'🏆', n:'500 aciertos',        d:'500 respuestas correctas'},
+];
+
+function gExtraAchs(g, tryA) {
+  const e = eLoad();
+  tryA('voc20', (e.voc || 0) >= 20);
+  tryA('ctx10', (e.ctx || 0) >= 10);
+}
+
+// ── Secció 1: Definición → Palabra ──
+let defPrev = -1;
+
+function nextDef() {
+  let idx;
+  do { idx = ri(0, VOC_POOL.length - 1); } while (idx === defPrev && VOC_POOL.length > 1);
+  defPrev = idx;
+  const e = VOC_POOL[idx];
+
+  document.getElementById('def-box').textContent  = e.def;
+  document.getElementById('def-word').textContent = '';
+  document.getElementById('def-hint').textContent = '';
+  const fbEl = document.getElementById('def-fb');
+  fbEl.textContent = '';
+  fbEl.className   = 'fb mt2';
+
+  const opts = sh([e.w, e.opts[0], e.opts[1], e.opts[2]]);
+  const onOk = () => {
+    document.getElementById('def-word').textContent = e.w;
+    document.getElementById('def-hint').textContent = e.hint;
+    setFb('def-fb', true, pick(OK));
+    gCorrect(10, 'voc');
+  };
+  const onKo = () => {
+    document.getElementById('def-word').textContent = e.w;
+    document.getElementById('def-hint').textContent = e.hint;
+    setFb('def-fb', false, 'Era «' + e.w + '»');
+    gWrong();
+  };
+  renderOpts('def-opts', opts, e.w, onOk, onKo);
+}
+
+// ── Secció 2: Completa la frase ──
+let ctxPrev = -1;
+
+function nextCtx() {
+  let idx;
+  do { idx = ri(0, VOC_POOL.length - 1); } while (idx === ctxPrev && VOC_POOL.length > 1);
+  ctxPrev = idx;
+  const e = VOC_POOL[idx];
+
+  document.getElementById('ctx-frase').textContent = e.ctx.replace('{w}', '___');
+  document.getElementById('ctx-hint').textContent  = '';
+  const fbEl = document.getElementById('ctx-fb');
+  fbEl.textContent = '';
+  fbEl.className   = 'fb mt2';
+
+  const opts = sh([e.w, e.opts[0], e.opts[1]]);
+  const onOk = () => {
+    document.getElementById('ctx-frase').innerHTML =
+      e.ctx.replace('{w}', '<strong class="letter-ok">' + e.w + '</strong>');
+    document.getElementById('ctx-hint').textContent = e.hint;
+    setFb('ctx-fb', true, pick(OK));
+    gCorrect(8, 'ctx');
+  };
+  const onKo = () => {
+    document.getElementById('ctx-frase').innerHTML =
+      e.ctx.replace('{w}', '<strong class="letter-ok">' + e.w + '</strong>');
+    document.getElementById('ctx-hint').textContent = e.hint;
+    setFb('ctx-fb', false, 'Era «' + e.w + '»');
+    gWrong();
+  };
+  renderOpts('ctx-opts', opts, e.w, onOk, onKo);
+}
+
+// ── Init ──
+gRender();
+nextDef();
+nextCtx();
+</script>
+</body>
+</html>
