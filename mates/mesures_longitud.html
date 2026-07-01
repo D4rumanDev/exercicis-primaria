@@ -179,6 +179,19 @@ function gExtraAchs(g,tryA){
   tryA('topograf',(e.ruler||0)>=5);
 }
 
+const _inpHtml=(id,unit,fn,w='110px')=>
+  `<div class="inp-row"><input class="geo-inp" id="${id}" type="number" min="0" placeholder="?" style="width:${w}" onkeydown="if(event.key==='Enter')${fn}()"><span class="inp-unit">${unit}</span></div>`;
+
+function _checkNumInp(inpId,ans,fbId,btnId,nextBtnId,xp,type,suffix=''){
+  const inp=document.getElementById(inpId);
+  if(!inp||inp.value.trim()==='') return;
+  inp.disabled=true;
+  const nxt=document.getElementById(nextBtnId); if(nxt) nxt.style.display='';
+  const val=Number(inp.value);
+  if(val===ans){ inp.classList.add('ok'); setFb(fbId,true,pick(OK)); gCorrect(xp,type); }
+  else{ inp.classList.add('ko'); setFb(fbId,false,pick(KO)+' (Era: '+ans+suffix+')'); gWrong(); }
+}
+
 // ════════════════════════════════════════════════════════════
 // SECCIÓ 1 — QUINA UNITAT?
 // ════════════════════════════════════════════════════════════
@@ -211,41 +224,20 @@ function genConv(){
   return {val, fromU, toU, ans};
 }
 
-let _convAns, _convLocked=false, _convTimer=null;
+let _convAns;
 function nextSec2(){
-  if(_convTimer){clearTimeout(_convTimer);_convTimer=null;}
-  const nxt=document.getElementById('conv-next-btn');if(nxt)nxt.style.display='none';
-  _convLocked=false;
-  const q=genConv();
-  _convAns=q.ans;
+  document.getElementById('conv-next-btn').style.display='none';
+  const q=genConv(); _convAns=q.ans;
   document.getElementById('sec2-vis').innerHTML=
     `<div class="mes-vis"><span style="color:var(--t)">${q.val} ${q.fromU}</span> = <span style="color:var(--m)">? ${q.toU}</span></div>`;
-  document.getElementById('sec2-inp').innerHTML=
-    `<div class="inp-row"><input class="geo-inp" id="conv-inp" type="number" min="0" placeholder="?" style="width:110px" onkeydown="if(event.key==='Enter')checkConv()"><span class="inp-unit">${q.toU}</span></div>`;
+  document.getElementById('sec2-inp').innerHTML=_inpHtml('conv-inp',q.toU,'checkConv');
   document.getElementById('sec2-fb').textContent='';
-  const btn=document.getElementById('conv-btn');
-  btn.textContent='Comprova'; btn.disabled=false;
+  const btn=document.getElementById('conv-btn'); btn.textContent='Comprova'; btn.disabled=false;
   setTimeout(()=>document.getElementById('conv-inp')?.focus({preventScroll:true}),50);
 }
-
 function checkConv(){
-  if(_convLocked) return;
-  const inp=document.getElementById('conv-inp');
-  if(!inp||inp.value.trim()==='') return;
-  _convLocked=true;
-  inp.disabled=true;
-  document.getElementById('conv-btn').disabled=true;
-  const nxtC=document.getElementById('conv-next-btn');if(nxtC)nxtC.style.display='';
-  const val=Number(inp.value);
-  if(val===_convAns){
-    inp.classList.add('ok');
-    setFb('sec2-fb',true,pick(OK));
-    gCorrect(8,'conv');
-  } else {
-    inp.classList.add('ko');
-    setFb('sec2-fb',false,pick(KO)+' (Era: '+_convAns+')');
-    gWrong();
-  }
+  const btn=document.getElementById('conv-btn'); if(btn.disabled) return; btn.disabled=true;
+  _checkNumInp('conv-inp',_convAns,'sec2-fb','conv-btn','conv-next-btn',8,'conv');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -298,41 +290,19 @@ function genCalc(){
   return {text, ans, unit};
 }
 
-let _calcAns, _calcUnit, _calcLocked=false, _calcTimer=null;
+let _calcAns, _calcUnit;
 function nextSec4(){
-  if(_calcTimer){clearTimeout(_calcTimer);_calcTimer=null;}
-  const nxt=document.getElementById('calc-next-btn');if(nxt)nxt.style.display='none';
-  _calcLocked=false;
-  const q=genCalc();
-  _calcAns=q.ans; _calcUnit=q.unit;
-  document.getElementById('sec4-vis').innerHTML=
-    `<div class="mes-vis">${q.text} = ?</div>`;
-  document.getElementById('sec4-inp').innerHTML=
-    `<div class="inp-row"><input class="geo-inp" id="calc-inp" type="number" min="0" placeholder="?" style="width:110px" onkeydown="if(event.key==='Enter')checkCalc()"><span class="inp-unit">${q.unit}</span></div>`;
+  document.getElementById('calc-next-btn').style.display='none';
+  const q=genCalc(); _calcAns=q.ans; _calcUnit=q.unit;
+  document.getElementById('sec4-vis').innerHTML=`<div class="mes-vis">${q.text} = ?</div>`;
+  document.getElementById('sec4-inp').innerHTML=_inpHtml('calc-inp',q.unit,'checkCalc');
   document.getElementById('sec4-fb').textContent='';
-  const btn=document.getElementById('calc-btn');
-  btn.textContent='Comprova'; btn.disabled=false;
+  const btn=document.getElementById('calc-btn'); btn.textContent='Comprova'; btn.disabled=false;
   setTimeout(()=>document.getElementById('calc-inp')?.focus({preventScroll:true}),50);
 }
-
 function checkCalc(){
-  if(_calcLocked) return;
-  const inp=document.getElementById('calc-inp');
-  if(!inp||inp.value.trim()==='') return;
-  _calcLocked=true;
-  inp.disabled=true;
-  document.getElementById('calc-btn').disabled=true;
-  const nxtC=document.getElementById('calc-next-btn');if(nxtC)nxtC.style.display='';
-  const val=Number(inp.value);
-  if(val===_calcAns){
-    inp.classList.add('ok');
-    setFb('sec4-fb',true,pick(OK));
-    gCorrect(8,'calc');
-  } else {
-    inp.classList.add('ko');
-    setFb('sec4-fb',false,pick(KO)+' (Era: '+_calcAns+' '+_calcUnit+')');
-    gWrong();
-  }
+  const btn=document.getElementById('calc-btn'); if(btn.disabled) return; btn.disabled=true;
+  _checkNumInp('calc-inp',_calcAns,'sec4-fb','calc-btn','calc-next-btn',8,'calc',' '+_calcUnit);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -348,7 +318,7 @@ function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,5);}
 const R_PX_CM = 28;   // pixels per cm en el viewBox
 const R_CMS   = 15;   // cm que mostra el regle
 const R_X0    = 12;   // marge esquerre per a l'etiqueta "0"
-const R_OBJ_H = 20;   // alçada de cada barra objecte
+const R_OBJ_H = 36;   // alçada de cada barra objecte
 const R_OBJ_G = 5;    // gap entre barres (compare mode)
 
 function buildRulerSVG(objs, unit){
@@ -435,7 +405,6 @@ let _rulerAns    = null;        // cm value (measure mode)
 let _rulerBigger = null;        // 'A' | 'B' (compare mode)
 let _rulerLocked = false;
 let _sec6Ctr     = 0;
-let _sec6Timer   = null;
 
 function setRulerUnit(unit){
   _rulerUnit = unit;
@@ -448,11 +417,7 @@ function setRulerUnit(unit){
     const curObj = _rulerObjs[0]?.svgObj;
     const qName  = curObj ? `${curObj.art} ${curObj.nom}` : `l'objecte`;
     document.getElementById('sec6-q').textContent = `Quant mesura ${qName}? (en ${unit})`;
-    document.getElementById('sec6-ans').innerHTML =
-      `<div class="inp-row">`
-      + `<input class="geo-inp" id="ruler-inp" type="number" min="0" placeholder="?" `
-      + `style="width:100px" onkeydown="if(event.key==='Enter')checkSec6()">`
-      + `<span class="inp-unit">${unit}</span></div>`;
+    document.getElementById('sec6-ans').innerHTML = _inpHtml('ruler-inp',unit,'checkSec6','100px');
     document.getElementById('sec6-fb').textContent = '';
     document.getElementById('ruler-btn').disabled = false;
     setTimeout(()=>document.getElementById('ruler-inp')?.focus({preventScroll:true}), 50);
@@ -460,7 +425,6 @@ function setRulerUnit(unit){
 }
 
 function nextSec6(){
-  if(_sec6Timer){clearTimeout(_sec6Timer);_sec6Timer=null;}
   const nxtR=document.getElementById('ruler-next-btn');if(nxtR)nxtR.style.display='none';
   _rulerLocked = false;
   _rulerUnit   = 'cm';
@@ -497,11 +461,7 @@ function nextSec6(){
     _rulerObjs = [{start:0, len:_rulerAns, color:'#1d4ed8', svgObj:rObj}];
     document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, _rulerUnit);
     document.getElementById('sec6-q').textContent = `Quant mesura ${rObj.art} ${rObj.nom}? (en cm)`;
-    document.getElementById('sec6-ans').innerHTML =
-      `<div class="inp-row">`
-      + `<input class="geo-inp" id="ruler-inp" type="number" min="0" placeholder="?" `
-      + `style="width:100px" onkeydown="if(event.key==='Enter')checkSec6()">`
-      + `<span class="inp-unit">cm</span></div>`;
+    document.getElementById('sec6-ans').innerHTML = _inpHtml('ruler-inp','cm','checkSec6','100px');
     const btn = document.getElementById('ruler-btn');
     btn.style.display = '';
     btn.textContent   = 'Comprova';

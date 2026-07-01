@@ -4,6 +4,64 @@
 let _svgUid = 0;
 const _uid = () => ++_svgUid;
 
+// Helper: genera embed() i standalone() a partir d'una sola funció de formes.
+// innerFn(col) → contingut SVG intern · vb → viewBox · standW → amplada standalone en px
+function _mkSVGObj(innerFn, vb, standW){
+  return {
+    embed(x,y,w,h,col){ return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${vb}" preserveAspectRatio="none">${innerFn(col)}</svg>`; },
+    standalone(col){ return `<svg viewBox="${vb}" style="width:${standW}px;height:auto;display:block;margin:auto">${innerFn(col)}</svg>`; }
+  };
+}
+
+// Formes de cada objecte (viewBox "0 0 100 36" pels allargats, altres per rodons/targeta)
+const _clipShapes = col =>
+  `<rect x="2" y="2" width="96" height="32" rx="16" fill="none" stroke="${col}" stroke-width="4.5"/>` +
+  `<rect x="16" y="12" width="80" height="13" rx="6.5" fill="none" stroke="${col}" stroke-width="3"/>`;
+
+const _gomaShapes = col =>
+  `<rect x="1" y="1" width="98" height="34" rx="4" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>` +
+  `<rect x="79" y="1" width="20" height="34" fill="#7c3aed"/>` +
+  `<text x="36" y="19" font-size="12" fill="#9d174d" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI',sans-serif">GOMA</text>`;
+
+const _llapisShapes = col =>
+  `<polygon points="0,18 10,4 10,32" fill="#c8956c"/>` +
+  `<rect x="10" y="4" width="7" height="28" fill="#c8956c"/>` +
+  `<rect x="17" y="2" width="67" height="32" fill="${col}"/>` +
+  `<rect x="84" y="2" width="9" height="32" fill="#d1d5db"/>` +
+  `<rect x="84" y="2" width="1.5" height="32" fill="#9ca3af"/>` +
+  `<rect x="91.5" y="2" width="1.5" height="32" fill="#9ca3af"/>` +
+  `<rect x="93" y="6" width="7" height="24" rx="2" fill="#fca5a5"/>`;
+
+// boligraf: cap final arriba exactament a x=100 (82+18=100)
+const _boligrafShapes = col =>
+  `<polygon points="0,18 8,9 8,27" fill="#9ca3af"/>` +
+  `<rect x="8" y="8" width="10" height="20" fill="#d1d5db"/>` +
+  `<rect x="18" y="4" width="64" height="28" rx="4" fill="${col}"/>` +
+  `<rect x="82" y="4" width="18" height="28" rx="4" fill="#1f2937"/>` +
+  `<rect x="88" y="2" width="3" height="32" rx="1" fill="#374151"/>`;
+
+const _tarjetaShapes = col => {
+  const id=_uid();
+  return `<defs><linearGradient id="tg${id}" x1="0%" y1="0%" x2="100%" y2="100%">` +
+    `<stop offset="0%" stop-color="${col}"/><stop offset="100%" stop-color="#4c1d95"/>` +
+    `</linearGradient></defs>` +
+    `<rect x="1" y="1" width="98" height="61" rx="5" fill="url(#tg${id})"/>` +
+    `<rect x="0" y="16" width="100" height="14" fill="#0f172a" opacity=".8"/>` +
+    `<rect x="8" y="35" width="20" height="15" rx="2" fill="#d4b44a"/>`;
+};
+
+const _monedaDiamShapes = col => {
+  const id=_uid();
+  return `<defs><radialGradient id="mg${id}" cx="35%" cy="30%" r="60%">` +
+    `<stop offset="0%" stop-color="rgba(255,255,255,0.6)"/>` +
+    `<stop offset="100%" stop-color="rgba(0,0,0,0.2)"/>` +
+    `</radialGradient></defs>` +
+    `<circle cx="20" cy="20" r="19" fill="#8b6914"/>` +
+    `<circle cx="20" cy="20" r="17" fill="${col}"/>` +
+    `<circle cx="20" cy="20" r="17" fill="url(#mg${id})"/>` +
+    `<text x="20" y="20" font-size="10" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="rgba(0,0,0,0.7)" font-family="'Segoe UI',sans-serif">1€</text>`;
+};
+
 // ── OBJECTES DE LONGITUD ──────────────────────────────────────
 // cat: 'mm' | 'cm' | 'm' | 'km'
 // min/max: rang real típic en la seva unitat (enters)
@@ -58,140 +116,13 @@ const SVG_LONGITUD = [
     }
   },
 
-  // ── cm (amb embed al regle) ──────────────────────────────────
-  { id:'clip', nom:'clip de paper', cat:'cm', art:'el', min:3, max:4, icon:'📎',
-    embed(x,y,w,h,col='#1d4ed8'){
-      return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 100 20" preserveAspectRatio="none">
-        <rect x="2" y="1.5" width="96" height="17" rx="8.5" fill="none" stroke="${col}" stroke-width="3.5"/>
-        <rect x="16" y="7" width="80" height="7" rx="3.5" fill="none" stroke="${col}" stroke-width="2.5"/>
-      </svg>`;
-    },
-    standalone(col='#1d4ed8'){
-      return `<svg viewBox="0 0 100 42" style="width:200px;height:auto;display:block;margin:auto">
-        <rect x="4" y="3" width="92" height="36" rx="18" fill="none" stroke="${col}" stroke-width="4.5"/>
-        <rect x="22" y="14" width="74" height="16" rx="7" fill="none" stroke="${col}" stroke-width="3.5"/>
-      </svg>`;
-    }
-  },
-
-  { id:'goma', nom:'goma d\'esborrar', cat:'cm', art:'la', min:4, max:7, icon:'🧹',
-    embed(x,y,w,h,col='#ec4899'){
-      return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 100 20" preserveAspectRatio="none">
-        <rect x="1" y="1.5" width="97" height="17" rx="3" fill="#fce7f3" stroke="#be185d" stroke-width="1.5"/>
-        <rect x="79" y="1.5" width="20" height="17" fill="#7c3aed"/>
-        <text x="36" y="12.5" font-size="7.5" fill="#9d174d" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI',sans-serif">GOMA</text>
-      </svg>`;
-    },
-    standalone(col='#ec4899'){
-      return `<svg viewBox="0 0 100 38" style="width:220px;height:auto;display:block;margin:auto">
-        <rect x="3" y="3" width="94" height="32" rx="4" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>
-        <rect x="79" y="3" width="18" height="32" fill="#7c3aed"/>
-        <text x="38" y="23" font-size="10" fill="#9d174d" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI',sans-serif">GOMA</text>
-      </svg>`;
-    }
-  },
-
-  { id:'llapis', nom:'llapis', cat:'cm', art:'el', min:10, max:17, icon:'✏️',
-    embed(x,y,w,h,col='#fbbf24'){
-      return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 100 20" preserveAspectRatio="none">
-        <polygon points="0,10 8,2.5 8,17.5" fill="#c8956c"/>
-        <rect x="8" y="2.5" width="5" height="15" fill="#c8956c"/>
-        <rect x="13" y="1" width="71" height="18" fill="${col}"/>
-        <rect x="84" y="1" width="9" height="18" fill="#d1d5db"/>
-        <rect x="84" y="1" width="1.5" height="18" fill="#9ca3af"/>
-        <rect x="91.5" y="1" width="1.5" height="18" fill="#9ca3af"/>
-        <rect x="93" y="3.5" width="7" height="13" rx="1.5" fill="#fca5a5"/>
-      </svg>`;
-    },
-    standalone(col='#fbbf24'){
-      return `<svg viewBox="0 0 100 28" style="width:260px;height:auto;display:block;margin:auto">
-        <polygon points="0,14 12,4 12,24" fill="#c8956c"/>
-        <rect x="12" y="4" width="8" height="20" fill="#c8956c"/>
-        <rect x="20" y="2" width="62" height="24" fill="${col}"/>
-        <rect x="82" y="2" width="12" height="24" fill="#d1d5db"/>
-        <rect x="82" y="2" width="2" height="24" fill="#9ca3af"/>
-        <rect x="92" y="2" width="2" height="24" fill="#9ca3af"/>
-        <rect x="94" y="5" width="6" height="18" rx="2" fill="#fca5a5"/>
-      </svg>`;
-    }
-  },
-
-  { id:'boligraf', nom:'bolígraf', cat:'cm', art:'el', min:12, max:16, icon:'🖊️',
-    embed(x,y,w,h,col='#1d4ed8'){
-      return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 100 20" preserveAspectRatio="none">
-        <polygon points="0,10 6,6 6,14" fill="#9ca3af"/>
-        <rect x="6" y="4.5" width="9" height="11" fill="#d1d5db"/>
-        <rect x="15" y="2" width="71" height="16" rx="3" fill="${col}"/>
-        <rect x="86" y="2" width="12" height="16" rx="3" fill="#1f2937"/>
-        <rect x="91" y="0" width="3" height="20" rx="1" fill="#4b5563"/>
-      </svg>`;
-    },
-    standalone(col='#1d4ed8'){
-      return `<svg viewBox="0 0 100 22" style="width:260px;height:auto;display:block;margin:auto">
-        <polygon points="0,11 8,7 8,15" fill="#9ca3af"/>
-        <rect x="8" y="6" width="10" height="10" fill="#d1d5db"/>
-        <rect x="18" y="3" width="65" height="16" rx="4" fill="${col}"/>
-        <rect x="83" y="3" width="14" height="16" rx="4" fill="#1f2937"/>
-        <rect x="88" y="1" width="3" height="20" rx="1" fill="#374151"/>
-      </svg>`;
-    }
-  },
-
-  { id:'targeta', nom:'targeta de crèdit', cat:'cm', art:'la', min:8, max:9, icon:'💳',
-    embed(x,y,w,h,col='#7c3aed'){
-      const id=_uid();
-      return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 100 63" preserveAspectRatio="none">
-        <defs><linearGradient id="tg${id}" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="${col}"/>
-          <stop offset="100%" stop-color="#4c1d95"/>
-        </linearGradient></defs>
-        <rect x="1" y="1" width="98" height="61" rx="5" fill="url(#tg${id})"/>
-        <rect x="0" y="16" width="100" height="14" fill="#0f172a" opacity=".8"/>
-        <rect x="8" y="35" width="20" height="15" rx="2" fill="#d4b44a"/>
-      </svg>`;
-    },
-    standalone(col='#7c3aed'){
-      const id=_uid();
-      return `<svg viewBox="0 0 85 54" style="width:200px;height:auto;display:block;margin:auto">
-        <defs><linearGradient id="tg${id}" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="${col}"/>
-          <stop offset="100%" stop-color="#4c1d95"/>
-        </linearGradient></defs>
-        <rect x="2" y="2" width="81" height="50" rx="5" fill="url(#tg${id})"/>
-        <rect x="0" y="14" width="85" height="11" fill="#0f172a" opacity=".8"/>
-        <rect x="12" y="28" width="16" height="13" rx="2" fill="#d4b44a"/>
-      </svg>`;
-    }
-  },
-
-  { id:'moneda_diam', nom:'moneda (diàmetre)', cat:'cm', art:'la', min:2, max:3, icon:'🪙',
-    embed(x,y,w,h,col='#d4b44a'){
-      const id=_uid();
-      return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 20 20" preserveAspectRatio="none">
-        <defs><radialGradient id="mg${id}" cx="35%" cy="30%" r="60%">
-          <stop offset="0%" stop-color="rgba(255,255,255,0.6)"/>
-          <stop offset="100%" stop-color="rgba(0,0,0,0.2)"/>
-        </radialGradient></defs>
-        <circle cx="10" cy="10" r="9.5" fill="#8b6914"/>
-        <circle cx="10" cy="10" r="8.5" fill="${col}"/>
-        <circle cx="10" cy="10" r="8.5" fill="url(#mg${id})"/>
-        <text x="10" y="10" font-size="5" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="rgba(0,0,0,0.7)" font-family="'Segoe UI',sans-serif">1€</text>
-      </svg>`;
-    },
-    standalone(col='#d4b44a'){
-      const id=_uid();
-      return `<svg viewBox="0 0 40 40" style="width:100px;height:auto;display:block;margin:auto">
-        <defs><radialGradient id="mg${id}" cx="35%" cy="30%" r="60%">
-          <stop offset="0%" stop-color="rgba(255,255,255,0.6)"/>
-          <stop offset="100%" stop-color="rgba(0,0,0,0.2)"/>
-        </radialGradient></defs>
-        <circle cx="20" cy="20" r="19" fill="#8b6914"/>
-        <circle cx="20" cy="20" r="17" fill="${col}"/>
-        <circle cx="20" cy="20" r="17" fill="url(#mg${id})"/>
-        <text x="20" y="20" font-size="12" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="rgba(0,0,0,0.7)" font-family="'Segoe UI',sans-serif">1€</text>
-      </svg>`;
-    }
-  },
+  // ── cm (amb embed al regle) — formes definides una sola vegada via _mkSVGObj ──
+  { id:'clip',        nom:'clip de paper',    cat:'cm', art:'el', min:3,  max:4,  icon:'📎', ..._mkSVGObj(_clipShapes,       '0 0 100 36', 200) },
+  { id:'goma',        nom:"goma d'esborrar",  cat:'cm', art:'la', min:4,  max:7,  icon:'🧹', ..._mkSVGObj(_gomaShapes,       '0 0 100 36', 220) },
+  { id:'llapis',      nom:'llapis',           cat:'cm', art:'el', min:10, max:17, icon:'✏️', ..._mkSVGObj(_llapisShapes,     '0 0 100 36', 260) },
+  { id:'boligraf',    nom:'bolígraf',         cat:'cm', art:'el', min:12, max:16, icon:'🖊️', ..._mkSVGObj(_boligrafShapes,   '0 0 100 36', 260) },
+  { id:'targeta',     nom:'targeta de crèdit',cat:'cm', art:'la', min:8,  max:9,  icon:'💳', ..._mkSVGObj(_tarjetaShapes,    '0 0 100 63', 200) },
+  { id:'moneda_diam', nom:'moneda (diàmetre)',cat:'cm', art:'la', min:2,  max:3,  icon:'🪙', ..._mkSVGObj(_monedaDiamShapes, '0 0 40 40',  100) },
 
   // ── cm sense embed (massa ample o alt per al regle) ─────────
   { id:'telefon', nom:'telèfon mòbil', cat:'cm', art:'el', min:14, max:17, icon:'📱',
