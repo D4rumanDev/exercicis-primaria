@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Comprensión lectora</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+#root{padding:16px 14px 60px}
+.slist{border:1px solid var(--b);border-radius:var(--r);overflow:hidden;background:var(--s)}
+.srow{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--b);transition:background .1s}
+.srow:last-child{border-bottom:none}
+.srow:hover{background:var(--bg-hi)}
+.srow.next-up{background:var(--bg-hi2)}
+.srow-num{font-size:.8rem;color:var(--m);width:18px;flex-shrink:0;text-align:right}
+.srow-title{flex:1;font-size:.93rem;font-weight:500}
+.srow-right{font-size:.8rem;text-align:right;flex-shrink:0}
+.srow-right.done{color:var(--ok);font-weight:700}
+.srow-right.next{color:var(--a);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.story-meta{margin-bottom:16px}
+.story-text{font-family:Georgia,'Times New Roman',serif;font-size:1.05rem;line-height:1.9;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:24px 22px}
+.story-text p{margin-bottom:1.1em;color:var(--t)}
+.story-text p:last-child{margin-bottom:0}
+@media(max-width:480px){.story-text{font-size:.97rem;padding:16px 14px}}
+.qdots{display:flex;gap:4px;margin-bottom:18px}
+.qdot{flex:1;height:3px;background:var(--b);border-radius:2px;transition:background .2s}
+.qdot.answered{background:var(--a)}
+.qcard{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.qcard.fill-card{background:var(--bg-hi)}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:var(--r);cursor:pointer;border:1.5px solid transparent;margin-bottom:6px;transition:background .1s,border-color .1s;font-size:.88rem;line-height:1.45;user-select:none}
+.opt:hover{background:var(--bg)}
+.opt.on{border-color:var(--a);background:var(--bg-hi)}
+.opt-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--b);flex-shrink:0;margin-top:2px;transition:border-color .1s,background .1s}
+.opt.on .opt-dot{border-color:var(--a);background:var(--a)}
+.fill-sent{font-family:Georgia,serif;font-size:1rem;line-height:2.4;margin-bottom:16px;color:var(--t)}
+.blank{display:inline-block;min-width:72px;border-bottom:2px solid var(--a);text-align:center;margin:0 3px;padding:0 8px;cursor:pointer;color:var(--a);font-weight:700;border-radius:3px 3px 0 0;transition:background .1s;font-family:inherit;font-size:inherit}
+.blank:hover{background:var(--bg-hi)}
+.blank.empty{color:transparent;position:relative}
+.blank.empty::after{content:'···';color:var(--m);position:absolute;left:50%;transform:translateX(-50%)}
+.word-pool{display:flex;flex-wrap:wrap;gap:8px;padding-top:4px}
+.chip{padding:6px 16px;border-radius:20px;border:1.5px solid var(--b);cursor:pointer;font-size:.85rem;background:var(--s);transition:all .1s;user-select:none;min-height:36px;display:inline-flex;align-items:center}
+.chip:hover{border-color:var(--a);color:var(--a)}
+.chip.picked{background:var(--a);color:#fff;border-color:var(--a)}
+.chip.used{opacity:.22;pointer-events:none}
+.tf-row{display:flex;gap:10px;margin-top:4px}
+.tf-btn{flex:1;padding:11px 16px;border-radius:var(--r);border:1.5px solid var(--b);cursor:pointer;text-align:center;font-size:.88rem;font-weight:600;transition:all .1s;background:var(--s);font-family:inherit;user-select:none}
+.tf-btn:hover{border-color:var(--a)}
+.tf-btn.on{border-color:var(--a);background:var(--bg-hi);color:var(--a)}
+.score-hero{text-align:center;padding:28px 16px 20px;border-bottom:1px solid var(--b);margin-bottom:20px}
+.score-big{font-size:3.8rem;font-weight:900;letter-spacing:-.04em;line-height:1}
+.score-denom{font-size:1.6rem;color:var(--m);font-weight:400}
+.score-msg{color:var(--m);margin-top:6px;font-size:.95rem}
+.xp-gain{display:inline-block;margin-top:14px;font-size:1.15rem;font-weight:800;color:var(--a)}
+.xp-bonus{font-size:.82rem;font-weight:600;color:var(--a);opacity:.7;margin-left:6px}
+.rev-item{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--b)}
+.rev-item:last-child{border-bottom:none}
+.rev-icon{font-size:.9rem;font-weight:900;flex-shrink:0;width:18px;margin-top:1px}
+.rev-icon.ok{color:var(--ok)}
+.rev-icon.err{color:var(--er)}
+.rev-body{flex:1;min-width:0}
+.rev-q{font-size:.88rem;font-weight:600;margin-bottom:4px}
+.rev-ans-ok{font-size:.83rem;color:var(--ok)}
+.rev-ans-err{font-size:.83rem;color:var(--er)}
+.rev-exp{font-size:.8rem;color:var(--m);margin-top:5px;font-style:italic;line-height:1.5}
+.ach-flash{background:var(--bg-hi);border:1.5px solid var(--a);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.ach-flash .ach-sym{background:var(--bg-hi2);border-color:var(--a);color:var(--a)}
+.ach-flash-text .name{font-size:.9rem;font-weight:700}
+.ach-flash-text .desc{font-size:.78rem;color:var(--m)}
+@media(max-width:420px){.score-big{font-size:3rem}.xp-gain{font-size:1rem}.row-btns{flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="root" class="page"></div>
+<div class="gam-toast" id="gam-toast"></div>
+<script src="comprension_data.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cast_comp_v1';
+
+const LEVELS = [
+  {min:0,    name:'Lector principiante'},
+  {min:150,  name:'Lector curioso'},
+  {min:400,  name:'Lector hábil'},
+  {min:800,  name:'Lector experto'},
+  {min:1400, name:'Gran lector'}
+];
+
+const ACHS = [
+  {id:'first',    sym:'I',   name:'Primer paso',        desc:'Completa tu primer cuento'},
+  {id:'perfect',  sym:'★',   name:'Sin errores',        desc:'Consigue 10/10 en un cuento'},
+  {id:'three',    sym:'III', name:'Buen ritmo',         desc:'Completa 3 cuentos'},
+  {id:'all',      sym:'V',   name:'¡Todos los cuentos!',desc:'Completa los 5 cuentos'},
+  {id:'perfect3', sym:'★★★', name:'Impecable',          desc:'Consigue 10/10 tres veces'}
+];
+
+// ── Estado ────────────────────────────────────────────────────────────────────
+const K = {xp:'cs_xp', achs:'cs_achs', done:'cs_done', order:'cs_order', idx:'cs_idx'};
+const gXP   = () => parseInt(localStorage.getItem(K.xp)  || '0');
+const gDone = () => JSON.parse(localStorage.getItem(K.done)  || '{}');
+const gAchs = () => JSON.parse(localStorage.getItem(K.achs)  || '[]');
+const gIdx  = () => parseInt(localStorage.getItem(K.idx) || '0');
+
+function gOrder() {
+  let o = JSON.parse(localStorage.getItem(K.order) || 'null');
+  if (!o) { o = clShuffle(STORIES.map((_, i) => i)); localStorage.setItem(K.order, JSON.stringify(o)); }
+  return o;
+}
+
+function clShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function getLvl(xp)     { let l = LEVELS[0]; for (const x of LEVELS) if (xp >= x.min) l = x; return l; }
+function getNextLvl(xp) { for (const x of LEVELS) if (xp < x.min) return x; return null; }
+
+// ── Avance y guardado ─────────────────────────────────────────────────────────
+function advanceOrder() {
+  const order = gOrder(), idx = gIdx() + 1;
+  if (idx >= order.length) {
+    localStorage.setItem(K.order, JSON.stringify(clShuffle(STORIES.map((_, i) => i))));
+    localStorage.setItem(K.idx, '0');
+  } else {
+    localStorage.setItem(K.idx, String(idx));
+  }
+}
+
+function saveResult(storyId, score) {
+  const done = gDone();
+  const firstTime = !done[storyId];
+  done[storyId] = {score, total: sess.qs.length, date: new Date().toLocaleDateString('es-ES')};
+  localStorage.setItem(K.done, JSON.stringify(done));
+  return firstTime;
+}
+
+function awardXP(n) {
+  const xp = gXP() + n;
+  localStorage.setItem(K.xp, String(xp));
+  return xp;
+}
+
+function checkAchs(score, done) {
+  const earned = gAchs(), newA = [];
+  const dc   = Object.keys(done).length;
+  const perf = Object.values(done).filter(d => d.score === d.total).length;
+  const tryE = (id, cond) => { if (!earned.includes(id) && cond) { earned.push(id); newA.push(id); } };
+  tryE('first',    dc >= 1);
+  tryE('perfect',  score === sess.qs.length);
+  tryE('three',    dc >= 3);
+  tryE('all',      dc >= STORIES.length);
+  tryE('perfect3', perf >= 3);
+  localStorage.setItem(K.achs, JSON.stringify(earned));
+  return newA;
+}
+
+// ── Sesión ────────────────────────────────────────────────────────────────────
+let sess = {storyId: null, qs: [], answers: {}, fillState: {}};
+let clStatsVisible = false, clAchsVisible = false;
+
+function pickQuestions(story) { return clShuffle(story.questions).slice(0, 10); }
+
+function initFillState(qs) {
+  const fs = {};
+  qs.forEach((q, qi) => { if (q.type === 'f') fs[qi] = {placed: new Array(q.blanks.length).fill(null), sel: null}; });
+  return fs;
+}
+
+// ── Render XP bar ─────────────────────────────────────────────────────────────
+const root = document.getElementById('root');
+
+function xpBar(xp) {
+  const l = getLvl(xp), nl = getNextLvl(xp);
+  const base = l.min, top = nl ? nl.min : xp + 1;
+  const pct = Math.min(100, Math.round((xp - base) / (top - base) * 100));
+  return `<div class="xp-block">
+    <div class="xp-top"><span class="level-name">${l.name}</span><span class="xp-nums">${xp} XP${nl ? ` · hasta ${nl.name}: ${nl.min - xp} XP` : ' · Nivel máximo'}</span></div>
+    <div class="xp-track"><div class="xp-fill" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+// ── Inicio ────────────────────────────────────────────────────────────────────
+function renderHome() {
+  const xp = gXP(), order = gOrder(), idx = gIdx(), done = gDone(), earned = gAchs();
+  const nextId = STORIES[order[idx % order.length]].id;
+  const doneCount = Object.keys(done).length;
+
+  let rows = '';
+  STORIES.forEach((s, i) => {
+    const d = done[s.id];
+    const isNext = s.id === nextId && !d;
+    rows += `<div class="srow${isNext ? ' next-up' : ''}" onclick="startStory(${s.id})">
+      <span class="srow-num">${i + 1}</span>
+      <span class="srow-title">${s.title}</span>
+      <span class="srow-right${d ? ' done' : isNext ? ' next' : ''}">${d ? `${d.score}/${d.total || 10}` : isNext ? 'Siguiente' : '—'}</span>
+    </div>`;
+  });
+
+  let achRows = '';
+  ACHS.forEach(a => {
+    const e = earned.includes(a.id);
+    achRows += `<div class="ach-row${e ? ' earned' : ' locked'}">
+      <div class="ach-sym">${a.sym}</div>
+      <div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
+      ${e ? '<span style="margin-left:auto;font-size:.75rem;font-weight:700;color:var(--ok)">Conseguido</span>' : ''}
+    </div>`;
+  });
+
+  const statsHtml = clStatsVisible ? `<div class="stats-row">
+    <div class="stat"><div class="stat-num">${doneCount}</div><div class="stat-lbl">📖 Cuentos</div></div>
+    <div class="stat"><div class="stat-num">${xp}</div><div class="stat-lbl">⭐ XP Total</div></div>
+    <div class="stat"><div class="stat-num">${earned.length}</div><div class="stat-lbl">🏅 Logros</div></div>
+  </div><button class="reset-lnk" onclick="if(confirm('¿Borrar todo el progreso?'))resetAll()">Reiniciar progreso</button>` : '';
+
+  const achsHtml = clAchsVisible ? `<div class="ach-grid">${achRows}</div>` : '';
+
+  root.innerHTML = `
+    <div class="hdr"><h1>Comprensión lectora</h1></div>
+    ${xpBar(xp)}
+    <div class="gam-tabs">
+      <button class="gam-tab${clStatsVisible ? ' on' : ''}" onclick="toggleClStats()">📊 Estadísticas</button>
+      <button class="gam-tab${clAchsVisible ? ' on' : ''}" onclick="toggleClAchs()">🏅 Logros</button>
+    </div>
+    ${statsHtml}
+    ${achsHtml}
+    <div class="slist">${rows}</div>`;
+}
+
+window.toggleClStats = function () { clStatsVisible = !clStatsVisible; renderHome(); };
+window.toggleClAchs  = function () { clAchsVisible  = !clAchsVisible;  renderHome(); };
+
+// ── Lector de cuento ──────────────────────────────────────────────────────────
+window.startStory = function (id) {
+  const story = STORIES.find(s => s.id === id);
+  sess = {storyId: id, qs: [], answers: {}, fillState: {}};
+  root.innerHTML = `
+    <button class="back" onclick="renderHome()">← Volver</button>
+    <div class="story-meta">
+      <h2>${story.title}</h2>
+      <p class="muted mt2">Lee el texto con atención antes de responder.</p>
+    </div>
+    <div class="story-text">${story.text}</div>
+    <div class="row-btns">
+      <button class="btn btn-dark" onclick="startQuiz(${id})">Responder las preguntas</button>
+    </div>`;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+// ── Cuestionario ──────────────────────────────────────────────────────────────
+window.startQuiz = function (id) {
+  const story = STORIES.find(s => s.id === id);
+  sess.qs = pickQuestions(story);
+  sess.answers = {};
+  sess.fillState = initFillState(sess.qs);
+  renderQuiz();
+};
+
+function renderQuiz() {
+  const story = STORIES.find(s => s.id === sess.storyId);
+  const dots = sess.qs.map((_, i) => `<div class="qdot${sess.answers[i] !== undefined || isFilledCorrectly(i) ? ' answered' : ''}" id="dot${i}"></div>`).join('');
+
+  let qhtml = '';
+  sess.qs.forEach((q, qi) => {
+    if      (q.type === 'c') qhtml += buildChoiceQ(q, qi);
+    else if (q.type === 'v') qhtml += buildTFQ(q, qi);
+    else                     qhtml += buildFillQ(q, qi);
+  });
+
+  root.innerHTML = `
+    <button class="back" onclick="startStory(${sess.storyId})">← Volver al texto</button>
+    <h2 style="margin-bottom:14px">${story.title}</h2>
+    <div class="qdots">${dots}</div>
+    ${qhtml}
+    <div class="row-btns mt4">
+      <button class="btn btn-dark" onclick="checkAnswers()">Comprobar respuestas</button>
+    </div>`;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function buildChoiceQ(q, qi) {
+  return `<div class="qcard" id="qc${qi}">
+    <div class="q-top">Pregunta ${qi + 1} · Elige la mejor respuesta</div>
+    <div class="q-stem">${q.q}</div>
+    ${q.opts.map((o, oi) => `
+      <div class="opt${sess.answers[qi] === oi ? ' on' : ''}" id="opt-${qi}-${oi}" onclick="pickC(${qi},${oi})">
+        <div class="opt-dot"></div><span>${o}</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+function buildTFQ(q, qi) {
+  const sel = sess.answers[qi];
+  return `<div class="qcard" id="qtf${qi}">
+    <div class="q-top">Pregunta ${qi + 1} · Verdadero o Falso</div>
+    <div class="q-stem">${q.q}</div>
+    <div class="tf-row">
+      <div class="tf-btn${sel === true  ? ' on' : ''}" id="tf-${qi}-true"  onclick="pickTF(${qi},true)">Verdadero</div>
+      <div class="tf-btn${sel === false ? ' on' : ''}" id="tf-${qi}-false" onclick="pickTF(${qi},false)">Falso</div>
+    </div>
+  </div>`;
+}
+
+function buildFillQ(q, qi) {
+  const fs = sess.fillState[qi];
+  return `<div class="qcard fill-card" id="qf${qi}">
+    <div class="q-top">Pregunta ${qi + 1} · Rellena los huecos</div>
+    <div id="fill-inner-${qi}">
+      <div class="fill-sent">${buildFillSentence(q, qi, fs)}</div>
+      <div class="label mt3" style="margin-bottom:8px">Palabras disponibles</div>
+      <div class="word-pool">${buildPool(q, qi, fs)}</div>
+    </div>
+  </div>`;
+}
+
+function buildFillSentence(q, qi, fs) {
+  return q.t.replace(/\{(\d+)\}/g, (match, bi) => {
+    const word = fs.placed[parseInt(bi)];
+    return `<span class="blank${word ? '' : ' empty'}" onclick="blankClick(${qi},${bi})">${word || ''}</span>`;
+  });
+}
+
+function buildPool(q, qi, fs) {
+  const usedWords = fs.placed.filter(w => w !== null);
+  return clShuffle([...q.pool]).map(w => {
+    const used   = usedWords.includes(w);
+    const picked = fs.sel === w;
+    return `<span class="chip${used ? ' used' : picked ? ' picked' : ''}" onclick="chipClick(${qi},'${w}')">${w}</span>`;
+  }).join('');
+}
+
+function isFilledCorrectly(qi) {
+  const q = sess.qs[qi];
+  if (q.type !== 'f') return false;
+  const fs = sess.fillState[qi];
+  return fs.placed.every((w, i) => w === q.blanks[i]);
+}
+
+function updateFillInner(qi) {
+  const el = document.getElementById('fill-inner-' + qi);
+  if (!el) return;
+  const q = sess.qs[qi], fs = sess.fillState[qi];
+  el.innerHTML = `<div class="fill-sent">${buildFillSentence(q, qi, fs)}</div>
+    <div class="label mt3" style="margin-bottom:8px">Palabras disponibles</div>
+    <div class="word-pool">${buildPool(q, qi, fs)}</div>`;
+  updateDots();
+}
+
+function updateDots() {
+  sess.qs.forEach((_, i) => {
+    const el = document.getElementById('dot' + i);
+    if (el) el.className = 'qdot' + (sess.answers[i] !== undefined || isFilledCorrectly(i) ? ' answered' : '');
+  });
+}
+
+window.pickC = function (qi, oi) {
+  sess.answers[qi] = oi;
+  const q = sess.qs[qi];
+  q.opts.forEach((_, i) => {
+    const el = document.getElementById(`opt-${qi}-${i}`);
+    if (el) el.className = 'opt' + (i === oi ? ' on' : '');
+  });
+  updateDots();
+};
+
+window.pickTF = function (qi, val) {
+  sess.answers[qi] = val;
+  [true, false].forEach(v => {
+    const el = document.getElementById(`tf-${qi}-${v}`);
+    if (el) el.className = 'tf-btn' + (v === val ? ' on' : '');
+  });
+  updateDots();
+};
+
+window.chipClick = function (qi, word) {
+  const fs = sess.fillState[qi];
+  fs.sel = (fs.sel === word) ? null : word;
+  updateFillInner(qi);
+};
+
+window.blankClick = function (qi, bi) {
+  const fs = sess.fillState[qi];
+  bi = parseInt(bi);
+  if (fs.sel !== null) {
+    fs.placed[bi] = fs.sel;
+    fs.sel = null;
+  } else if (fs.placed[bi] !== null) {
+    fs.placed[bi] = null;
+  }
+  updateFillInner(qi);
+};
+
+// ── Comprobar respuestas ──────────────────────────────────────────────────────
+window.checkAnswers = function () {
+  const unanswered = sess.qs.findIndex((q, i) => {
+    if (q.type === 'c' || q.type === 'v') return sess.answers[i] === undefined;
+    return sess.fillState[i].placed.some(w => w === null);
+  });
+  if (unanswered >= 0) {
+    alert(`Falta completar la pregunta ${unanswered + 1}. ¡Respóndelas todas!`);
+    const qEl = document.getElementById('qtf' + unanswered) ||
+                document.getElementById('qc'  + unanswered) ||
+                document.getElementById('qf'  + unanswered);
+    qEl?.scrollIntoView({behavior: 'smooth', block: 'center'});
+    return;
+  }
+
+  let xpEarned = 0;
+  const results = sess.qs.map((q, i) => {
+    let correct = false;
+    if (q.type === 'c') {
+      correct = sess.answers[i] === q.ans;
+      if (correct) xpEarned += 10;
+      return {q, correct, userAns: q.opts[sess.answers[i]], correctAns: q.opts[q.ans]};
+    } else if (q.type === 'v') {
+      correct = sess.answers[i] === q.ans;
+      if (correct) xpEarned += 10;
+      return {q, correct, userAns: sess.answers[i] ? 'Verdadero' : 'Falso', correctAns: q.ans ? 'Verdadero' : 'Falso'};
+    } else {
+      const fs = sess.fillState[i];
+      correct = q.blanks.every((b, bi) => fs.placed[bi] === b);
+      if (correct) xpEarned += 15;
+      return {q, correct, userAns: fs.placed.map(w => w || '—').join(', '), correctAns: q.blanks.join(', ')};
+    }
+  });
+
+  const score = results.filter(r => r.correct).length;
+  const tot   = sess.qs.length;
+  if (score >= tot - 2) xpEarned += 20;
+  if (score === tot)    xpEarned += 50;
+
+  const prevXP = gXP();
+  const newXP  = awardXP(xpEarned);
+  if (score > 0) gCorrect(score);
+  const firstTime = saveResult(sess.storyId, score);
+  if (firstTime || gOrder()[gIdx() % gOrder().length] === sess.storyId) advanceOrder();
+  const newAchs = checkAchs(score, gDone());
+
+  renderResults(score, xpEarned, results, newAchs, prevXP, newXP);
+};
+
+// ── Resultados ────────────────────────────────────────────────────────────────
+function renderResults(score, xpEarned, results, newAchs, prevXP, newXP) {
+  const story  = STORIES.find(s => s.id === sess.storyId);
+  const tot    = sess.qs.length;
+  const msg    = score === tot               ? '¡Perfecto! ¡Increíble trabajo!'
+               : score >= tot - 2            ? '¡Muy bien! Casi perfecto.'
+               : score >= Math.round(tot*.7) ? '¡Bien! Sigues mejorando.'
+               : score >= Math.round(tot*.5) ? 'Pasable. Relee el texto y lo harás mejor.'
+               :                               '¡Sigue practicando, lo conseguirás!';
+
+  const achFlashes = newAchs.map(id => {
+    const a = ACHS.find(x => x.id === id);
+    return `<div class="ach-flash">
+      <div class="ach-sym">${a.sym}</div>
+      <div class="ach-flash-text"><div class="name">Logro: ${a.name}</div><div class="desc">${a.desc}</div></div>
+    </div>`;
+  }).join('');
+
+  const revItems = results.map((r, i) => {
+    const ok = r.correct;
+    const sentHint = r.q.type === 'f'
+      ? `<div class="rev-q" style="font-weight:400;color:var(--m);margin-bottom:3px;font-size:.82rem">${r.q.t.replace(/\{(\d+)\}/g, (_, bi) => `[${r.q.blanks[bi]}]`)}</div>`
+      : '';
+    return `<div class="rev-item">
+      <div class="rev-icon ${ok ? 'ok' : 'err'}">${ok ? '✓' : '✗'}</div>
+      <div class="rev-body">
+        <div class="rev-q">${i + 1}. ${r.q.q || 'Rellena los huecos'}</div>
+        ${sentHint}
+        ${ok
+          ? `<div class="rev-ans-ok">Correcto: ${r.correctAns}</div>`
+          : `<div class="rev-ans-err">Tu respuesta: ${r.userAns}</div><div class="rev-ans-ok">Correcto: ${r.correctAns}</div>`}
+        ${!ok ? `<div class="rev-exp">${r.q.exp}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="score-hero">
+      <div><span class="score-big">${score}</span><span class="score-denom">/${tot}</span></div>
+      <div class="score-msg">${msg}</div>
+      <div><span class="xp-gain">+${xpEarned} XP</span>${score >= tot - 2 ? `<span class="xp-bonus">(incluye +${score === tot ? 50 : 20} de bonus)</span>` : ''}</div>
+    </div>
+    ${xpBar(newXP)}
+    ${achFlashes ? `<div style="margin-bottom:16px">${achFlashes}</div>` : ''}
+    <div class="label mt4" style="margin-bottom:12px">Revisión de respuestas — ${story.title}</div>
+    <div style="background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:4px 16px">${revItems}</div>
+    <div class="row-btns mt4">
+      <button class="btn btn-ok"      onclick="renderHome()">Volver al inicio</button>
+      <button class="btn btn-outline" onclick="startStory(${sess.storyId})">Releer el cuento</button>
+    </div>`;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ── Reiniciar ─────────────────────────────────────────────────────────────────
+window.resetAll = function () {
+  Object.values(K).forEach(k => localStorage.removeItem(k));
+  renderHome();
+};
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderHome();
+gRender();
+</script>
+</body>
+</html>
