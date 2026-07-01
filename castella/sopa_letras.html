@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sopa de letras</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+:root{--ws:32px}
+.size-btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.size-btn{padding:7px 18px;border-radius:8px;border:2px solid var(--b);cursor:pointer;font-weight:600;background:var(--s);color:var(--t);font-family:inherit;font-size:.85rem;transition:all .1s}
+.size-btn.active{border-color:var(--a);background:var(--bg-hi2);color:var(--a)}
+.ws-wrap{overflow-x:auto;padding:8px 0;text-align:center}
+.ws-grid{display:inline-grid;gap:2px;user-select:none;-webkit-user-select:none;touch-action:none;}
+.ws-cell{width:var(--ws);height:var(--ws);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;text-transform:uppercase;border-radius:4px;background:var(--bg);color:var(--t);transition:background .07s,color .07s}
+.ws-cell.sel{background:var(--bd-hi);color:var(--a)}
+.ws-cell.found{background:var(--a);color:#fff}
+.ws-cell.miss{background:var(--er2);color:var(--ko)}
+.ws-word-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.ws-word{font-size:.88rem;font-weight:600;color:var(--t);padding:4px 10px;border-radius:6px;border:1.5px solid var(--b);background:var(--s);white-space:nowrap;transition:all .2s}
+.ws-word.done{text-decoration:line-through;color:var(--ok);border-color:var(--ok);background:var(--ok2)}
+@media(max-width:480px){:root{--ws:24px}.ws-cell{font-size:.8rem}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Sopa de letras</h1>
+    <div class="muted">Encuentra las palabras ocultas en todas las direcciones ↔ ↕ ↗ ↘</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<div class="card">
+  <h2><span class="num">⊞</span> Nueva partida</h2>
+  <div class="card-sub">Elige el tamaño y genera una nueva sopa de letras.</div>
+  <div class="size-btns">
+    <button class="size-btn active" data-d="S" onclick="setDiff('S')">Pequeño · 7 palabras</button>
+    <button class="size-btn" data-d="M" onclick="setDiff('M')">Mediano · 11 palabras</button>
+    <button class="size-btn" data-d="L" onclick="setDiff('L')">Grande · 15 palabras</button>
+  </div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline" onclick="newGame()">Generar ▶</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2><span class="num">🔍</span> Encuentra las palabras</h2>
+  <div class="card-sub">Haz clic y arrastra para marcar cada palabra. ¡En todas las direcciones!</div>
+  <div class="ws-wrap">
+    <div id="ws-grid" class="ws-grid"></div>
+  </div>
+  <div id="ws-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="newGame()">Nueva ↺</button>
+    <button class="btn btn-outline btn-sm" onclick="showSol()">Solución</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2><span class="num">📋</span> Palabras a encontrar</h2>
+  <div id="ws-word-list" class="ws-word-list"></div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+
+<script src="sopa_letras_data.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cast_ws_v1';
+
+GAM_ACHS = [
+  ...GAM_ACHS,
+  {id:'ws1',  s:'🔍', n:'Primera sopa',  d:'Completa la primera sopa de letras'},
+  {id:'ws5',  s:'🧩', n:'5 sopas',       d:'Completa 5 sopas de letras'},
+  {id:'ws10', s:'🏆', n:'10 sopas',      d:'Completa 10 sopas de letras'},
+];
+function gExtraAchs(g, tryA) {
+  const e = eLoad();
+  tryA('ws1',  (e.wsearch || 0) >= 1);
+  tryA('ws5',  (e.wsearch || 0) >= 5);
+  tryA('ws10', (e.wsearch || 0) >= 10);
+}
+
+// ── GENERADOR ──
+const DIRS8 = [[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];
+const FILL   = 'aaaeeeeiiioouulllrrrssstttnnccddmpfgbvhj';
+
+let diff = 'S', currentGrid = [], currentPlaced = [], foundWords = new Set(), gridSize = 0;
+let selStart = null, selCurrent = null;
+
+function setDiff(d) {
+  diff = d;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.toggle('active', b.dataset.d === d));
+}
+
+function generateGrid(words, size) {
+  const G = Array.from({length: size}, () => Array(size).fill(null));
+  const placed = [];
+  for (const word of words) {
+    let ok = false;
+    const dirs = sh([...DIRS8]);
+    for (let att = 0; att < 200 && !ok; att++) {
+      const [dr, dc] = dirs[att % dirs.length];
+      const n = word.w.length;
+      const row = Math.floor(Math.random() * size);
+      const col = Math.floor(Math.random() * size);
+      const eR = row + dr * (n - 1), eC = col + dc * (n - 1);
+      if (eR < 0 || eR >= size || eC < 0 || eC >= size) continue;
+      let valid = true;
+      for (let i = 0; i < n && valid; i++) {
+        const r = row + dr * i, c = col + dc * i;
+        if (G[r][c] !== null && G[r][c] !== word.w[i]) valid = false;
+      }
+      if (valid) {
+        for (let i = 0; i < n; i++) G[row + dr * i][col + dc * i] = word.w[i];
+        placed.push({...word, row, col, dr, dc});
+        ok = true;
+      }
+    }
+  }
+  for (let r = 0; r < size; r++) for (let c = 0; c < size; c++)
+    if (G[r][c] === null) G[r][c] = FILL[Math.floor(Math.random() * FILL.length)];
+  return {G, placed};
+}
+
+function newGame() {
+  const cnt  = {S: 7, M: 11, L: 15}[diff];
+  const size = {S: 10, M: 13, L: 16}[diff];
+  const words = sh([...WSEARCH_POOL]).slice(0, cnt);
+  let res;
+  for (let att = 0; att < 6; att++) {
+    res = generateGrid(sh([...words]), size);
+    if (res.placed.length === words.length) break;
+  }
+  foundWords = new Set();
+  currentGrid = res.G;
+  currentPlaced = res.placed;
+  gridSize = size;
+  selStart = null; selCurrent = null;
+  document.getElementById('ws-fb').textContent = '';
+  document.getElementById('ws-fb').className = 'fb mt2';
+  renderGrid(res.G, size);
+  renderWordList(res.placed);
+}
+
+// ── RENDER ──
+function renderGrid(G, size) {
+  const el = document.getElementById('ws-grid');
+  el.style.gridTemplateColumns = `repeat(${size},var(--ws))`;
+  el.textContent = '';
+  for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
+    const d = document.createElement('div');
+    d.className = 'ws-cell'; d.dataset.r = r; d.dataset.c = c;
+    d.textContent = G[r][c].toUpperCase();
+    el.appendChild(d);
+  }
+}
+
+function renderWordList(placed) {
+  const el = document.getElementById('ws-word-list');
+  el.textContent = '';
+  placed.forEach(p => {
+    const sp = document.createElement('span');
+    sp.className = 'ws-word'; sp.dataset.w = p.w;
+    sp.textContent = p.w.toUpperCase();
+    el.appendChild(sp);
+  });
+}
+
+// ── SELECCIÓN ──
+function snapDir(dr, dc) {
+  if (dr === 0 && dc === 0) return null;
+  if (dr === 0) return [0, dc > 0 ? 1 : -1];
+  if (dc === 0) return [dr > 0 ? 1 : -1, 0];
+  const ratio = Math.abs(dc / dr);
+  if (ratio > 2) return [0, dc > 0 ? 1 : -1];
+  if (ratio < 0.5) return [dr > 0 ? 1 : -1, 0];
+  return [dr > 0 ? 1 : -1, dc > 0 ? 1 : -1];
+}
+
+function getCells(r1, c1, r2, c2) {
+  const dr = r2 - r1, dc = c2 - c1;
+  if (dr === 0 && dc === 0) return [{r: r1, c: c1}];
+  const d = snapDir(dr, dc); if (!d) return [{r: r1, c: c1}];
+  const steps = Math.max(Math.abs(dr), Math.abs(dc));
+  const cells = [];
+  for (let i = 0; i <= steps; i++) {
+    const r = r1 + d[0] * i, c = c1 + d[1] * i;
+    if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) cells.push({r, c});
+  }
+  return cells;
+}
+
+function clearSel() {
+  document.querySelectorAll('#ws-grid .ws-cell.sel').forEach(e => e.classList.remove('sel'));
+}
+
+function applySel(cells) {
+  clearSel();
+  cells.forEach(({r, c}) => {
+    document.querySelector(`#ws-grid .ws-cell[data-r="${r}"][data-c="${c}"]`)?.classList.add('sel');
+  });
+}
+
+function checkSel(cells) {
+  if (cells.length < 2) { clearSel(); return; }
+  const word = cells.map(({r, c}) => currentGrid[r][c]).join('');
+  const rev  = [...word].reverse().join('');
+  const match = currentPlaced.find(p => (p.w === word || p.w === rev) && !foundWords.has(p.w));
+  const alreadyDone = !match && currentPlaced.some(p => p.w === word || p.w === rev);
+  clearSel();
+  if (match) {
+    cells.forEach(({r, c}) => {
+      document.querySelector(`#ws-grid .ws-cell[data-r="${r}"][data-c="${c}"]`)?.classList.add('found');
+    });
+    foundWords.add(match.w);
+    document.querySelector(`.ws-word[data-w="${match.w}"]`)?.classList.add('done');
+    gCorrect(5, 'wsearch');
+    if (foundWords.size >= currentPlaced.length) onAllFound();
+  } else if (!alreadyDone) {
+    cells.forEach(({r, c}) => {
+      const el = document.querySelector(`#ws-grid .ws-cell[data-r="${r}"][data-c="${c}"]`);
+      if (el) { el.classList.add('miss'); setTimeout(() => el.classList.remove('miss'), 400); }
+    });
+  }
+}
+
+function onAllFound() {
+  const fb = document.getElementById('ws-fb');
+  fb.textContent = '✓ ¡Perfecto! ¡Todas las palabras encontradas!';
+  fb.className = 'fb ok mt2';
+  gCorrect(15, 'wsearch');
+}
+
+function showSol() {
+  currentPlaced.forEach(p => {
+    for (let i = 0; i < p.w.length; i++)
+      document.querySelector(`#ws-grid .ws-cell[data-r="${p.row + p.dr * i}"][data-c="${p.col + p.dc * i}"]`)?.classList.add('found');
+    document.querySelector(`.ws-word[data-w="${p.w}"]`)?.classList.add('done');
+    foundWords.add(p.w);
+  });
+  document.getElementById('ws-fb').textContent = 'Solución mostrada.';
+}
+
+// ── EVENTOS — Ratón ──
+const wsGrid = document.getElementById('ws-grid');
+
+wsGrid.addEventListener('mousedown', e => {
+  const cell = e.target.closest('.ws-cell');
+  if (!cell) return;
+  e.preventDefault();
+  selStart = {r: +cell.dataset.r, c: +cell.dataset.c};
+  selCurrent = selStart;
+  clearSel(); cell.classList.add('sel');
+});
+
+document.addEventListener('mousemove', e => {
+  if (!selStart) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const cell = el?.closest('#ws-grid .ws-cell');
+  if (!cell) return;
+  const r = +cell.dataset.r, c = +cell.dataset.c;
+  if (r === selCurrent.r && c === selCurrent.c) return;
+  selCurrent = {r, c};
+  applySel(getCells(selStart.r, selStart.c, r, c));
+});
+
+document.addEventListener('mouseup', e => {
+  if (!selStart) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const cell = el?.closest('#ws-grid .ws-cell');
+  const r = cell ? +cell.dataset.r : selCurrent.r;
+  const c = cell ? +cell.dataset.c : selCurrent.c;
+  const cells = getCells(selStart.r, selStart.c, r, c);
+  selStart = null; selCurrent = null;
+  checkSel(cells);
+});
+
+// ── EVENTOS — Táctil ──
+wsGrid.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const cell = el?.closest('.ws-cell');
+  if (!cell) return;
+  selStart = {r: +cell.dataset.r, c: +cell.dataset.c};
+  selCurrent = selStart;
+  clearSel(); cell.classList.add('sel');
+}, {passive: false});
+
+document.addEventListener('touchmove', e => {
+  if (!selStart) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const cell = el?.closest('#ws-grid .ws-cell');
+  if (!cell) return;
+  const r = +cell.dataset.r, c = +cell.dataset.c;
+  if (r === selCurrent.r && c === selCurrent.c) return;
+  selCurrent = {r, c};
+  applySel(getCells(selStart.r, selStart.c, r, c));
+}, {passive: false});
+
+document.addEventListener('touchend', e => {
+  if (!selStart) return;
+  const cells = getCells(selStart.r, selStart.c, selCurrent.r, selCurrent.c);
+  selStart = null; selCurrent = null;
+  checkSel(cells);
+}, {passive: false});
+
+// Init
+gRender();
+newGame();
+</script>
+</body>
+</html>
