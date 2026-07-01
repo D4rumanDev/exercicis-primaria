@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signos de puntuación</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+.sent-disp{font-size:1.05rem;color:var(--t);text-align:center;padding:14px 12px;line-height:2;min-height:3em}
+.punct-blank{display:inline-block;min-width:20px;border-bottom:3px solid var(--a);color:var(--a);font-weight:900;font-size:1.2rem;vertical-align:middle;padding:0 3px}
+.rule-box{background:var(--bg-hi);border:1px solid var(--bd-hi);border-radius:10px;padding:14px 16px;font-size:.97rem;color:var(--t);text-align:center;line-height:1.6;margin:12px 0}
+.hint-rule{font-size:.78rem;font-weight:600;color:var(--m);text-align:center;margin-top:6px;min-height:1.2em}
+.rules-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.rules-list li{font-size:.88rem;padding:8px 12px;border-radius:8px;background:var(--bg-hi);border:1px solid var(--bd-hi)}
+#punct-opts button,#rule-opts button{font-size:1.25rem;font-weight:900;min-width:52px;font-family:'Courier New',monospace}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <h1>Signos de puntuación</h1>
+    <div class="muted">Castellano · Ortografía</div>
+  </div>
+</div>
+
+<div id="gam-bar"></div>
+
+<!-- 1: ¿Qué signo falta? -->
+<div class="card">
+  <h2><span class="num">1</span> ¿Qué signo falta?</h2>
+  <div class="card-sub">Lee la oración y elige el signo de puntuación correcto.</div>
+  <div id="punct-sent" class="sent-disp mt3"></div>
+  <div id="punct-opts" class="opts-row"></div>
+  <div id="punct-hint" class="hint-rule"></div>
+  <div id="punct-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextPunct()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- 2: Regles -->
+<div class="card">
+  <h2><span class="num">2</span> Signos y sus usos</h2>
+  <ul class="rules-list mt3">
+    <li>🔵 <strong>Punto (.)</strong> → Final de oración enunciativa: <em>El sol brilla.</em></li>
+    <li>🟡 <strong>Coma (,)</strong> → Separa elementos de una lista o va tras conectores: <em>pan, leche y huevos / Sin embargo, llegamos.</em></li>
+    <li>🟠 <strong>Dos puntos (:)</strong> → Anuncia una lista o cita: <em>Los colores son: rojo, azul…</em></li>
+    <li>🟣 <strong>Puntos suspensivos (...)</strong> → Idea incompleta o suspense: <em>Y entonces...</em></li>
+    <li>🔴 <strong>Interrogación (¿?)</strong> → Preguntas directas: <em>¿Qué hora es?</em></li>
+    <li>🟢 <strong>Exclamación (¡!)</strong> → Exclamaciones y órdenes: <em>¡Qué alegría!</em></li>
+  </ul>
+</div>
+
+<!-- 3: ¿Para qué se usa? -->
+<div class="card">
+  <h2><span class="num">3</span> ¿Para qué se usa?</h2>
+  <div class="card-sub">Lee la descripción y elige el signo correspondiente.</div>
+  <div id="rule-box" class="rule-box mt3"></div>
+  <div id="rule-opts" class="opts-row"></div>
+  <div id="rule-hint" class="hint-rule"></div>
+  <div id="rule-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="btn-row mt4">
+    <button class="btn btn-outline btn-sm" onclick="nextRule()">Siguiente →</button>
+  </div>
+</div>
+
+</div>
+<div class="gam-toast" id="gam-toast"></div>
+<script src="signos_data.js"></script>
+<script src="../shared.js"></script>
+<script>
+const EXER_KEY = 'ex_cast_sig_v1';
+
+GAM_ACHS = [
+  {id:'first',  s:'⭐', n:'¡Primera respuesta!',    d:'Tu primer acierto'},
+  {id:'s3',     s:'🔥', n:'Racha x3',               d:'3 aciertos seguidos'},
+  {id:'s5',     s:'⚡', n:'Racha x5',               d:'5 aciertos seguidos'},
+  {id:'s10',    s:'💥', n:'Racha x10',              d:'10 aciertos seguidos'},
+  {id:'sig20',  s:'.',  n:'Experto en puntuación',  d:'20 signos identificados correctamente'},
+  {id:'rule10', s:'?',  n:'Conoce las reglas',      d:'10 reglas reconocidas'},
+  {id:'ok50',   s:'🥉', n:'50 aciertos',            d:'50 respuestas correctas en total'},
+  {id:'ok200',  s:'🥈', n:'200 aciertos',           d:'200 respuestas correctas'},
+  {id:'ok500',  s:'🏆', n:'500 aciertos',           d:'500 respuestas correctas'},
+];
+
+function gExtraAchs(g, tryA) {
+  const e = eLoad();
+  tryA('sig20',  (e.sig  || 0) >= 20);
+  tryA('rule10', (e.rule || 0) >= 10);
+}
+
+// ── Helpers ──
+function pHtml(sent) {
+  return sent.replace(/_/g, '<span class="punct-blank">◻</span>');
+}
+
+// ── Secció 1: Signe que falta ──
+let punctPrev = -1;
+
+function nextPunct() {
+  let idx;
+  do { idx = ri(0, PUNCT_POOL.length - 1); } while (idx === punctPrev && PUNCT_POOL.length > 1);
+  punctPrev = idx;
+  const e = PUNCT_POOL[idx];
+
+  const sentEl = document.getElementById('punct-sent');
+  sentEl.innerHTML = pHtml(e.sent);
+  document.getElementById('punct-hint').textContent = '';
+  const fbEl = document.getElementById('punct-fb');
+  fbEl.textContent = '';
+  fbEl.className   = 'fb mt2';
+
+  const onOk = () => {
+    sentEl.textContent = e.full;
+    document.getElementById('punct-hint').textContent = e.hint;
+    setFb('punct-fb', true, pick(OK));
+    gCorrect(8, 'sig');
+  };
+  const onKo = () => {
+    sentEl.textContent = e.full;
+    document.getElementById('punct-hint').textContent = e.hint;
+    setFb('punct-fb', false, 'Era «' + e.ans + '»');
+    gWrong();
+  };
+  renderOpts('punct-opts', sh([...e.opts]), e.ans, onOk, onKo);
+}
+
+// ── Secció 3: Regla → Signe ──
+let rulePrev = -1;
+
+function nextRule() {
+  let idx;
+  do { idx = ri(0, RULE_POOL.length - 1); } while (idx === rulePrev && RULE_POOL.length > 1);
+  rulePrev = idx;
+  const e = RULE_POOL[idx];
+
+  document.getElementById('rule-box').textContent = e.rule;
+  document.getElementById('rule-hint').textContent = '';
+  const fbEl = document.getElementById('rule-fb');
+  fbEl.textContent = '';
+  fbEl.className   = 'fb mt2';
+
+  const opts = sh([e.ans, e.wrong[0], e.wrong[1], e.wrong[2]]);
+  const onOk = () => {
+    document.getElementById('rule-hint').textContent = e.hint;
+    setFb('rule-fb', true, pick(OK));
+    gCorrect(10, 'rule');
+  };
+  const onKo = () => {
+    document.getElementById('rule-hint').textContent = e.hint;
+    setFb('rule-fb', false, 'Era «' + e.ans + '»');
+    gWrong();
+  };
+  renderOpts('rule-opts', opts, e.ans, onOk, onKo);
+}
+
+// ── Init ──
+gRender();
+nextPunct();
+nextRule();
+</script>
+</body>
+</html>
