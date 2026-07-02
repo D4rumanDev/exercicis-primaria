@@ -96,24 +96,25 @@
   </div>
 </div>
 
-<!-- ═══════════ SECCIÓ 4: MESURA AMB EL REGLE ═══════════ -->
+<!-- ═══════════ SECCIÓ 4: ESCALA I UNITATS ═══════════ -->
 <div class="card">
-  <h2><span class="num">4</span> Mesura amb el regle</h2>
-  <div class="card-sub">Llegeix el regle i escriu la mesura de l'objecte. Canvia l'escala per practicar en mm.</div>
+  <h2><span class="num">4</span> Escala i unitats</h2>
+  <div class="card-sub">Canvia el regle i observa quantes vegades cal repetir-lo per mesurar l'objecte. Tria la unitat més adequada per guanyar punts.</div>
+  <div id="vis4-obj" style="text-align:center;margin-bottom:8px"></div>
   <div class="ruler-ctrl">
-    <span style="font-size:.78rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Escala:</span>
-    <button class="unit-badge on" id="badge-cm" onclick="setRulerUnit('cm')">cm</button>
-    <button class="unit-badge"    id="badge-mm" onclick="setRulerUnit('mm')">mm</button>
+    <span style="font-size:.78rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Regle:</span>
+    <button class="unit-badge" id="vbadge-mm" onclick="setVisUnit('mm')">mm</button>
+    <button class="unit-badge on" id="vbadge-cm" onclick="setVisUnit('cm')">cm</button>
+    <button class="unit-badge" id="vbadge-m"  onclick="setVisUnit('m')">m</button>
+    <button class="unit-badge" id="vbadge-km" onclick="setVisUnit('km')">km</button>
   </div>
-  <div class="ruler-wrap">
-    <div id="sec6-ruler"></div>
+  <div class="ruler-wrap" style="padding:8px 6px 6px">
+    <canvas id="vis4-cvs" style="width:100%;display:block"></canvas>
   </div>
-  <div id="sec6-q" class="q-top" style="text-align:center;margin-top:4px"></div>
-  <div id="sec6-ans"></div>
-  <div id="sec6-fb" class="fb mt3" style="text-align:center"></div>
+  <div id="vis4-times" style="text-align:center;font-size:1rem;font-weight:700;padding:6px 0;min-height:1.5em"></div>
+  <div id="vis4-fb" class="fb mt2" style="text-align:center"></div>
   <div class="btn-row mt3">
-    <button class="btn btn-dark btn-sm" id="ruler-btn" onclick="checkSec6()">Comprova</button>
-    <button class="btn btn-outline btn-sm" id="ruler-next-btn" onclick="nextSec6()" style="display:none">Següent →</button>
+    <button class="btn btn-outline btn-sm" onclick="nextSec4vis()">Nou objecte →</button>
   </div>
 </div>
 
@@ -154,7 +155,7 @@ GAM_ACHS = [
   {id:'s5',        s:'⚡', n:'Ratxa x5',          d:'5 encerts seguits'},
   {id:'s10',       s:'💥', n:'Ratxa x10',         d:'10 encerts seguits'},
   {id:'conversor', s:'🔄', n:'Conversor Expert',   d:'5 conversions correctes'},
-  {id:'topograf',  s:'📐', n:'Topògraf',           d:'5 objectes mesurats al regle'},
+  {id:'topograf',  s:'📐', n:'Topògraf',           d:'5 escales triades correctament'},
   {id:'ok50',      s:'🥉', n:'50 Encerts',         d:'50 respostes correctes'},
   {id:'ok200',     s:'🥈', n:'200 Encerts',        d:'200 respostes correctes'}
 ];
@@ -162,7 +163,7 @@ GAM_ACHS = [
 function gExtraAchs(g,tryA){
   const e=eLoad();
   tryA('conversor',(e.conv||0)>=5);
-  tryA('topograf',(e.ruler||0)>=5);
+  tryA('topograf',(e.scale||0)>=5);
 }
 
 const _inpHtml=(id,unit,fn,w='110px')=>
@@ -284,182 +285,191 @@ const PROB_POOL=getProbs('longitud');
 function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,5);}
 
 // ════════════════════════════════════════════════════════════
-// SECCIÓ 6 — MESURA AMB EL REGLE
+// SECCIÓ 4 — ESCALA I UNITATS (Canvas)
 // ════════════════════════════════════════════════════════════
-const R_PX_CM = 28;   // pixels per cm en el viewBox
-const R_CMS   = 15;   // cm que mostra el regle
-const R_X0    = 12;   // marge esquerre per a l'etiqueta "0"
-const R_OBJ_H = 36;   // alçada de cada barra objecte
-const R_OBJ_G = 5;    // gap entre barres (compare mode)
+// Span en mm que representa "una longitud del regle" per a cada unitat.
+// Defineix el zoom: mm mostra 100mm, km mostra 50km.
+const VIS_SPAN_MM = {mm:100, cm:250, m:5000, km:50000000};
+const VIS_H       = 112;  // alçada del canvas en px CSS
+const VIS_OBJ_Y   = 8;
+const VIS_OBJ_H   = 48;
+const VIS_RUL_Y   = VIS_OBJ_Y + VIS_OBJ_H + 16; // espai per als labels
+const VIS_RUL_H   = 28;
+const VIS_COLS    = ['#1d4ed8','#16a34a','#dc2626','#7c3aed','#ea580c'];
 
-function buildRulerSVG(objs, unit){
-  const R_W = R_CMS * R_PX_CM;                  // amplada útil del regle
-  const SVG_W = R_X0 + R_W + 22;               // amplada total del viewBox
+let _visUnit     = 'cm';
+let _visObjMm    = 0;
+let _visObjItem  = null;
+let _visAnimId   = null;
+let _visAnswered = false;
 
-  // Calcula posició Y de cada objecte
-  const objYs = [];
-  let cy = 6;
-  for(const o of objs){ objYs.push(cy); cy += R_OBJ_H + R_OBJ_G; }
-  const lastBot = cy - R_OBJ_G;                // part inferior del darrer objecte
+function _visCol(item){
+  return VIS_COLS[SVG_LONGITUD.indexOf(item) % VIS_COLS.length];
+}
 
-  // El regle comença prou baix per deixar espai a les etiquetes
-  const RY = lastBot + 14;                      // y superior del regle
-  const RH = 26;                                // alçada del cos del regle
-  const SH = RY + RH + 8;                      // alçada total del SVG
+function _visDraw(pxMm){
+  const canvas = document.getElementById('vis4-cvs');
+  if(!canvas) return;
+  const W = canvas.width, ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, VIS_H);
 
-  const COLS = ['#1d4ed8','#16a34a','#dc2626','#7c3aed'];
+  const col    = _visCol(_visObjItem);
+  const spanPx = VIS_SPAN_MM[_visUnit] * pxMm;  // una longitud del regle en px
+  const objPx  = _visObjMm * pxMm;              // amplada total de l'objecte en px
 
-  // Línies guia (es dibuixen primer, per sota del regle)
-  let guides = '';
-  for(let i = 0; i < objs.length; i++){
-    const o = objs[i];
-    const ex = R_X0 + (o.start + o.len) * R_PX_CM;
-    const oy = objYs[i];
-    const col = o.color || COLS[i % COLS.length];
-    guides += `<line x1="${ex}" y1="${oy + R_OBJ_H}" x2="${ex}" y2="${RY}" `
-            + `stroke="${col}" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.45"/>`;
+  // ── Barra de l'objecte — alternança clar/fosc per repetició del regle ──
+  let x = 0, stripe = 0;
+  while(x < W + 1 && x < objPx + 1){
+    const sw = Math.min(spanPx, objPx - x, W + 1 - x);
+    if(sw <= 0) break;
+    ctx.globalAlpha = stripe % 2 === 0 ? 0.88 : 0.50;
+    ctx.fillStyle = col;
+    ctx.fillRect(x, VIS_OBJ_Y, sw, VIS_OBJ_H);
+    x += spanPx; stripe++;
+  }
+  ctx.globalAlpha = 1;
+
+  // Línies divisòries entre repeticions
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4,3]);
+  for(let lx = spanPx; lx < Math.min(objPx, W) + 1; lx += spanPx){
+    ctx.beginPath(); ctx.moveTo(lx, VIS_OBJ_Y); ctx.lineTo(lx, VIS_OBJ_Y + VIS_OBJ_H); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Fletxa si l'objecte desborda cap a la dreta
+  if(objPx > W + 1){
+    ctx.save();
+    ctx.fillStyle = col; ctx.globalAlpha = 0.88;
+    ctx.beginPath();
+    ctx.moveTo(W - 2, VIS_OBJ_Y + VIS_OBJ_H * 0.2);
+    ctx.lineTo(W - 2, VIS_OBJ_Y + VIS_OBJ_H * 0.8);
+    ctx.lineTo(W + 10, VIS_OBJ_Y + VIS_OBJ_H * 0.5);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
   }
 
-  // Marques del regle
-  let ticks = '';
-  for(let mm = 0; mm <= R_CMS * 10; mm++){
-    const x = R_X0 + mm * R_PX_CM / 10;
-    let h, sw;
-    if(mm % 10 === 0){ h = RH; sw = 1.5; }
-    else if(mm % 5 === 0){ h = 10; sw = 0.8; }
-    else { h = 4; sw = 0.5; }
-    ticks += `<line x1="${x}" y1="${RY}" x2="${x}" y2="${RY+h}" stroke="#78350f" stroke-width="${sw}"/>`;
-    if(mm % 10 === 0){
-      const lbl = unit === 'mm' ? mm : mm / 10;
-      ticks += `<text x="${x}" y="${RY-3}" text-anchor="middle" `
-             + `font-size="8.5" fill="#78350f" font-weight="600" `
-             + `font-family="'Segoe UI',sans-serif">${lbl}</text>`;
+  // Nom de l'objecte sobre la barra
+  if(objPx > 24 && _visObjItem){
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.font = 'bold 11px "Segoe UI",sans-serif';
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.fillText(_visObjItem.nom, 8, VIS_OBJ_Y + VIS_OBJ_H / 2);
+    ctx.restore();
+  }
+
+  // ── Cos del regle ──
+  ctx.fillStyle = '#fef3c7';
+  ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.rect(0, VIS_RUL_Y, W, VIS_RUL_H); ctx.fill(); ctx.stroke();
+
+  // Marques del regle (de menor a major per a que les majors queden al damunt)
+  const tDefs = {
+    mm: [{s:1,   h:5,         w:0.4}, {s:5,   h:11,        w:0.8}, {s:10,     h:VIS_RUL_H, w:1.5, lbl:true}],
+    cm: [{s:10,  h:5,         w:0.4}, {s:50,  h:11,        w:0.8}, {s:100,    h:VIS_RUL_H, w:1.5, lbl:true}],
+    m:  [{s:100, h:5,         w:0.4}, {s:500, h:11,        w:0.8}, {s:1000,   h:VIS_RUL_H, w:1.5, lbl:true}],
+    km: [                             {s:500000,h:11,       w:0.8}, {s:1000000,h:VIS_RUL_H, w:1.5, lbl:true}]
+  };
+  const toLbl = mm => ({mm, cm:mm/10, m:mm/1000, km:mm/1000000}[_visUnit]);
+  const spanMm = VIS_SPAN_MM[_visUnit];
+
+  ctx.save();
+  ctx.strokeStyle = '#78350f'; ctx.fillStyle = '#78350f';
+  ctx.textBaseline = 'bottom'; ctx.textAlign = 'center';
+  ctx.font = '8.5px "Segoe UI",sans-serif';
+
+  for(const td of tDefs[_visUnit]){
+    ctx.lineWidth = td.w;
+    for(let mm = 0; mm <= spanMm + 0.001; mm += td.s){
+      const tx = (mm / spanMm) * W;
+      if(tx > W + 0.5) break;
+      ctx.beginPath(); ctx.moveTo(tx, VIS_RUL_Y); ctx.lineTo(tx, VIS_RUL_Y + td.h); ctx.stroke();
+      if(td.lbl){
+        const lbl = toLbl(mm);
+        ctx.fillText(Number.isInteger(lbl) ? lbl : +lbl.toFixed(1), tx, VIS_RUL_Y - 2);
+      }
     }
   }
   // Etiqueta de la unitat al final del regle
-  ticks += `<text x="${R_X0 + R_W + 4}" y="${RY + RH/2 + 4}" `
-          + `font-size="9" fill="#92400e" font-weight="700" `
-          + `font-family="'Segoe UI',sans-serif">${unit}</text>`;
+  ctx.font = 'bold 9px "Segoe UI",sans-serif';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  ctx.fillText(_visUnit, W - 3, VIS_RUL_Y + VIS_RUL_H / 2);
+  ctx.restore();
 
-  // Barres dels objectes (es dibuixen al damunt del regle)
-  let bars = '';
-  for(let i = 0; i < objs.length; i++){
-    const o = objs[i];
-    const x = R_X0 + o.start * R_PX_CM;
-    const w = o.len * R_PX_CM;
-    const oy = objYs[i];
-    const col = o.color || COLS[i % COLS.length];
-    if(o.svgObj && o.svgObj.embed){
-      bars += o.svgObj.embed(x, oy, w, R_OBJ_H, col);
-    } else {
-      bars += `<rect x="${x}" y="${oy}" width="${w}" height="${R_OBJ_H}" rx="3" fill="${col}" opacity="0.9"/>`;
-      if(o.label)
-        bars += `<text x="${x + w/2}" y="${oy + 13}" text-anchor="middle" `
-              + `font-size="10" fill="white" font-weight="700" `
-              + `font-family="'Segoe UI',sans-serif">${o.label}</text>`;
-    }
-  }
-
-  return `<svg viewBox="0 0 ${SVG_W} ${SH}" style="width:100%;height:auto;display:block" `
-       + `preserveAspectRatio="xMinYMin meet">`
-       + guides
-       + `<rect x="${R_X0}" y="${RY}" width="${R_W}" height="${RH}" `
-       + `fill="#fef3c7" stroke="#92400e" stroke-width="1.5" rx="1"/>`
-       + ticks + bars
-       + `</svg>`;
-}
-
-let _rulerUnit   = 'cm';
-let _rulerMode   = 'measure';   // 'measure' | 'compare'
-let _rulerObjs   = [];
-let _rulerAns    = null;        // cm value (measure mode)
-let _rulerBigger = null;        // 'A' | 'B' (compare mode)
-let _rulerLocked = false;
-let _sec6Ctr     = 0;
-
-function setRulerUnit(unit){
-  _rulerUnit = unit;
-  document.getElementById('badge-cm').classList.toggle('on', unit === 'cm');
-  document.getElementById('badge-mm').classList.toggle('on', unit === 'mm');
-  document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, unit);
-
-  // En mode mesura, si encara no s'ha respost, reconstruïm l'input amb la nova unitat
-  if(_rulerMode === 'measure' && !_rulerLocked){
-    const curObj = _rulerObjs[0]?.svgObj;
-    const qName  = curObj ? `${curObj.art} ${curObj.nom}` : `l'objecte`;
-    document.getElementById('sec6-q').textContent = `Quant mesura ${qName}? (en ${unit})`;
-    document.getElementById('sec6-ans').innerHTML = _inpHtml('ruler-inp',unit,'checkSec6','100px');
-    document.getElementById('sec6-fb').textContent = '';
-    document.getElementById('ruler-btn').disabled = false;
-    setTimeout(()=>document.getElementById('ruler-inp')?.focus({preventScroll:true}), 50);
+  // ── Comptador de repeticions ──
+  const times = Math.max(1, Math.ceil(_visObjMm / VIS_SPAN_MM[_visUnit]));
+  const el = document.getElementById('vis4-times');
+  if(el){
+    if(times === 1)     { el.textContent = '✓ La regla hi cap una sola vegada'; el.style.color = 'var(--ok)'; }
+    else if(times <= 5) { el.textContent = `Cal repetir la regla ${times} vegades`; el.style.color = 'var(--a)'; }
+    else                { el.textContent = `Cal repetir la regla ${times} vegades!`; el.style.color = 'var(--ko)'; }
   }
 }
 
-function nextSec6(){
-  const nxtR=document.getElementById('ruler-next-btn');if(nxtR)nxtR.style.display='none';
-  _rulerLocked = false;
-  _rulerUnit   = 'cm';
-  _sec6Ctr++;
+function _visAnimate(newUnit){
+  if(_visAnimId){ cancelAnimationFrame(_visAnimId); _visAnimId = null; }
+  const canvas = document.getElementById('vis4-cvs');
+  if(!canvas) return;
+  const W = canvas.width;
+  const logA = Math.log(W / VIS_SPAN_MM[_visUnit]);
+  _visUnit = newUnit;
+  const logB = Math.log(W / VIS_SPAN_MM[newUnit]);
+  const t0 = performance.now(), dur = 420;
+  function step(now){
+    const p = Math.min((now - t0) / dur, 1);
+    const ease = p < 0.5 ? 2*p*p : -1 + (4-2*p)*p;
+    _visDraw(Math.exp(logA + (logB - logA) * ease));
+    if(p < 1) _visAnimId = requestAnimationFrame(step);
+    else { _visDraw(Math.exp(logB)); _visAnimId = null; }
+  }
+  _visAnimId = requestAnimationFrame(step);
+}
 
-  document.getElementById('badge-cm').classList.add('on');
-  document.getElementById('badge-mm').classList.remove('on');
-  document.getElementById('sec6-fb').textContent = '';
-
-  if(_sec6Ctr % 4 === 0){
-    // ── Compare mode: 2 objectes ──
-    _rulerMode = 'compare';
-    let aLen = ri(2, 12), bLen;
-    do { bLen = ri(2, 12); } while(bLen === aLen);
-    _rulerBigger = aLen > bLen ? 'A' : 'B';
-    _rulerObjs = [
-      {start:0, len:aLen, color:'#1d4ed8', label:'A'},
-      {start:0, len:bLen, color:'#16a34a', label:'B'}
-    ];
-    document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, _rulerUnit);
-    document.getElementById('sec6-q').textContent = 'Quin objecte és més llarg?';
-    document.getElementById('ruler-btn').style.display = 'none';
-    const nxtRcmp=document.getElementById('ruler-next-btn');
-    renderOpts('sec6-ans', sh(['Objecte A','Objecte B']), `Objecte ${_rulerBigger}`,
-      ()=>{ setFb('sec6-fb',true,pick(OK));  gCorrect(7,'ruler_cmp'); if(nxtRcmp)nxtRcmp.style.display=''; },
-      ()=>{ setFb('sec6-fb',false,pick(KO)); gWrong(); if(nxtRcmp)nxtRcmp.style.display=''; }
-    );
-  } else {
-    // ── Measure mode: 1 objecte real ──
-    _rulerMode = 'measure';
-    const cmObjs = SVG_LONGITUD.filter(o=>o.cat==='cm'&&o.embed);
-    const rObj   = pick(cmObjs);
-    _rulerAns  = ri(Math.max(1, rObj.min), Math.min(12, rObj.max));
-    _rulerObjs = [{start:0, len:_rulerAns, color:'#1d4ed8', svgObj:rObj}];
-    document.getElementById('sec6-ruler').innerHTML = buildRulerSVG(_rulerObjs, _rulerUnit);
-    document.getElementById('sec6-q').textContent = `Quant mesura ${rObj.art} ${rObj.nom}? (en cm)`;
-    document.getElementById('sec6-ans').innerHTML = _inpHtml('ruler-inp','cm','checkSec6','100px');
-    const btn = document.getElementById('ruler-btn');
-    btn.style.display = '';
-    btn.textContent   = 'Comprova';
-    btn.disabled      = false;
-    setTimeout(()=>document.getElementById('ruler-inp')?.focus({preventScroll:true}), 50);
+function setVisUnit(unit){
+  if(unit === _visUnit) return;
+  ['mm','cm','m','km'].forEach(u =>
+    document.getElementById(`vbadge-${u}`).classList.toggle('on', u === unit)
+  );
+  _visAnimate(unit);
+  if(!_visAnswered && _visObjItem && unit === _visObjItem.cat){
+    _visAnswered = true;
+    setFb('vis4-fb', true, pick(OK));
+    gCorrect(7, 'scale');
   }
 }
 
-function checkSec6(){
-  if(_rulerLocked || _rulerMode !== 'measure') return;
-  const inp = document.getElementById('ruler-inp');
-  if(!inp || inp.value.trim() === '') return;
-  _rulerLocked = true;
-  inp.disabled = true;
-  document.getElementById('ruler-btn').disabled = true;
-  const nxtRm=document.getElementById('ruler-next-btn');if(nxtRm)nxtRm.style.display='';
-  const val      = Number(inp.value);
-  const expected = _rulerUnit === 'cm' ? _rulerAns : _rulerAns * 10;
-  if(val === expected){
-    inp.classList.add('ok');
-    setFb('sec6-fb', true, pick(OK));
-    gCorrect(8, 'ruler');
-  } else {
-    inp.classList.add('ko');
-    setFb('sec6-fb', false, pick(KO) + ' (Era: ' + expected + ' ' + _rulerUnit + ')');
-    gWrong();
-  }
+function nextSec4vis(){
+  if(_visAnimId){ cancelAnimationFrame(_visAnimId); _visAnimId = null; }
+  _visAnswered = false;
+  _visUnit = 'cm';
+  ['mm','cm','m','km'].forEach(u =>
+    document.getElementById(`vbadge-${u}`).classList.toggle('on', u === 'cm')
+  );
+  document.getElementById('vis4-fb').textContent = '';
+  document.getElementById('vis4-times').textContent = '';
+
+  _visObjItem = pick(SVG_LONGITUD);
+  const mult = {mm:1, cm:10, m:1000, km:1000000};
+  _visObjMm = ri(_visObjItem.min, _visObjItem.max) * mult[_visObjItem.cat];
+
+  document.getElementById('vis4-obj').innerHTML =
+    _visObjItem.standalone() +
+    `<div class="mes-vis" style="font-size:.95rem;padding:4px 0">
+      ${_visObjItem.art} <strong>${_visObjItem.nom}</strong>
+      <span style="font-size:.8rem;color:var(--m)"> — Tria la millor unitat de mesura</span>
+    </div>`;
+
+  setTimeout(()=>{
+    const canvas = document.getElementById('vis4-cvs');
+    if(!canvas) return;
+    const w = Math.max(200, Math.round(canvas.parentElement.getBoundingClientRect().width - 12));
+    canvas.width  = w;
+    canvas.height = VIS_H;
+    _visDraw(w / VIS_SPAN_MM['cm']);
+  }, 0);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -575,7 +585,7 @@ nextSec2();
 nextSec3();
 nextSec4();
 nextProblemes();
-nextSec6();
+nextSec4vis();
 renderSec7();
 </script>
 </body>
