@@ -84,7 +84,7 @@
 <!-- ── 4: Likes or doesn't like? ── -->
 <div class="card">
   <h2><span class="num">4</span> Likes or doesn't like?</h2>
-  <p class="card-sub">Look at the table and complete the sentences about Josh and Lily.</p>
+  <p class="card-sub">Look at the table and complete the sentences about the two friends.</p>
   <table class="pref-table" id="s4-table"></table>
   <div id="s4-qs" style="margin-top:14px"></div>
   <div class="btn-row" style="margin-top:10px">
@@ -244,16 +244,17 @@ function s3Ans(btn, i, choice) {
 }
 
 /* ══ SECTION 4 ══ */
-let s4Current = [];
+let s4Current = [], s4Pair = [];
 function s4Init() {
+  s4Pair = sh([...CHARS]).slice(0, 2);
   const actKeys = sh([...CHAR_ACTS]).slice(0, 5);
   document.getElementById('s4-table').innerHTML =
-    '<tr><th>Activity</th><th>Josh</th><th>Lily</th></tr>'
+    `<tr><th>Activity</th><th>${s4Pair[0].name}</th><th>${s4Pair[1].name}</th></tr>`
     + actKeys.map(a =>
-        `<tr><td>${a}</td><td>${CHARS[0].acts[a] ? '✓' : '✗'}</td><td>${CHARS[1].acts[a] ? '✓' : '✗'}</td></tr>`
+        `<tr><td>${a}</td><td>${s4Pair[0].acts[a] ? '✓' : '✗'}</td><td>${s4Pair[1].acts[a] ? '✓' : '✗'}</td></tr>`
       ).join('');
   const pool = [];
-  actKeys.forEach(a => CHARS.forEach(ch => pool.push({name:ch.name, act:a, likes:ch.acts[a]})));
+  actKeys.forEach(a => s4Pair.forEach(ch => pool.push({name:ch.name, act:a, likes:ch.acts[a]})));
   s4Current = sh(pool).slice(0, 5);
   document.getElementById('s4-qs').innerHTML = s4Current.map((q, i) => `
     <div class="q-block">

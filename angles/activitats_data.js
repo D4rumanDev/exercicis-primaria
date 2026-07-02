@@ -13,6 +13,16 @@ const ACTIVITIES = [
   {gerund:'watching films',      icon:'🎬', hint:'You sit down and enjoy a movie.'},
   {gerund:'listening to music',  icon:'🎵', hint:'You enjoy songs through headphones or speakers.'},
   {gerund:'cooking',             icon:'🍳', hint:'You prepare and make food in the kitchen.'},
+  {gerund:'playing football',     icon:'⚽', hint:'You kick a ball into the other team\'s net.'},
+  {gerund:'playing basketball',   icon:'🏀', hint:'You throw a ball through a high hoop.'},
+  {gerund:'cycling',              icon:'🚲', hint:'You ride a bicycle for fun or exercise.'},
+  {gerund:'swimming',             icon:'🏊', hint:'You move through water using your arms and legs.'},
+  {gerund:'running',              icon:'🏃', hint:'You move fast on your feet for exercise.'},
+  {gerund:'going to the cinema',  icon:'🎬', hint:'You sit in a dark room and watch a film on a big screen.'},
+  {gerund:'going to the library', icon:'📚', hint:'You visit a place where you can borrow books for free.'},
+  {gerund:'going to the zoo',     icon:'🦁', hint:'You walk around and see animals from all over the world.'},
+  {gerund:'drawing',              icon:'✏️', hint:'You use a pencil or pen to make pictures on paper.'},
+  {gerund:'playing video games',  icon:'🎮', hint:'You control characters on a screen using a controller.'},
 ];
 
 const ANNA = [
@@ -31,19 +41,34 @@ const ANNA = [
 const CHARS = [
   {name:'Josh', acts:{
     'playing tennis':true,'watching films':true,'cooking':true,'using a computer':true,
-    'shopping':false,'dancing':false,'painting pictures':false,
-    'reading comics':false,'listening to music':false,
+    'playing football':true,'playing basketball':true,'running':true,'going to the cinema':true,'playing video games':true,
+    'shopping':false,'dancing':false,'painting pictures':false,'reading comics':false,'listening to music':false,
+    'swimming':false,'cycling':false,'going to the library':false,'going to the zoo':false,'drawing':false,
   }},
   {name:'Lily', acts:{
-    'dancing':true,'painting pictures':true,'reading comics':true,
-    'listening to music':true,'going to museums':true,
-    'playing tennis':false,'shopping':false,'using a computer':false,
-    'watching films':false,'cooking':false,
+    'dancing':true,'painting pictures':true,'reading comics':true,'listening to music':true,
+    'swimming':true,'cycling':true,'going to the cinema':true,'going to the library':true,'going to the zoo':true,'drawing':true,
+    'playing tennis':false,'shopping':false,'using a computer':false,'watching films':false,'cooking':false,
+    'playing football':false,'playing basketball':false,'running':false,'playing video games':false,
+  }},
+  {name:'Sam', acts:{
+    'playing football':true,'playing basketball':true,'swimming':true,'running':true,'going to the cinema':true,
+    'going to the zoo':true,'using a computer':true,'watching films':true,'reading comics':true,'listening to music':true,
+    'playing tennis':false,'cooking':false,'dancing':false,'painting pictures':false,'shopping':false,
+    'cycling':false,'going to the library':false,'drawing':false,'playing video games':false,
+  }},
+  {name:'Emma', acts:{
+    'dancing':true,'cooking':true,'painting pictures':true,'swimming':true,'cycling':true,
+    'going to the cinema':true,'going to the library':true,'going to the zoo':true,'drawing':true,'listening to music':true,
+    'playing tennis':false,'shopping':false,'using a computer':false,'watching films':false,'reading comics':false,
+    'playing football':false,'playing basketball':false,'running':false,'playing video games':false,
   }},
 ];
 
 const CHAR_ACTS = ['playing tennis','watching films','cooking','dancing','painting pictures',
-                   'reading comics','shopping','using a computer','listening to music'];
+                   'reading comics','shopping','using a computer','listening to music',
+                   'playing football','playing basketball','swimming','running','cycling',
+                   'going to the cinema','going to the library','going to the zoo','drawing','playing video games'];
 
 const ERROR_POOL = [
   {wrong:'She <em>collecting</em> stickers.',
