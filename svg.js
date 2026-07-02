@@ -459,6 +459,33 @@ function solidSVG(type, W=200, H=170){
       +line(A,B,stroke,sw)+line(B,C,stroke,sw)+line(A,C,stroke,sw,'4 3')
       +line(A,apex,stroke,sw)+line(B,apex,stroke,sw)+line(C,apex,stroke,sw,'4 3')+'</svg>';
   }
+  if(type==='octahedron'){
+    const ox=W/2, oy=H*.52, s=52;
+    const top=iso(0.5,1.5,0.5,ox,oy,s), bot=iso(0.5,-0.5,0.5,ox,oy,s);
+    const eL=iso(0,0.5,0.5,ox,oy,s), eR=iso(1,0.5,0.5,ox,oy,s);
+    const eB=iso(0.5,0.5,0,ox,oy,s), eF=iso(0.5,0.5,1,ox,oy,s);
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">`
+      +poly([top,eB,eR],fill,stroke,sw)+poly([top,eR,eF],fill,stroke,sw)+poly([top,eF,eL],fill,stroke,sw)
+      +poly([bot,eR,eF],fill,stroke,sw)+poly([bot,eF,eL],fill,stroke,sw)
+      +line(eL,eB,stroke,sw,'4 3')+line(eB,bot,stroke,sw,'4 3')+line(eL,bot,stroke,sw,'4 3')+'</svg>';
+  }
+  if(type==='cone'){
+    const cx=W/2,bcy=Math.round(H*.78),rx=Math.round(W*.32),ry=Math.round(W*.09),ay=Math.round(H*.12);
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">`
+      +`<path d="M${cx-rx},${bcy} L${cx},${ay} L${cx+rx},${bcy}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`
+      +`<ellipse cx="${cx}" cy="${bcy}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`
+      +`<circle cx="${cx}" cy="${ay}" r="3.5" fill="${stroke}"/>`+'</svg>';
+  }
+  if(type==='cylinder'){
+    const cx=W/2,ty=Math.round(H*.18),by=Math.round(H*.8),rx=Math.round(W*.32),ry=Math.round(W*.09);
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">`
+      +`<rect x="${cx-rx}" y="${ty}" width="${rx*2}" height="${by-ty}" fill="${fill}"/>`
+      +`<line x1="${cx-rx}" y1="${ty}" x2="${cx-rx}" y2="${by}" stroke="${stroke}" stroke-width="${sw}"/>`
+      +`<line x1="${cx+rx}" y1="${ty}" x2="${cx+rx}" y2="${by}" stroke="${stroke}" stroke-width="${sw}"/>`
+      +`<ellipse cx="${cx}" cy="${by}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`
+      +`<ellipse cx="${cx}" cy="${ty}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`
+      +'</svg>';
+  }
   return '';
 }
 

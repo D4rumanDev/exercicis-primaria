@@ -493,8 +493,12 @@ const POLIGS = [
   {name:'rombe',       sides:4, verts:4, pts:[[110,20],[190,75],[110,130],[30,75]]},
   {name:'pentàgon',    sides:5, verts:5, pts:[[110,20],[185,75],[158,155],[62,155],[35,75]]},
   {name:'hexàgon',     sides:6, verts:6, pts:[[110,20],[185,60],[185,120],[110,160],[35,120],[35,60]]},
+  {name:'trapezi',     sides:4, verts:4, pts:[[20,140],[200,140],[165,30],[55,30]]},
+  {name:'romboid',     sides:4, verts:4, pts:[[55,140],[195,140],[155,30],[15,30]]},
+  {name:'heptàgon',   sides:7, verts:7, pts:[[110,15],[169,43],[183,107],[141,157],[79,157],[37,107],[51,43]]},
+  {name:'octàgon',    sides:8, verts:8, pts:[[110,20],[160,41],[180,90],[160,140],[110,160],[60,140],[40,90],[60,41]]},
 ];
-const POL_CLR=['#60a5fa','#34d399','#f472b6','#fbbf24','#a78bfa','#f87171'];
+const POL_CLR=['#60a5fa','#34d399','#f472b6','#fbbf24','#a78bfa','#f87171','#2dd4bf','#fb923c','#4ade80','#e879f9'];
 // polygonSVG → svg.js
 const POL_QUESTIONS=['name','sides','verts'];
 let polPrev=-1, polQMode=0;
@@ -540,6 +544,9 @@ const SOLIDS=[
   {name:'Prisma triangular',    faces:5, edges:9,  verts:6,  draw:'triprism'},
   {name:'Piràmide quadrada',    faces:5, edges:8,  verts:5,  draw:'sq_pyramid'},
   {name:'Tetraedre',            faces:4, edges:6,  verts:4,  draw:'tetra'},
+  {name:'Octaedre',             faces:8, edges:12, verts:6,  draw:'octahedron'},
+  {name:'Con',                  faces:2, edges:1,  verts:1,  draw:'cone'},
+  {name:'Cilindre',             faces:3, edges:2,  verts:0,  draw:'cylinder'},
 ];
 // solidSVG → svg.js
 const SOL_PROPS=['faces','edges','verts'];
