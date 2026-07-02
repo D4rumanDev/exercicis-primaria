@@ -73,21 +73,26 @@ const SVG_LONGITUD = [
   { id:'formiga', nom:'formiga', cat:'mm', art:'la', min:1, max:3, icon:'🐜',
     embed:null,
     standalone(col='#78350f'){
-      return `<svg viewBox="0 0 90 44" style="width:180px;height:auto;display:block;margin:auto">
-        <ellipse cx="22" cy="26" rx="8" ry="6" fill="${col}"/>
-        <ellipse cx="33" cy="22" rx="6" ry="5" fill="${col}"/>
-        <ellipse cx="43" cy="21" rx="8" ry="7" fill="${col}"/>
-        <circle cx="51" cy="16" r="5" fill="${col}"/>
-        <line x1="18" y1="24" x2="9" y2="17" stroke="${col}" stroke-width="1.3"/>
-        <line x1="18" y1="27" x2="8" y2="27" stroke="${col}" stroke-width="1.3"/>
-        <line x1="19" y1="30" x2="10" y2="35" stroke="${col}" stroke-width="1.3"/>
-        <line x1="30" y1="22" x2="25" y2="14" stroke="${col}" stroke-width="1.3"/>
-        <line x1="30" y1="26" x2="24" y2="30" stroke="${col}" stroke-width="1.3"/>
-        <line x1="39" y1="23" x2="34" y2="15" stroke="${col}" stroke-width="1.3"/>
-        <line x1="39" y1="27" x2="33" y2="31" stroke="${col}" stroke-width="1.3"/>
-        <line x1="47" y1="24" x2="44" y2="17" stroke="${col}" stroke-width="1.3"/>
-        <ellipse cx="54" cy="13" rx="3.5" ry="2.5" fill="none" stroke="${col}" stroke-width="1.2"/>
-        <ellipse cx="49" cy="11" rx="2.5" ry="3.5" fill="none" stroke="${col}" stroke-width="1.2"/>
+      return `<svg viewBox="0 0 88 42" style="width:180px;height:auto;display:block;margin:0">
+        <ellipse cx="16" cy="27" rx="15" ry="11" fill="${col}"/>
+        <ellipse cx="13" cy="23" rx="7" ry="5" fill="rgba(255,255,255,.14)"/>
+        <circle cx="35" cy="24" r="4" fill="${col}"/>
+        <circle cx="44" cy="22" r="8" fill="${col}"/>
+        <circle cx="54" cy="21" r="4" fill="${col}"/>
+        <circle cx="62" cy="19" r="9" fill="${col}"/>
+        <circle cx="67" cy="14" r="2.5" fill="rgba(255,255,255,.7)"/>
+        <line x1="66" y1="11" x2="79" y2="2" stroke="${col}" stroke-width="1.5"/>
+        <line x1="64" y1="11" x2="85" y2="7" stroke="${col}" stroke-width="1.5"/>
+        <circle cx="79" cy="2" r="2.5" fill="${col}"/>
+        <circle cx="85" cy="7" r="2.5" fill="${col}"/>
+        <line x1="70" y1="22" x2="80" y2="29" stroke="${col}" stroke-width="1.8"/>
+        <line x1="70" y1="17" x2="80" y2="11" stroke="${col}" stroke-width="1.8"/>
+        <line x1="40" y1="27" x2="28" y2="38" stroke="${col}" stroke-width="1.3"/>
+        <line x1="44" y1="29" x2="38" y2="41" stroke="${col}" stroke-width="1.3"/>
+        <line x1="48" y1="27" x2="58" y2="38" stroke="${col}" stroke-width="1.3"/>
+        <line x1="40" y1="17" x2="28" y2="6" stroke="${col}" stroke-width="1.3"/>
+        <line x1="44" y1="15" x2="38" y2="3" stroke="${col}" stroke-width="1.3"/>
+        <line x1="48" y1="17" x2="58" y2="6" stroke="${col}" stroke-width="1.3"/>
       </svg>`;
     }
   },
@@ -95,10 +100,11 @@ const SVG_LONGITUD = [
   { id:'ungla', nom:'ungla del dit', cat:'mm', art:'l\'', min:5, max:10, icon:'💅',
     embed:null,
     standalone(col='#f9a8d4'){
-      return `<svg viewBox="0 0 60 65" style="width:100px;height:auto;display:block;margin:auto">
-        <rect x="8" y="36" width="44" height="22" rx="3" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
-        <path d="M8,36 Q8,10 30,8 Q52,10 52,36 Z" fill="${col}" stroke="#db2777" stroke-width="2"/>
-        <path d="M15,33 Q15,18 30,15 Q45,18 45,33" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.8"/>
+      return `<svg viewBox="0 0 80 38" style="width:160px;height:auto;display:block;margin:0">
+        <rect x="0" y="16" width="80" height="20" rx="8" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
+        <path d="M1,24 Q2,2 40,1 Q78,2 79,24 Z" fill="${col}" stroke="#db2777" stroke-width="2"/>
+        <path d="M10,20 Q12,7 40,5 Q62,6 63,17" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+        <path d="M6,25 Q8,22 40,21 Q72,22 74,25" fill="none" stroke="#db2777" stroke-width=".9" opacity=".45"/>
       </svg>`;
     }
   },
@@ -106,7 +112,7 @@ const SVG_LONGITUD = [
   { id:'moneda_gruix', nom:'moneda (gruix)', cat:'mm', art:'la', min:1, max:3, icon:'🪙',
     embed:null,
     standalone(col='#d4b44a'){
-      return `<svg viewBox="0 0 80 32" style="width:180px;height:auto;display:block;margin:auto">
+      return `<svg viewBox="7 0 66 32" style="width:180px;height:auto;display:block;margin:0">
         <ellipse cx="40" cy="8" rx="32" ry="7.5" fill="${col}" stroke="#8b6914" stroke-width="1.5"/>
         <rect x="8" y="8" width="64" height="16" fill="${col}" stroke="#8b6914" stroke-width="1.5"/>
         <ellipse cx="40" cy="24" rx="32" ry="7.5" fill="${col}" stroke="#8b6914" stroke-width="1.5"/>
@@ -128,11 +134,19 @@ const SVG_LONGITUD = [
   { id:'telefon', nom:'telèfon mòbil', cat:'cm', art:'el', min:14, max:17, icon:'📱',
     embed:null,
     standalone(col='#1f2937'){
-      return `<svg viewBox="0 0 50 100" style="width:80px;height:auto;display:block;margin:auto">
-        <rect x="3" y="3" width="44" height="94" rx="7" fill="${col}" stroke="#374151" stroke-width="1.5"/>
-        <rect x="8" y="10" width="34" height="58" rx="3" fill="#0ea5e9" opacity=".7"/>
-        <rect x="16" y="6" width="18" height="3" rx="1.5" fill="#6b7280"/>
-        <circle cx="25" cy="87" r="5" fill="#374151" stroke="#6b7280" stroke-width="1.2"/>
+      return `<svg viewBox="0 0 100 48" style="width:220px;height:auto;display:block;margin:0">
+        <rect x="1" y="6" width="98" height="36" rx="8" fill="${col}" stroke="#374151" stroke-width="2"/>
+        <rect x="8" y="10" width="62" height="28" rx="4" fill="#0ea5e9" opacity=".8"/>
+        <rect x="9" y="11" width="28" height="7" rx="2" fill="rgba(255,255,255,.18)"/>
+        <circle cx="14" cy="24" r="3.5" fill="#0284c7"/>
+        <circle cx="23" cy="24" r="3.5" fill="#0284c7"/>
+        <circle cx="14" cy="24" r="1.5" fill="#bae6fd" opacity=".5"/>
+        <circle cx="23" cy="24" r="1.5" fill="#bae6fd" opacity=".5"/>
+        <circle cx="40" cy="7" r="2.5" fill="#374151"/>
+        <rect x="80" y="15" width="14" height="18" rx="7" fill="#374151" stroke="#6b7280" stroke-width="1.2"/>
+        <circle cx="87" cy="24" r="4" fill="#4b5563"/>
+        <rect x="90" y="2" width="2" height="3" rx="1" fill="#6b7280"/>
+        <rect x="36" y="41" width="20" height="2.5" rx="1.2" fill="#6b7280"/>
       </svg>`;
     }
   },
@@ -156,15 +170,22 @@ const SVG_LONGITUD = [
   { id:'cotxe', nom:'cotxe', cat:'m', art:'el', min:3, max:5, icon:'🚗',
     embed:null,
     standalone(col='#dc2626'){
-      return `<svg viewBox="4 0 132 62" style="width:220px;height:auto;display:block;margin:auto">
-        <rect x="5" y="30" width="130" height="26" rx="5" fill="${col}" stroke="#991b1b" stroke-width="2"/>
-        <path d="M25,30 Q35,8 55,6 H90 Q110,8 120,30 Z" fill="${col}" stroke="#991b1b" stroke-width="2"/>
-        <rect x="38" y="11" width="28" height="16" rx="2" fill="#bae6fd" opacity=".85"/>
-        <rect x="73" y="11" width="27" height="16" rx="2" fill="#bae6fd" opacity=".85"/>
-        <circle cx="32" cy="56" r="9" fill="#1f2937" stroke="#374151" stroke-width="1.5"/>
-        <circle cx="32" cy="56" r="4.5" fill="#6b7280"/>
-        <circle cx="108" cy="56" r="9" fill="#1f2937" stroke="#374151" stroke-width="1.5"/>
-        <circle cx="108" cy="56" r="4.5" fill="#6b7280"/>
+      return `<svg viewBox="4 0 132 62" style="width:220px;height:auto;display:block;margin:0">
+        <rect x="5" y="32" width="130" height="24" rx="6" fill="${col}" stroke="#991b1b" stroke-width="2"/>
+        <path d="M20,32 Q30,7 52,6 H92 Q112,7 120,32 Z" fill="${col}" stroke="#991b1b" stroke-width="2"/>
+        <path d="M35,29 L52,8 H65 V29 Z" fill="#bae6fd" opacity=".88"/>
+        <path d="M75,29 V8 H88 L105,29 Z" fill="#bae6fd" opacity=".88"/>
+        <rect x="65" y="8" width="10" height="21" fill="${col}"/>
+        <line x1="70" y1="29" x2="70" y2="54" stroke="#7f1d1d" stroke-width="1.5" opacity=".45"/>
+        <rect x="7" y="37" width="13" height="9" rx="3" fill="#fef9c3" stroke="#d97706" stroke-width="1"/>
+        <line x1="8" y1="41" x2="19" y2="41" stroke="#d97706" stroke-width=".8" opacity=".6"/>
+        <rect x="115" y="37" width="13" height="9" rx="3" fill="#fecaca" stroke="#dc2626" stroke-width="1"/>
+        <circle cx="32" cy="55" r="9" fill="#1f2937" stroke="#374151" stroke-width="1.5"/>
+        <circle cx="32" cy="55" r="4.5" fill="#6b7280"/>
+        <circle cx="32" cy="55" r="1.8" fill="#9ca3af"/>
+        <circle cx="108" cy="55" r="9" fill="#1f2937" stroke="#374151" stroke-width="1.5"/>
+        <circle cx="108" cy="55" r="4.5" fill="#6b7280"/>
+        <circle cx="108" cy="55" r="1.8" fill="#9ca3af"/>
       </svg>`;
     }
   },
@@ -172,12 +193,17 @@ const SVG_LONGITUD = [
   { id:'taula', nom:'taula', cat:'m', art:'la', min:1, max:2, icon:'🪑',
     embed:null,
     standalone(col='#92400e'){
-      return `<svg viewBox="4 0 112 80" style="width:180px;height:auto;display:block;margin:auto">
-        <rect x="5" y="20" width="110" height="12" rx="3" fill="${col}" stroke="#78350f" stroke-width="2"/>
-        <rect x="12" y="32" width="8" height="40" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
-        <rect x="100" y="32" width="8" height="40" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
-        <rect x="24" y="32" width="8" height="34" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
-        <rect x="88" y="32" width="8" height="34" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
+      return `<svg viewBox="4 0 112 80" style="width:180px;height:auto;display:block;margin:0">
+        <rect x="5" y="14" width="110" height="16" rx="3" fill="#fde68a" stroke="#78350f" stroke-width="2"/>
+        <line x1="30" y1="15" x2="30" y2="29" stroke="#92400e" stroke-width=".9" opacity=".28"/>
+        <line x1="60" y1="15" x2="60" y2="29" stroke="#92400e" stroke-width=".9" opacity=".28"/>
+        <line x1="90" y1="15" x2="90" y2="29" stroke="#92400e" stroke-width=".9" opacity=".28"/>
+        <rect x="5" y="28" width="110" height="4" rx="1" fill="#78350f" opacity=".2"/>
+        <rect x="12" y="32" width="9" height="42" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
+        <rect x="99" y="32" width="9" height="42" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
+        <rect x="26" y="32" width="9" height="36" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
+        <rect x="86" y="32" width="9" height="36" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
+        <rect x="21" y="50" width="78" height="5" rx="2" fill="${col}" stroke="#78350f" stroke-width="1" opacity=".65"/>
       </svg>`;
     }
   },
