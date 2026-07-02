@@ -268,7 +268,7 @@ GAM_ACHS=[
   {id:'ok200',s:'🥈',n:'200 Encerts',d:'200 respostes correctes'},
 ];
 function gResetExtra(){
-  [KEY_VIS,KEY_TAB,KEY_EX,KEY_REST,KEY_R2,KEY_PROB].forEach(k=>localStorage.removeItem(k));
+  [KEY_VIS,KEY_TAB,KEY_EX,KEY_REST,KEY_R2].forEach(k=>localStorage.removeItem(k));
   location.reload();
 }
 function gStatsExtra(){
@@ -718,14 +718,11 @@ document.getElementById('r2-q2').addEventListener('keydown',e=>{
 });
 
 // ── Sec 6: Problemes ─────────────────────────────────────────────────────────
-const KEY_PROB='ex_div5_v1';
-function loadProb(){try{return Object.assign({c:0,e:0},JSON.parse(localStorage.getItem(KEY_PROB)||'{}'));}catch{return{c:0,e:0};}}
-function saveProb(s){localStorage.setItem(KEY_PROB,JSON.stringify(s));}
 const PROB_POOL=getProbs('divisio');
 function nextProblemes(){
   renderProbs(PROB_POOL,'prob-list',3,null,
-    (qi,fb)=>{fb.className='fb ok';fb.textContent='✓ Molt bé!';const s=loadProb();s.c++;saveProb(s);gCorrect(4,tryA=>tryA('div-prob',s.c>=5));},
-    (qi,fb)=>{fb.className='fb ko';fb.textContent='✗ La resposta correcta era '+PROB_POOL[qi].ans;const s=loadProb();s.e++;saveProb(s);gWrong();}
+    (qi,fb)=>{fb.className='fb ok';fb.textContent='✓ Molt bé!';const e=eLoad();e.prob_c=(e.prob_c||0)+1;eSave(e);gCorrect(4,tryA=>tryA('div-prob',e.prob_c>=5));},
+    (qi,fb)=>{fb.className='fb ko';fb.textContent='✗ La resposta correcta era '+PROB_POOL[qi].ans;const e=eLoad();e.prob_e=(e.prob_e||0)+1;eSave(e);gWrong();}
   );
 }
 

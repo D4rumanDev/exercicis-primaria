@@ -162,11 +162,8 @@
 <script src="../shared.js"></script>
 <script>
 const EXER_KEY='mesures_cap_v1';
-let S=JSON.parse(localStorage.getItem(EXER_KEY)||'{"ok":0,"ko":0,"pts":0}');
-const sv=()=>localStorage.setItem(EXER_KEY,JSON.stringify(S));
-const addOk=(p=1)=>{S.ok++;S.pts+=p;sv();gCorrect(p)};
-const addKo=()=>{S.ko++;sv();gWrong()};
-function gResetExtra(){S={ok:0,ko:0,pts:0};sv();}
+const addOk=(p=1)=>gCorrect(p);
+const addKo=()=>gWrong();
 gRender();
 function fmtN(n){
   // number → catalan string (comma decimal, dot thousands)

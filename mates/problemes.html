@@ -24,7 +24,7 @@
   <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
   <div id="prob1-list"></div>
   <div class="btn-row mt4">
-    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob1-list', POOL1, 3)">Nous problemes →</button>
+    <button class="btn btn-outline btn-sm" onclick="showProbs('prob1-list', POOL1, 3)">Nous problemes →</button>
   </div>
 </div>
 
@@ -34,7 +34,7 @@
   <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
   <div id="prob2-list"></div>
   <div class="btn-row mt4">
-    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob2-list', POOL2, 3)">Nous problemes →</button>
+    <button class="btn btn-outline btn-sm" onclick="showProbs('prob2-list', POOL2, 3)">Nous problemes →</button>
   </div>
 </div>
 
@@ -44,7 +44,7 @@
   <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
   <div id="prob3-list"></div>
   <div class="btn-row mt4">
-    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob3-list', POOL3, 3)">Nous problemes →</button>
+    <button class="btn btn-outline btn-sm" onclick="showProbs('prob3-list', POOL3, 3)">Nous problemes →</button>
   </div>
 </div>
 
@@ -54,7 +54,7 @@
   <div class="card-sub">Llegeix cada problema i tria la resposta correcta.</div>
   <div id="prob4-list"></div>
   <div class="btn-row mt4">
-    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob4-list', POOL4, 3)">Nous problemes →</button>
+    <button class="btn btn-outline btn-sm" onclick="showProbs('prob4-list', POOL4, 3)">Nous problemes →</button>
   </div>
 </div>
 
@@ -64,7 +64,7 @@
   <div class="card-sub">Aquests problemes necessiten dues operacions. Pensa bé!</div>
   <div id="prob5-list"></div>
   <div class="btn-row mt4">
-    <button class="btn btn-outline btn-sm" onclick="renderProbs('prob5-list', POOL5, 2)">Nous problemes →</button>
+    <button class="btn btn-outline btn-sm" onclick="showProbs('prob5-list', POOL5, 2)">Nous problemes →</button>
   </div>
 </div>
 
@@ -103,7 +103,7 @@ const POOL4=getProbs('mesures_diners');
 const POOL5=getProbs('dos_passos');
 
 // ════ RENDERITZAR PROBLEMES ════
-function renderProbs(listId, pool, n){
+function showProbs(listId, pool, n){
   const sel = sh([...pool]).slice(0, n);
   const list = document.getElementById(listId); list.innerHTML = '';
   sel.forEach((p, i) => {
@@ -135,11 +135,11 @@ function renderProbs(listId, pool, n){
 
 // ── INIT ──
 gRender();
-renderProbs('prob1-list', POOL1, 3);
-renderProbs('prob2-list', POOL2, 3);
-renderProbs('prob3-list', POOL3, 3);
-renderProbs('prob4-list', POOL4, 3);
-renderProbs('prob5-list', POOL5, 2);
+showProbs('prob1-list', POOL1, 3);
+showProbs('prob2-list', POOL2, 3);
+showProbs('prob3-list', POOL3, 3);
+showProbs('prob4-list', POOL4, 3);
+showProbs('prob5-list', POOL5, 2);
 </script>
 </body>
 </html>
