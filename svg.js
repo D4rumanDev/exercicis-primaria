@@ -73,26 +73,26 @@ const SVG_LONGITUD = [
   { id:'formiga', nom:'formiga', cat:'mm', art:'la', min:1, max:3, icon:'🐜',
     embed:null,
     standalone(col='#78350f'){
-      return `<svg viewBox="0 0 88 42" style="width:180px;height:auto;display:block;margin:0">
-        <ellipse cx="16" cy="27" rx="15" ry="11" fill="${col}"/>
-        <ellipse cx="13" cy="23" rx="7" ry="5" fill="rgba(255,255,255,.14)"/>
-        <circle cx="35" cy="24" r="4" fill="${col}"/>
-        <circle cx="44" cy="22" r="8" fill="${col}"/>
-        <circle cx="54" cy="21" r="4" fill="${col}"/>
-        <circle cx="62" cy="19" r="9" fill="${col}"/>
-        <circle cx="67" cy="14" r="2.5" fill="rgba(255,255,255,.7)"/>
-        <line x1="66" y1="11" x2="79" y2="2" stroke="${col}" stroke-width="1.5"/>
-        <line x1="64" y1="11" x2="85" y2="7" stroke="${col}" stroke-width="1.5"/>
-        <circle cx="79" cy="2" r="2.5" fill="${col}"/>
-        <circle cx="85" cy="7" r="2.5" fill="${col}"/>
-        <line x1="70" y1="22" x2="80" y2="29" stroke="${col}" stroke-width="1.8"/>
-        <line x1="70" y1="17" x2="80" y2="11" stroke="${col}" stroke-width="1.8"/>
-        <line x1="40" y1="27" x2="28" y2="38" stroke="${col}" stroke-width="1.3"/>
-        <line x1="44" y1="29" x2="38" y2="41" stroke="${col}" stroke-width="1.3"/>
-        <line x1="48" y1="27" x2="58" y2="38" stroke="${col}" stroke-width="1.3"/>
-        <line x1="40" y1="17" x2="28" y2="6" stroke="${col}" stroke-width="1.3"/>
-        <line x1="44" y1="15" x2="38" y2="3" stroke="${col}" stroke-width="1.3"/>
-        <line x1="48" y1="17" x2="58" y2="6" stroke="${col}" stroke-width="1.3"/>
+      return `<svg viewBox="0 0 88 44" style="width:180px;height:auto;display:block;margin:0">
+        <ellipse cx="17" cy="28" rx="17" ry="12" fill="${col}"/>
+        <ellipse cx="12" cy="23" rx="7" ry="4.5" fill="rgba(255,255,255,.16)"/>
+        <ellipse cx="36" cy="25" rx="4.5" ry="4" fill="${col}"/>
+        <ellipse cx="46" cy="23" rx="10" ry="9" fill="${col}"/>
+        <ellipse cx="57" cy="21" rx="4" ry="3.5" fill="${col}"/>
+        <ellipse cx="65" cy="19" rx="10" ry="10" fill="${col}"/>
+        <ellipse cx="60" cy="14" rx="3.5" ry="2.5" fill="rgba(255,255,255,.65)"/>
+        <path d="M68,10 Q76,3 85,1" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round"/>
+        <path d="M66,10 Q74,8 87,10" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="85" cy="1" r="2.5" fill="${col}"/>
+        <circle cx="87" cy="10" r="2.5" fill="${col}"/>
+        <path d="M74,21 L83,17" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M74,21 L83,25" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
+        <polyline points="41,23 30,15 22,9" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="45,21 40,11 38,4" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="50,22 57,14 62,8" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="41,30 30,38 22,43" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="45,31 40,40 38,43" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="50,31 57,38 62,43" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>`;
     }
   },
@@ -101,8 +101,8 @@ const SVG_LONGITUD = [
     embed:null,
     standalone(col='#f9a8d4'){
       return `<svg viewBox="0 0 80 38" style="width:160px;height:auto;display:block;margin:0">
-        <rect x="0" y="16" width="80" height="20" rx="8" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
-        <path d="M1,24 Q2,2 40,1 Q78,2 79,24 Z" fill="${col}" stroke="#db2777" stroke-width="2"/>
+        <rect x="0" y="16" width="80" height="20" rx="5" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
+        <path d="M0,26 Q1,2 40,1 Q79,2 80,26 Z" fill="${col}" stroke="#db2777" stroke-width="2"/>
         <path d="M10,20 Q12,7 40,5 Q62,6 63,17" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
         <path d="M6,25 Q8,22 40,21 Q72,22 74,25" fill="none" stroke="#db2777" stroke-width=".9" opacity=".45"/>
       </svg>`;
@@ -112,7 +112,7 @@ const SVG_LONGITUD = [
   { id:'moneda_gruix', nom:'moneda (gruix)', cat:'mm', art:'la', min:1, max:3, icon:'🪙',
     embed:null,
     standalone(col='#d4b44a'){
-      return `<svg viewBox="7 0 66 32" style="width:180px;height:auto;display:block;margin:0">
+      return `<svg viewBox="8 0 64 32" style="width:180px;height:auto;display:block;margin:0">
         <ellipse cx="40" cy="8" rx="32" ry="7.5" fill="${col}" stroke="#8b6914" stroke-width="1.5"/>
         <rect x="8" y="8" width="64" height="16" fill="${col}" stroke="#8b6914" stroke-width="1.5"/>
         <ellipse cx="40" cy="24" rx="32" ry="7.5" fill="${col}" stroke="#8b6914" stroke-width="1.5"/>
@@ -135,7 +135,7 @@ const SVG_LONGITUD = [
     embed:null,
     standalone(col='#1f2937'){
       return `<svg viewBox="0 0 100 48" style="width:220px;height:auto;display:block;margin:0">
-        <rect x="1" y="6" width="98" height="36" rx="8" fill="${col}" stroke="#374151" stroke-width="2"/>
+        <rect x="0" y="6" width="100" height="36" rx="4" fill="${col}" stroke="#374151" stroke-width="2"/>
         <rect x="8" y="10" width="62" height="28" rx="4" fill="#0ea5e9" opacity=".8"/>
         <rect x="9" y="11" width="28" height="7" rx="2" fill="rgba(255,255,255,.18)"/>
         <circle cx="14" cy="24" r="3.5" fill="#0284c7"/>
