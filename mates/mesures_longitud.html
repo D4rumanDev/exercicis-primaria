@@ -18,7 +18,7 @@
 
 /* ── Regle SVG ── */
 .ruler-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.ruler-wrap{background:var(--bg);border-radius:var(--r);padding:10px 6px 6px;margin-bottom:8px;overflow:hidden}
+.ruler-wrap{background:var(--bg);border-radius:var(--r);padding:10px 6px 6px;margin-bottom:8px;overflow-x:hidden}
 .unit-badge{font-size:.8rem;font-weight:700;color:var(--m);padding:4px 13px;border:1.5px solid var(--b);border-radius:100px;background:var(--bg);cursor:pointer;font-family:inherit;transition:all .15s}
 .unit-badge:hover{border-color:var(--a);color:var(--a)}
 .unit-badge.on{background:var(--a);color:#fff;border-color:var(--a)}
@@ -53,21 +53,9 @@
 
 <div id="gam-bar"></div>
 
-<!-- ═══════════ SECCIÓ 1: QUINA UNITAT? ═══════════ -->
+<!-- ═══════════ SECCIÓ 1: CONVERTEIX ═══════════ -->
 <div class="card">
-  <h2><span class="num">1</span> Quina unitat?</h2>
-  <div class="card-sub">Tria la unitat de mesura adequada per a cada objecte o distància.</div>
-  <div id="sec1-vis"></div>
-  <div id="sec1-opts" class="opts-row"></div>
-  <div id="sec1-fb" class="fb mt3" style="text-align:center"></div>
-  <div class="btn-row mt4">
-    <button class="btn btn-outline btn-sm" onclick="nextSec1()">Següent →</button>
-  </div>
-</div>
-
-<!-- ═══════════ SECCIÓ 2: CONVERTEIX ═══════════ -->
-<div class="card">
-  <h2><span class="num">2</span> Converteix</h2>
+  <h2><span class="num">1</span> Converteix</h2>
   <div class="info-box" style="font-size:.82rem">
     <strong>Taula de conversió:</strong><br>
     1 cm = <strong>10</strong> mm &nbsp;·&nbsp; 1 m = <strong>100</strong> cm &nbsp;·&nbsp; 1 km = <strong>1000</strong> m<br>
@@ -83,9 +71,9 @@
   </div>
 </div>
 
-<!-- ═══════════ SECCIÓ 3: QUIN ÉS MÉS GRAN? ═══════════ -->
+<!-- ═══════════ SECCIÓ 2: QUIN ÉS MÉS GRAN? ═══════════ -->
 <div class="card">
-  <h2><span class="num">3</span> Quin és més gran?</h2>
+  <h2><span class="num">2</span> Quin és més gran?</h2>
   <div class="card-sub">Compara les dues mesures i tria la més gran.</div>
   <div id="sec3-vis"></div>
   <div id="sec3-opts" class="opts-row"></div>
@@ -95,9 +83,9 @@
   </div>
 </div>
 
-<!-- ═══════════ SECCIÓ 4: SUMA I RESTA ═══════════ -->
+<!-- ═══════════ SECCIÓ 3: SUMA I RESTA ═══════════ -->
 <div class="card">
-  <h2><span class="num">4</span> Suma i resta</h2>
+  <h2><span class="num">3</span> Suma i resta</h2>
   <div class="card-sub">Calcula el resultat. Prem Comprova quan tinguis la resposta.</div>
   <div id="sec4-vis"></div>
   <div id="sec4-inp"></div>
@@ -108,9 +96,9 @@
   </div>
 </div>
 
-<!-- ═══════════ SECCIÓ 5: MESURA AMB EL REGLE ═══════════ -->
+<!-- ═══════════ SECCIÓ 4: MESURA AMB EL REGLE ═══════════ -->
 <div class="card">
-  <h2><span class="num">5</span> Mesura amb el regle</h2>
+  <h2><span class="num">4</span> Mesura amb el regle</h2>
   <div class="card-sub">Llegeix el regle i escriu la mesura de l'objecte. Canvia l'escala per practicar en mm.</div>
   <div class="ruler-ctrl">
     <span style="font-size:.78rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Escala:</span>
@@ -129,9 +117,9 @@
   </div>
 </div>
 
-<!-- ═══════════ SECCIÓ 6: TAULA DE CONVERSIÓ ═══════════ -->
+<!-- ═══════════ SECCIÓ 5: TAULA DE CONVERSIÓ ═══════════ -->
 <div class="card">
-  <h2><span class="num">6</span> Taula de conversió</h2>
+  <h2><span class="num">5</span> Taula de conversió</h2>
   <div class="card-sub">Omple les caselles buides amb el valor correcte. Prem Comprova tot per validar.</div>
   <div id="sec7-content"></div>
   <div id="sec7-fb" class="fb mt3" style="text-align:center"></div>
@@ -141,9 +129,9 @@
   </div>
 </div>
 
-<!-- ═══════════ SECCIÓ 7: PROBLEMES ═══════════ -->
+<!-- ═══════════ SECCIÓ 6: PROBLEMES ═══════════ -->
 <div class="card">
-  <h2><span class="num">7</span> Problemes</h2>
+  <h2><span class="num">6</span> Problemes</h2>
   <div id="prob-list"></div>
   <div class="btn-row mt4">
     <button class="btn btn-outline btn-sm" onclick="nextProblemes()">Nous problemes →</button>
@@ -165,7 +153,6 @@ GAM_ACHS = [
   {id:'s3',        s:'🔥', n:'Ratxa x3',          d:'3 encerts seguits'},
   {id:'s5',        s:'⚡', n:'Ratxa x5',          d:'5 encerts seguits'},
   {id:'s10',       s:'💥', n:'Ratxa x10',         d:'10 encerts seguits'},
-  {id:'mesurador', s:'📏', n:'Mesurador Nat',      d:'5 unitats identificades'},
   {id:'conversor', s:'🔄', n:'Conversor Expert',   d:'5 conversions correctes'},
   {id:'topograf',  s:'📐', n:'Topògraf',           d:'5 objectes mesurats al regle'},
   {id:'ok50',      s:'🥉', n:'50 Encerts',         d:'50 respostes correctes'},
@@ -174,7 +161,6 @@ GAM_ACHS = [
 
 function gExtraAchs(g,tryA){
   const e=eLoad();
-  tryA('mesurador',(e.unit||0)>=5);
   tryA('conversor',(e.conv||0)>=5);
   tryA('topograf',(e.ruler||0)>=5);
 }
@@ -193,22 +179,7 @@ function _checkNumInp(inpId,ans,fbId,btnId,nextBtnId,xp,type,suffix=''){
 }
 
 // ════════════════════════════════════════════════════════════
-// SECCIÓ 1 — QUINA UNITAT?
-// ════════════════════════════════════════════════════════════
-function nextSec1(){
-  const item=pick(SVG_LONGITUD);
-  document.getElementById('sec1-vis').innerHTML=
-    item.standalone()
-    +`<div class="mes-vis" style="font-size:1rem;padding:8px 0">${item.art} <strong>${item.nom}</strong></div>`;
-  document.getElementById('sec1-fb').textContent='';
-  renderOpts('sec1-opts', sh(['mm','cm','m','km']), item.cat,
-    ()=>{ setFb('sec1-fb',true,pick(OK));  gCorrect(5,'unit'); },
-    ()=>{ setFb('sec1-fb',false,pick(KO)); gWrong(); }
-  );
-}
-
-// ════════════════════════════════════════════════════════════
-// SECCIÓ 2 — CONVERTEIX
+// SECCIÓ 1 — CONVERTEIX
 // ════════════════════════════════════════════════════════════
 function genConv(){
   const type=ri(0,5);
@@ -600,7 +571,6 @@ function checkSec7(){
 
 // ── INIT ──
 gRender();
-nextSec1();
 nextSec2();
 nextSec3();
 nextSec4();

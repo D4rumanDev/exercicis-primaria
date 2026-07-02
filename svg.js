@@ -121,8 +121,8 @@ const SVG_LONGITUD = [
   { id:'goma',        nom:"goma d'esborrar",  cat:'cm', art:'la', min:4,  max:7,  icon:'🧹', ..._mkSVGObj(_gomaShapes,       '0 0 100 36', 220) },
   { id:'llapis',      nom:'llapis',           cat:'cm', art:'el', min:10, max:17, icon:'✏️', ..._mkSVGObj(_llapisShapes,     '0 0 100 36', 260) },
   { id:'boligraf',    nom:'bolígraf',         cat:'cm', art:'el', min:12, max:16, icon:'🖊️', ..._mkSVGObj(_boligrafShapes,   '0 0 100 36', 260) },
-  { id:'targeta',     nom:'targeta de crèdit',cat:'cm', art:'la', min:8,  max:9,  icon:'💳', ..._mkSVGObj(_tarjetaShapes,    '0 0 100 63', 200) },
-  { id:'moneda_diam', nom:'moneda (diàmetre)',cat:'cm', art:'la', min:2,  max:3,  icon:'🪙', ..._mkSVGObj(_monedaDiamShapes, '0 0 40 40',  100) },
+  { id:'targeta',     nom:'targeta de crèdit',cat:'cm', art:'la', min:8,  max:9,  icon:'💳', ..._mkSVGObj(_tarjetaShapes,    '0 0 100 63', 200), embed:null },
+  { id:'moneda_diam', nom:'moneda (diàmetre)',cat:'cm', art:'la', min:2,  max:3,  icon:'🪙', ..._mkSVGObj(_monedaDiamShapes, '0 0 40 40',  100), embed:null },
 
   // ── cm sense embed (massa ample o alt per al regle) ─────────
   { id:'telefon', nom:'telèfon mòbil', cat:'cm', art:'el', min:14, max:17, icon:'📱',
