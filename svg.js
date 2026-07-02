@@ -141,11 +141,14 @@ const SVG_LONGITUD = [
   { id:'porta', nom:'porta', cat:'m', art:'la', min:2, max:3, icon:'🚪',
     embed:null,
     standalone(col='#92400e'){
-      return `<svg viewBox="0 0 60 100" style="width:90px;height:auto;display:block;margin:auto">
-        <rect x="4" y="5" width="52" height="90" rx="3" fill="#fde68a" stroke="${col}" stroke-width="3"/>
-        <rect x="4" y="5" width="52" height="8" rx="2" fill="${col}" opacity=".4"/>
-        <circle cx="44" cy="54" r="3.5" fill="${col}"/>
-        <line x1="10" y1="50" x2="10" y2="78" stroke="${col}" stroke-width="1.5" stroke-dasharray="3,3" opacity=".5"/>
+      return `<svg viewBox="0 0 100 44" style="width:220px;height:auto;display:block;margin:0">
+        <rect x="1" y="4" width="98" height="36" rx="3" fill="#fde68a" stroke="${col}" stroke-width="2"/>
+        <rect x="1" y="4" width="98" height="7" rx="2" fill="${col}" opacity=".35"/>
+        <rect x="1" y="33" width="98" height="7" rx="2" fill="${col}" opacity=".35"/>
+        <rect x="1" y="4" width="6" height="36" rx="1" fill="${col}" opacity=".25"/>
+        <rect x="16" y="9" width="30" height="26" rx="2" fill="none" stroke="${col}" stroke-width="1.2" opacity=".5"/>
+        <rect x="54" y="9" width="30" height="26" rx="2" fill="none" stroke="${col}" stroke-width="1.2" opacity=".5"/>
+        <circle cx="90" cy="22" r="3" fill="${col}"/>
       </svg>`;
     }
   },
@@ -153,7 +156,7 @@ const SVG_LONGITUD = [
   { id:'cotxe', nom:'cotxe', cat:'m', art:'el', min:3, max:5, icon:'🚗',
     embed:null,
     standalone(col='#dc2626'){
-      return `<svg viewBox="0 0 140 62" style="width:220px;height:auto;display:block;margin:auto">
+      return `<svg viewBox="4 0 132 62" style="width:220px;height:auto;display:block;margin:auto">
         <rect x="5" y="30" width="130" height="26" rx="5" fill="${col}" stroke="#991b1b" stroke-width="2"/>
         <path d="M25,30 Q35,8 55,6 H90 Q110,8 120,30 Z" fill="${col}" stroke="#991b1b" stroke-width="2"/>
         <rect x="38" y="11" width="28" height="16" rx="2" fill="#bae6fd" opacity=".85"/>
@@ -169,7 +172,7 @@ const SVG_LONGITUD = [
   { id:'taula', nom:'taula', cat:'m', art:'la', min:1, max:2, icon:'🪑',
     embed:null,
     standalone(col='#92400e'){
-      return `<svg viewBox="0 0 120 80" style="width:180px;height:auto;display:block;margin:auto">
+      return `<svg viewBox="4 0 112 80" style="width:180px;height:auto;display:block;margin:auto">
         <rect x="5" y="20" width="110" height="12" rx="3" fill="${col}" stroke="#78350f" stroke-width="2"/>
         <rect x="12" y="32" width="8" height="40" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>
         <rect x="100" y="32" width="8" height="40" rx="3" fill="${col}" stroke="#78350f" stroke-width="1.5"/>

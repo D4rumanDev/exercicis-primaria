@@ -39,6 +39,14 @@
 .var-from{font-weight:700;font-size:.92rem;min-width:84px;color:var(--t)}
 .var-eq{color:var(--m);font-weight:700;font-size:.95rem}
 .var-unit{font-size:.88rem;color:var(--m);font-weight:700}
+
+/* ── Canvas quadrat (secció 4) ── */
+.zv-scene{overflow:hidden;position:relative;width:100%;aspect-ratio:3/1;background:var(--bg);border:2px solid var(--b);border-radius:8px 8px 0 0}
+#s4v-obj{position:absolute;top:50%;transform:translateY(-50%);line-height:0;pointer-events:none}
+#s4v-ruler{display:block;border:2px solid var(--b);border-top:none;border-radius:0 0 8px 8px}
+.zv-marker{position:absolute;top:0;bottom:0;width:2px;pointer-events:none;z-index:3;display:none}
+.zv-mstart{background:repeating-linear-gradient(to bottom,#22c55e 0,#22c55e 6px,transparent 6px,transparent 10px)}
+.zv-mend{background:repeating-linear-gradient(to bottom,#ef4444 0,#ef4444 6px,transparent 6px,transparent 10px)}
 </style>
 </head>
 <body>
@@ -96,24 +104,33 @@
   </div>
 </div>
 
-<!-- ═══════════ SECCIÓ 4: ESCALA I UNITATS ═══════════ -->
+<!-- ═══════════ SECCIÓ 4: QUINA MESURA TÉ? ═══════════ -->
 <div class="card">
-  <h2><span class="num">4</span> Escala i unitats</h2>
-  <div class="card-sub">Canvia el regle i observa quantes vegades cal repetir-lo per mesurar l'objecte. Tria la unitat més adequada per guanyar punts.</div>
-  <div id="vis4-obj" style="text-align:center;margin-bottom:8px"></div>
-  <div class="ruler-ctrl">
-    <span style="font-size:.78rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Regle:</span>
-    <button class="unit-badge" id="vbadge-mm" onclick="setVisUnit('mm')">mm</button>
-    <button class="unit-badge on" id="vbadge-cm" onclick="setVisUnit('cm')">cm</button>
-    <button class="unit-badge" id="vbadge-m"  onclick="setVisUnit('m')">m</button>
-    <button class="unit-badge" id="vbadge-km" onclick="setVisUnit('km')">km</button>
+  <h2><span class="num">4</span> Quina mesura té?</h2>
+  <div id="s4v-sub" class="card-sub"></div>
+  <div id="s4v-name" style="text-align:center;font-size:1.05rem;font-weight:800;color:var(--a);margin:6px 0 10px"></div>
+  <!-- Canvas quadrat: conté l'objecte i els marcadors d'inici/final -->
+  <div class="zv-scene" id="s4v-scene">
+    <div id="s4v-obj"></div>
+    <div class="zv-marker zv-mstart" id="s4v-mstart"></div>
+    <div class="zv-marker zv-mend"   id="s4v-mend"></div>
   </div>
-  <div class="ruler-wrap" style="padding:8px 6px 6px">
-    <canvas id="vis4-cvs" style="width:100%;display:block"></canvas>
+  <!-- Regle fora del canvas, alineat amb l'objecte -->
+  <canvas id="s4v-ruler"></canvas>
+  <div class="ruler-ctrl" style="margin-top:8px;gap:6px">
+    <span style="font-size:.78rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Zoom:</span>
+    <button class="unit-badge" onclick="s4vZoomStep(-1)">−</button>
+    <span id="z4-label" style="font-size:.9rem;font-weight:800;min-width:2.4ch;text-align:center;color:var(--a)">cm</span>
+    <button class="unit-badge" onclick="s4vZoomStep(+1)">+</button>
   </div>
-  <div id="vis4-times" style="text-align:center;font-size:1rem;font-weight:700;padding:6px 0;min-height:1.5em"></div>
-  <div id="vis4-fb" class="fb mt2" style="text-align:center"></div>
+  <div class="inp-row mt3">
+    <input class="geo-inp" id="s4v-inp" type="number" min="0" inputmode="numeric"
+           placeholder="?" onkeydown="if(event.key==='Enter')s4vCheck()">
+    <span class="inp-unit" id="s4v-unit"></span>
+  </div>
+  <div id="s4v-fb" class="fb mt2" style="text-align:center"></div>
   <div class="btn-row mt3">
+    <button class="btn btn-dark btn-sm" onclick="s4vCheck()">Comprova</button>
     <button class="btn btn-outline btn-sm" onclick="nextSec4vis()">Nou objecte →</button>
   </div>
 </div>
@@ -285,191 +302,141 @@ const PROB_POOL=getProbs('longitud');
 function nextProblemes(){renderProbs(PROB_POOL,'prob-list',3,5);}
 
 // ════════════════════════════════════════════════════════════
-// SECCIÓ 4 — ESCALA I UNITATS (Canvas)
+// SECCIÓ 4 — QUINA MESURA TÉ? (Canvas quadrat + regle extern)
 // ════════════════════════════════════════════════════════════
-// Span en mm que representa "una longitud del regle" per a cada unitat.
-// Defineix el zoom: mm mostra 100mm, km mostra 50km.
-const VIS_SPAN_MM = {mm:100, cm:250, m:5000, km:50000000};
-const VIS_H       = 112;  // alçada del canvas en px CSS
-const VIS_OBJ_Y   = 8;
-const VIS_OBJ_H   = 48;
-const VIS_RUL_Y   = VIS_OBJ_Y + VIS_OBJ_H + 16; // espai per als labels
-const VIS_RUL_H   = 28;
-const VIS_COLS    = ['#1d4ed8','#16a34a','#dc2626','#7c3aed','#ea580c'];
+const ITEMS_LON = SVG_LONGITUD.filter(o => o.cat !== 'km');
+const S4V_COL   = { clip:'#6b7280', goma:'#ec4899', llapis:'#3b82f6',
+                    boligraf:'#7c3aed', targeta:'#7c3aed', moneda_diam:'#d4b44a' };
+const S4V_LP    = 20;   // marge lateral px — per a l'etiqueta "0" del regle
+const S4V_UNITS = ['m','cm','mm'];  // coarse → fine
 
-let _visUnit     = 'cm';
-let _visObjMm    = 0;
-let _visObjItem  = null;
-let _visAnimId   = null;
-let _visAnswered = false;
+let s4v_item, s4v_mm=0, s4v_ans=0, s4v_unit='cm', s4v_zoom='cm', s4v_ok=false;
 
-function _visCol(item){
-  return VIS_COLS[SVG_LONGITUD.indexOf(item) % VIS_COLS.length];
+function s4vRender(){
+  const scene = document.getElementById('s4v-scene');
+  if(!scene || !s4v_item) return;
+  const W       = Math.max(150, Math.round(scene.getBoundingClientRect().width));
+  const ppmBase = (W - 2 * S4V_LP) / s4v_mm;
+  const delta   = S4V_UNITS.indexOf(s4v_zoom) - S4V_UNITS.indexOf(s4v_unit);
+  const ppm     = ppmBase * Math.pow(2, delta);
+  const objW    = Math.round(s4v_mm * ppm);
+
+  const col = S4V_COL[s4v_item.id] || '#60a5fa';
+  let svg = s4v_item.standalone(col);
+  svg = svg.replace(/width:\d+px/, `width:${Math.max(4, objW)}px`)
+           .replace(/margin\s*:\s*auto/, 'margin:0');
+  const objEl = document.getElementById('s4v-obj');
+  objEl.innerHTML  = svg;
+  objEl.style.left = S4V_LP + 'px';
+
+  // Marcadors: inici a x=LP, final a x=LP+objW (dins el canvas)
+  const ms = document.getElementById('s4v-mstart');
+  const me = document.getElementById('s4v-mend');
+  ms.style.left    = S4V_LP + 'px';
+  ms.style.display = 'block';
+  me.style.left    = (S4V_LP + objW) + 'px';
+  me.style.display = 'block';
+
+  s4vDrawRuler(W, ppm);
 }
 
-function _visDraw(pxMm){
-  const canvas = document.getElementById('vis4-cvs');
+function s4vDrawRuler(W, ppm){
+  const canvas = document.getElementById('s4v-ruler');
   if(!canvas) return;
-  const W = canvas.width, ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, VIS_H);
+  const dpr = devicePixelRatio || 1;
+  const H   = 46;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
 
-  const col    = _visCol(_visObjItem);
-  const spanPx = VIS_SPAN_MM[_visUnit] * pxMm;  // una longitud del regle en px
-  const objPx  = _visObjMm * pxMm;              // amplada total de l'objecte en px
-
-  // ── Barra de l'objecte — alternança clar/fosc per repetició del regle ──
-  let x = 0, stripe = 0;
-  while(x < W + 1 && x < objPx + 1){
-    const sw = Math.min(spanPx, objPx - x, W + 1 - x);
-    if(sw <= 0) break;
-    ctx.globalAlpha = stripe % 2 === 0 ? 0.88 : 0.50;
-    ctx.fillStyle = col;
-    ctx.fillRect(x, VIS_OBJ_Y, sw, VIS_OBJ_H);
-    x += spanPx; stripe++;
-  }
-  ctx.globalAlpha = 1;
-
-  // Línies divisòries entre repeticions
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([4,3]);
-  for(let lx = spanPx; lx < Math.min(objPx, W) + 1; lx += spanPx){
-    ctx.beginPath(); ctx.moveTo(lx, VIS_OBJ_Y); ctx.lineTo(lx, VIS_OBJ_Y + VIS_OBJ_H); ctx.stroke();
-  }
-  ctx.restore();
-
-  // Fletxa si l'objecte desborda cap a la dreta
-  if(objPx > W + 1){
-    ctx.save();
-    ctx.fillStyle = col; ctx.globalAlpha = 0.88;
-    ctx.beginPath();
-    ctx.moveTo(W - 2, VIS_OBJ_Y + VIS_OBJ_H * 0.2);
-    ctx.lineTo(W - 2, VIS_OBJ_Y + VIS_OBJ_H * 0.8);
-    ctx.lineTo(W + 10, VIS_OBJ_Y + VIS_OBJ_H * 0.5);
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-  }
-
-  // Nom de l'objecte sobre la barra
-  if(objPx > 24 && _visObjItem){
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.font = 'bold 11px "Segoe UI",sans-serif';
-    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    ctx.fillText(_visObjItem.nom, 8, VIS_OBJ_Y + VIS_OBJ_H / 2);
-    ctx.restore();
-  }
-
-  // ── Cos del regle ──
   ctx.fillStyle = '#fef3c7';
+  ctx.fillRect(0, 0, W, H);
   ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.rect(0, VIS_RUL_Y, W, VIS_RUL_H); ctx.fill(); ctx.stroke();
+  ctx.strokeRect(0.75, 0.75, W - 1.5, H - 1.5);
 
-  // Marques del regle (de menor a major per a que les majors queden al damunt)
-  const tDefs = {
-    mm: [{s:1,   h:5,         w:0.4}, {s:5,   h:11,        w:0.8}, {s:10,     h:VIS_RUL_H, w:1.5, lbl:true}],
-    cm: [{s:10,  h:5,         w:0.4}, {s:50,  h:11,        w:0.8}, {s:100,    h:VIS_RUL_H, w:1.5, lbl:true}],
-    m:  [{s:100, h:5,         w:0.4}, {s:500, h:11,        w:0.8}, {s:1000,   h:VIS_RUL_H, w:1.5, lbl:true}],
-    km: [                             {s:500000,h:11,       w:0.8}, {s:1000000,h:VIS_RUL_H, w:1.5, lbl:true}]
-  };
-  const toLbl = mm => ({mm, cm:mm/10, m:mm/1000, km:mm/1000000}[_visUnit]);
-  const spanMm = VIS_SPAN_MM[_visUnit];
+  const toLbl  = { mm: v => v, cm: v => v/10, m: v => v/1000 }[s4v_zoom];
+  const totMm  = s4v_mm;   // el regle cobreix exactament l'objecte
 
-  ctx.save();
+  const CANDS = [1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,20000,50000];
+  const majMm = CANDS.find(c => c * ppm >= 24) ?? CANDS[CANDS.length - 1];
+  const minMm = CANDS.find(c => c * ppm >=  4 && c < majMm) ?? majMm;
+
   ctx.strokeStyle = '#78350f'; ctx.fillStyle = '#78350f';
-  ctx.textBaseline = 'bottom'; ctx.textAlign = 'center';
-  ctx.font = '8.5px "Segoe UI",sans-serif';
 
-  for(const td of tDefs[_visUnit]){
-    ctx.lineWidth = td.w;
-    for(let mm = 0; mm <= spanMm + 0.001; mm += td.s){
-      const tx = (mm / spanMm) * W;
-      if(tx > W + 0.5) break;
-      ctx.beginPath(); ctx.moveTo(tx, VIS_RUL_Y); ctx.lineTo(tx, VIS_RUL_Y + td.h); ctx.stroke();
-      if(td.lbl){
-        const lbl = toLbl(mm);
-        ctx.fillText(Number.isInteger(lbl) ? lbl : +lbl.toFixed(1), tx, VIS_RUL_Y - 2);
-      }
-    }
+  // Marques menors
+  ctx.lineWidth = 0.7;
+  for(let mm = 0; mm <= totMm + minMm; mm += minMm){
+    if(mm % majMm === 0) continue;
+    const x = S4V_LP + mm * ppm;
+    if(x > W) break;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 7); ctx.stroke();
   }
-  // Etiqueta de la unitat al final del regle
-  ctx.font = 'bold 9px "Segoe UI",sans-serif';
+
+  // Marques majors + etiquetes
+  ctx.lineWidth = 1.5;
+  ctx.font = '9.5px "Segoe UI",sans-serif';
+  ctx.textBaseline = 'top';
+  for(let mm = 0; mm <= totMm + majMm; mm += majMm){
+    const x = S4V_LP + mm * ppm;
+    if(x > W) break;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 16); ctx.stroke();
+    const raw = toLbl(mm);
+    const lbl = Number.isInteger(raw) ? String(raw) : parseFloat(raw.toPrecision(4)).toString();
+    if(x < S4V_LP + 2)       { ctx.textAlign = 'left';   ctx.fillText(lbl, x + 2, 18); }
+    else if(x > W - S4V_LP/2){ ctx.textAlign = 'right';  ctx.fillText(lbl, x - 2, 18); }
+    else                      { ctx.textAlign = 'center'; ctx.fillText(lbl, x,     18); }
+  }
+
+  ctx.font = 'bold 9.5px "Segoe UI",sans-serif';
   ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  ctx.fillText(_visUnit, W - 3, VIS_RUL_Y + VIS_RUL_H / 2);
-  ctx.restore();
-
-  // ── Comptador de repeticions ──
-  const times = Math.max(1, Math.ceil(_visObjMm / VIS_SPAN_MM[_visUnit]));
-  const el = document.getElementById('vis4-times');
-  if(el){
-    if(times === 1)     { el.textContent = '✓ La regla hi cap una sola vegada'; el.style.color = 'var(--ok)'; }
-    else if(times <= 5) { el.textContent = `Cal repetir la regla ${times} vegades`; el.style.color = 'var(--a)'; }
-    else                { el.textContent = `Cal repetir la regla ${times} vegades!`; el.style.color = 'var(--ko)'; }
-  }
+  ctx.fillText(s4v_zoom, W - 4, H * 0.75);
 }
 
-function _visAnimate(newUnit){
-  if(_visAnimId){ cancelAnimationFrame(_visAnimId); _visAnimId = null; }
-  const canvas = document.getElementById('vis4-cvs');
-  if(!canvas) return;
-  const W = canvas.width;
-  const logA = Math.log(W / VIS_SPAN_MM[_visUnit]);
-  _visUnit = newUnit;
-  const logB = Math.log(W / VIS_SPAN_MM[newUnit]);
-  const t0 = performance.now(), dur = 420;
-  function step(now){
-    const p = Math.min((now - t0) / dur, 1);
-    const ease = p < 0.5 ? 2*p*p : -1 + (4-2*p)*p;
-    _visDraw(Math.exp(logA + (logB - logA) * ease));
-    if(p < 1) _visAnimId = requestAnimationFrame(step);
-    else { _visDraw(Math.exp(logB)); _visAnimId = null; }
-  }
-  _visAnimId = requestAnimationFrame(step);
+function s4vZoomStep(dir){
+  const idx = S4V_UNITS.indexOf(s4v_zoom);
+  const ni  = Math.max(0, Math.min(S4V_UNITS.length - 1, idx + dir));
+  if(ni === idx) return;
+  s4v_zoom = S4V_UNITS[ni];
+  document.getElementById('z4-label').textContent = s4v_zoom;
+  s4vRender();
 }
 
-function setVisUnit(unit){
-  if(unit === _visUnit) return;
-  ['mm','cm','m','km'].forEach(u =>
-    document.getElementById(`vbadge-${u}`).classList.toggle('on', u === unit)
-  );
-  _visAnimate(unit);
-  if(!_visAnswered && _visObjItem && unit === _visObjItem.cat){
-    _visAnswered = true;
-    setFb('vis4-fb', true, pick(OK));
-    gCorrect(7, 'scale');
+function s4vCheck(){
+  if(s4v_ok) return;
+  const inp = document.getElementById('s4v-inp');
+  const val = Number(inp.value);
+  if(!inp.value.trim() || isNaN(val)){ setFb('s4v-fb',false,'Escriu un número!'); return; }
+  inp.disabled = true;
+  if(val === s4v_ans){
+    inp.classList.add('ok');
+    setFb('s4v-fb', true, pick(OK) + ` — ${s4v_ans} ${s4v_unit} ✓`);
+    gCorrect(7, 'scale'); s4v_ok = true;
+  } else {
+    inp.classList.add('ko');
+    setFb('s4v-fb', false, pick(KO) + ` — Era ${s4v_ans} ${s4v_unit}`);
+    gWrong();
+    setTimeout(()=>{ inp.disabled=false; inp.classList.remove('ko'); inp.value=''; inp.focus(); }, 600);
   }
 }
 
 function nextSec4vis(){
-  if(_visAnimId){ cancelAnimationFrame(_visAnimId); _visAnimId = null; }
-  _visAnswered = false;
-  _visUnit = 'cm';
-  ['mm','cm','m','km'].forEach(u =>
-    document.getElementById(`vbadge-${u}`).classList.toggle('on', u === 'cm')
-  );
-  document.getElementById('vis4-fb').textContent = '';
-  document.getElementById('vis4-times').textContent = '';
+  s4v_ok=false;
+  s4v_item = pick(ITEMS_LON);
+  const mult = { mm:1, cm:10, m:1000 };
+  const val  = ri(s4v_item.min, s4v_item.max);
+  s4v_ans=val; s4v_unit=s4v_item.cat; s4v_mm=val*mult[s4v_unit]; s4v_zoom=s4v_unit;
 
-  _visObjItem = pick(SVG_LONGITUD);
-  const mult = {mm:1, cm:10, m:1000, km:1000000};
-  _visObjMm = ri(_visObjItem.min, _visObjItem.max) * mult[_visObjItem.cat];
-
-  document.getElementById('vis4-obj').innerHTML =
-    _visObjItem.standalone() +
-    `<div class="mes-vis" style="font-size:.95rem;padding:4px 0">
-      ${_visObjItem.art} <strong>${_visObjItem.nom}</strong>
-      <span style="font-size:.8rem;color:var(--m)"> — Tria la millor unitat de mesura</span>
-    </div>`;
-
-  setTimeout(()=>{
-    const canvas = document.getElementById('vis4-cvs');
-    if(!canvas) return;
-    const w = Math.max(200, Math.round(canvas.parentElement.getBoundingClientRect().width - 12));
-    canvas.width  = w;
-    canvas.height = VIS_H;
-    _visDraw(w / VIS_SPAN_MM['cm']);
-  }, 0);
+  document.getElementById('z4-label').textContent = s4v_zoom;
+  const art=s4v_item.art, nom=s4v_item.nom;
+  document.getElementById('s4v-name').textContent = s4v_item.icon+'  '+art[0].toUpperCase()+art.slice(1)+' '+nom;
+  document.getElementById('s4v-sub').textContent  = 'Llegeix el regle i escriu quants '+s4v_unit+' mesura '+art+' '+nom+'.';
+  document.getElementById('s4v-unit').textContent = s4v_unit;
+  clrInp('s4v-inp');
+  document.getElementById('s4v-fb').textContent = '';
+  setTimeout(() => s4vRender(), 0);
 }
 
 // ════════════════════════════════════════════════════════════
