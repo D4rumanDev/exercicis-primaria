@@ -86,6 +86,14 @@ function gCorrect(xp=1,typeOrFn=null){
   boom();
 }
 function gWrong(){const g=gLoad();g.ko++;g.todayKo=(g.todayKo||0)+1;g.streak=0;gSave(g);gRender();const e=eLoad();e.ko=(e.ko||0)+1;eSave(e);}
+// ZPD adaptive selection: pick from levels[] using challenge-zone weighting.
+// statsFn(level) must return {c,e}. Peak weight at ~62% accuracy; mastered (>88%) → 0.3; unexplored (<4 tries) → 2.0.
+function gAdapt(levels,statsFn){
+  const w=levels.map(l=>{const s=statsFn(l)||{c:0,e:0},tot=(s.c||0)+(s.e||0);if(tot<4)return 2.0;const acc=(s.c||0)/tot;if(acc>0.88)return 0.3;if(acc<0.35)return 0.6;return 0.8+1.2*Math.sin(Math.PI*(acc-0.35)/0.53);});
+  const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
+  for(let i=0;i<levels.length;i++){r-=w[i];if(r<=0)return levels[i];}
+  return levels[levels.length-1];
+}
 function boom(){
   const c=['#1d4ed8','#fbbf24','#16a34a','#dc2626','#7c3aed'];
   const vh=window.innerHeight;

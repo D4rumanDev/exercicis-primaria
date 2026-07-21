@@ -112,11 +112,8 @@ function updateStatsDisplay(){gRender();}
 // ── Adaptive difficulty ───────────────────────────────────────────────────────
 function selectDifficulty(){
   if(mode!==0)return mode;
-  const s=loadStats(),diffs=[2,3,4,5];
-  const w=diffs.map(d=>{const st=s['d'+d]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5});
-  const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
-  for(let i=0;i<diffs.length;i++){r-=w[i];if(r<=0)return diffs[i];}
-  return 5;
+  const s=loadStats();
+  return gAdapt([2,3,4,5],d=>s['d'+d]);
 }
 
 // ── Exercise generation ───────────────────────────────────────────────────────

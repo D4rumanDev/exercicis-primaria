@@ -288,22 +288,17 @@ function loadStats1(){try{return Object.assign(defStats1(),JSON.parse(localStora
 function saveStats1(s){localStorage.setItem(KEY1,JSON.stringify(s));}
 function selectMode1(){
   if(e1Mode==='taules'){
-    const s=loadStats1(),tables=[2,3,4,5,6,7,8,9];
-    const w=tables.map(t=>{const st=s['t'+t]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
-    const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
-    for(let i=0;i<tables.length;i++){r-=w[i];if(r<=0)return{type:'table',table:tables[i]};}
-    return{type:'table',table:9};
+    const s=loadStats1();
+    return{type:'table',table:gAdapt([2,3,4,5,6,7,8,9],t=>s['t'+t])};
   }
   if(typeof e1Mode==='number') return{type:'table',table:e1Mode};
   if(e1Mode==='m2') return{type:'mult',digits:2};
   if(e1Mode==='m3') return{type:'mult',digits:3};
   if(e1Mode==='m4') return{type:'mult',digits:4};
   if(e1Mode==='mauto'){
-    const s=loadStats1(),mults=['m2','m3','m4'],digits=[2,3,4];
-    const w=mults.map(k=>{const st=s[k]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
-    const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
-    for(let i=0;i<mults.length;i++){r-=w[i];if(r<=0)return{type:'mult',digits:digits[i]};}
-    return{type:'mult',digits:4};
+    const s=loadStats1(),keys=['m2','m3','m4'],digits=[2,3,4];
+    const k=gAdapt(keys,k=>s[k]);
+    return{type:'mult',digits:digits[keys.indexOf(k)]};
   }
   return{type:'table',table:5};
 }
@@ -433,10 +428,7 @@ function saveStats2(s){localStorage.setItem(KEY2,JSON.stringify(s));}
 function selectMode2(){
   if(e2Mode==='auto'){
     const s=loadStats2();
-    const w=MODES.map(m=>{const st=s[m.key]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
-    const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
-    for(let i=0;i<MODES.length;i++){r-=w[i];if(r<=0)return MODES[i];}
-    return MODES[0];
+    return gAdapt(MODES,m=>s[m.key]);
   }
   return MODES.find(m=>m.key==='m'+e2Mode)||MODES[0];
 }

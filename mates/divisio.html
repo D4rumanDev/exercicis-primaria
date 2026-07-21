@@ -379,11 +379,7 @@ function loadTab(){try{return Object.assign(defTab(),JSON.parse(localStorage.get
 function saveTab(s){localStorage.setItem(KEY_TAB,JSON.stringify(s));}
 function pickTable(stats,mode){
   if(mode!=='auto')return+mode;
-  const tables=[2,3,4,5,6,7,8,9];
-  const w=tables.map(t=>{const st=stats['t'+t]||{c:0,e:0},tot=st.c+st.e;return tot===0?2.5:0.4+(st.e/tot)*2.5;});
-  const tw=w.reduce((a,b)=>a+b,0);let r=Math.random()*tw;
-  for(let i=0;i<tables.length;i++){r-=w[i];if(r<=0)return tables[i];}
-  return 9;
+  return gAdapt([2,3,4,5,6,7,8,9],t=>stats['t'+t]);
 }
 function setTab(t){
   tabMode=t;
