@@ -213,6 +213,7 @@ html[data-theme="light"]{
   <div class="topbar">
     <button class="tog" onclick="openSidebar()" aria-label="Obre el menú">☰</button>
     <span class="topbar-title" id="topbar-title">Suma amb portant</span>
+    <button class="theme-btn" onclick="goStats()" title="Estadístiques" aria-label="Estadístiques">📊</button>
     <button class="theme-btn" onclick="goRandom()" title="Exercici aleatori" aria-label="Exercici aleatori">🎲</button>
     <button class="theme-btn" id="theme-tog" onclick="toggleTheme()" title="Mode fosc/clar" aria-label="Mode fosc/clar">🌙</button>
   </div>
@@ -326,6 +327,12 @@ function restoreLastPage(){
     });
     if(btn)goTo(btn,s.src,s.title);
   }catch{}
+}
+function goStats(){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('frame').src='stats.html';
+  document.getElementById('topbar-title').textContent='Estadístiques';
+  closeSidebar();
 }
 function goRandom(){
   const items=[...document.querySelectorAll('.nav-item')];

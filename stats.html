@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estadístiques</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+:root{--bar-ok:#16a34a;--bar-ko:#ef4444}
+@media(prefers-color-scheme:dark){:root{--bar-ok:#4ade80;--bar-ko:#f87171}}
+html[data-theme="dark"]{--bar-ok:#4ade80;--bar-ko:#f87171}
+html[data-theme="light"]{--bar-ok:#16a34a;--bar-ko:#ef4444}
+
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-sm)}
+.sum-cell{background:var(--bg-hi);border-radius:var(--r);padding:var(--sp-md) var(--sp-sm);text-align:center}
+.sum-n{font-size:var(--fxl);font-weight:800;color:var(--a);line-height:1.1}
+.sum-lbl{font-size:var(--fxs);color:var(--m);margin-top:4px}
+
+.chart-wrap{overflow-x:auto;padding-bottom:2px;margin-top:var(--sp-md)}
+.chart{display:flex;align-items:stretch;gap:3px;height:110px;min-width:min-content}
+.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:14px;max-width:28px;cursor:default}
+.bar-sp{flex:1;min-height:0}
+.bar-wrap{width:100%;border-radius:3px 3px 0 0;overflow:hidden;display:flex;flex-direction:column;opacity:.8;transition:opacity .1s}
+.bar-col:hover .bar-wrap{opacity:1}
+.bar-wrap.today{opacity:1;outline:2px solid var(--a);outline-offset:1px}
+.bar-ok{width:100%;background:var(--bar-ok)}
+.bar-ko{width:100%;background:var(--bar-ko)}
+.bar-zero{width:100%;height:2px;background:var(--b);opacity:.6;border-radius:2px}
+.bar-lbl{font-size:.48rem;color:var(--m);text-align:center;line-height:1;height:14px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+
+.legend{display:flex;gap:var(--sp-md);font-size:var(--fxs);color:var(--m);margin-top:var(--sp-sm);align-items:center}
+.leg-dot{width:9px;height:9px;border-radius:2px;display:inline-block;flex-shrink:0}
+.leg-ok{background:var(--bar-ok)}
+.leg-ko{background:var(--bar-ko)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hdr"><div><h1>📊 Estadístiques</h1><div class="muted">Exercicis fets per dia</div></div></div>
+  <div id="gam-bar"></div>
+  <div class="card">
+    <div class="sum-grid" id="summary"></div>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;color:var(--t);font-size:var(--fm)">Últims 30 dies</div>
+    <div class="chart-wrap"><div class="chart" id="chart"></div></div>
+    <div class="legend">
+      <span class="leg-dot leg-ok"></span>Encerts
+      <span class="leg-dot leg-ko" style="margin-left:var(--sp-sm)"></span>Errors
+    </div>
+  </div>
+</div>
+<script src="shared.js"></script>
+<script>
+function render(){
+  const today=new Date().toISOString().slice(0,10);
+  const hist=JSON.parse(localStorage.getItem('ex_hist_v1')||'[]');
+  const gam=JSON.parse(localStorage.getItem('ex_gam_v1')||'{}');
+
+  const byDay={};
+  hist.forEach(h=>{byDay[h.d]=h;});
+  if(gam.today===today)byDay[today]={d:today,ok:gam.todayOk||0,ko:gam.todayKo||0};
+
+  // Últims 30 dies
+  const days=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+
+  // Resum (dilluns = inici de setmana)
+  const wd=new Date();wd.setDate(wd.getDate()-((wd.getDay()+6)%7));
+  const ws=wd.toISOString().slice(0,10);
+  const mon=today.slice(0,7);
+  let wOk=0,mOk=0,best=0;
+  Object.values(byDay).forEach(h=>{
+    if(h.d>=ws)wOk+=h.ok;
+    if(h.d.startsWith(mon))mOk+=h.ok;
+    if(h.ok>best)best=h.ok;
+  });
+  const todayOk=byDay[today]?.ok||0;
+
+  document.getElementById('summary').innerHTML=
+    `<div class="sum-cell"><div class="sum-n">${todayOk}</div><div class="sum-lbl">📅 Avui</div></div>`+
+    `<div class="sum-cell"><div class="sum-n">${wOk}</div><div class="sum-lbl">📆 Setmana</div></div>`+
+    `<div class="sum-cell"><div class="sum-n">${mOk}</div><div class="sum-lbl">🗓 Mes</div></div>`+
+    `<div class="sum-cell"><div class="sum-n">${best}</div><div class="sum-lbl">🏆 Millor dia</div></div>`;
+
+  // Gràfic apilat ok + ko
+  const maxTotal=Math.max(1,...days.map(d=>(byDay[d]?.ok||0)+(byDay[d]?.ko||0)));
+  const H=90;
+  const MONS=['gen','feb','mar','abr','mai','jun','jul','ago','set','oct','nov','des'];
+
+  document.getElementById('chart').innerHTML=days.map(d=>{
+    const e=byDay[d]||{ok:0,ko:0};
+    const total=e.ok+e.ko;
+    const dt=new Date(d+'T12:00:00');
+    const dn=dt.getDate();
+    const mn=MONS[dt.getMonth()];
+    const lbl=dn===1?`${dn}<br>${mn}`:`${dn}`;
+    const tip=`${d}: ${e.ok} encerts · ${e.ko} errors`;
+
+    if(total===0){
+      return `<div class="bar-col" title="${tip}"><div class="bar-sp"></div><div class="bar-zero"></div><div class="bar-lbl">${lbl}</div></div>`;
+    }
+    const totalH=Math.max(5,Math.round(total/maxTotal*H));
+    const okH=Math.round(e.ok/total*totalH);
+    const koH=totalH-okH;
+    const isToday=d===today;
+
+    return `<div class="bar-col" title="${tip}">
+      <div class="bar-sp"></div>
+      <div class="bar-wrap${isToday?' today':''}">
+        ${koH>0?`<div class="bar-ko" style="height:${koH}px"></div>`:''}
+        ${okH>0?`<div class="bar-ok" style="height:${okH}px"></div>`:''}
+      </div>
+      <div class="bar-lbl">${lbl}</div>
+    </div>`;
+  }).join('');
+}
+render();
+gRender();
+</script>
+</body>
+</html>

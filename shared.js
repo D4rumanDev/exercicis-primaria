@@ -17,7 +17,7 @@ let GAM_ACHS = [
 ];
 
 function _eKey(){return typeof EXER_KEY!=='undefined'&&EXER_KEY?EXER_KEY:null;}
-function gLoad(){const today=new Date().toISOString().slice(0,10);try{const g=JSON.parse(localStorage.getItem(GAM))||{xp:0,ok:0,ko:0,streak:0,best:0,achs:[]};if(g.today!==today){g.today=today;g.todayOk=0;g.todayKo=0;}return g;}catch(_){return{xp:0,ok:0,ko:0,streak:0,best:0,achs:[],today,todayOk:0,todayKo:0};}}
+function gLoad(){const today=new Date().toISOString().slice(0,10);try{const g=JSON.parse(localStorage.getItem(GAM))||{xp:0,ok:0,ko:0,streak:0,best:0,achs:[]};if(g.today!==today){if(g.today&&(g.todayOk||g.todayKo)){try{const h=JSON.parse(localStorage.getItem('ex_hist_v1')||'[]');h.push({d:g.today,ok:g.todayOk||0,ko:g.todayKo||0});h.sort((a,b)=>a.d<b.d?-1:1);localStorage.setItem('ex_hist_v1',JSON.stringify(h.slice(-90)));}catch(_){}}g.today=today;g.todayOk=0;g.todayKo=0;}return g;}catch(_){return{xp:0,ok:0,ko:0,streak:0,best:0,achs:[],today,todayOk:0,todayKo:0};}}
 function gSave(g){localStorage.setItem(GAM,JSON.stringify(g));if(window.parent!==window)window.parent.postMessage({exGamUpdate:true},'*');}
 function eLoad(){const k=_eKey();if(!k)return{};try{return JSON.parse(localStorage.getItem(k))||{};}catch(_){return{};}}
 function eSave(e){const k=_eKey();if(k)localStorage.setItem(k,JSON.stringify(e));}
