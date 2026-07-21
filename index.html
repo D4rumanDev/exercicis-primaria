@@ -48,8 +48,10 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidde
 .nav-badge{margin-left:auto;font-size:.6rem;font-weight:700;color:var(--a);background:var(--a-light);border-radius:100px;padding:1px 6px;min-width:20px;text-align:center;line-height:1.7;flex-shrink:0}
 
 /* ── Progress panel — fixed at bottom ── */
-.gam-panel{padding:12px 14px 14px;border-top:1px solid var(--b);flex-shrink:0;background:var(--s)}
-.gam-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.gam-panel{padding:8px 14px 14px;border-top:1px solid var(--b);flex-shrink:0;background:var(--s)}
+.gam-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;cursor:pointer;background:none;border:none;width:100%;padding:4px 6px;margin-left:-6px;border-radius:8px;font-family:inherit;transition:background .15s}
+.gam-panel-hdr:hover{background:var(--bg)}
+.gam-panel.stats-active .gam-panel-hdr{background:var(--a-light)}
 .gam-panel-title{font-size:.63rem;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.08em}
 .gam-lv{font-size:.82rem;font-weight:700;color:var(--a)}
 .gam-xp-track{height:5px;background:var(--b);border-radius:3px;overflow:hidden;margin:5px 0 8px}
@@ -193,10 +195,10 @@ html[data-theme="light"]{
   </div><!-- end .nav-scroll -->
 
   <div id="gam-panel" class="gam-panel">
-    <div class="gam-panel-hdr">
+    <button class="gam-panel-hdr" onclick="goStats()" title="Veure estadístiques">
       <span class="gam-panel-title">Progrés</span>
-      <span class="gam-lv" id="gam-lv-name">—</span>
-    </div>
+      <span style="display:flex;align-items:center;gap:5px"><span class="gam-lv" id="gam-lv-name">—</span><span style="font-size:.65rem;opacity:.4">📊</span></span>
+    </button>
     <div class="gam-xp-track"><div class="gam-xp-fill" id="gam-xp-fill" style="width:0%"></div></div>
     <div class="gam-stats">
       <div class="gam-stat"><span class="gam-stat-n" id="gam-xp">0</span>⭐ XP</div>
@@ -213,7 +215,6 @@ html[data-theme="light"]{
   <div class="topbar">
     <button class="tog" onclick="openSidebar()" aria-label="Obre el menú">☰</button>
     <span class="topbar-title" id="topbar-title">Suma amb portant</span>
-    <button class="theme-btn" onclick="goStats()" title="Estadístiques" aria-label="Estadístiques">📊</button>
     <button class="theme-btn" onclick="goRandom()" title="Exercici aleatori" aria-label="Exercici aleatori">🎲</button>
     <button class="theme-btn" id="theme-tog" onclick="toggleTheme()" title="Mode fosc/clar" aria-label="Mode fosc/clar">🌙</button>
   </div>
@@ -308,6 +309,7 @@ function updateProgress(){
 }
 function goTo(btn,src,title){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('gam-panel').classList.remove('stats-active');
   btn.classList.add('active');
   const g=btn.closest('.nav-group');
   if(g&&g.classList.contains('collapsed')){g.classList.remove('collapsed');saveGroupState();}
@@ -330,6 +332,7 @@ function restoreLastPage(){
 }
 function goStats(){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('gam-panel').classList.add('stats-active');
   document.getElementById('frame').src='stats.html';
   document.getElementById('topbar-title').textContent='Estadístiques';
   closeSidebar();
