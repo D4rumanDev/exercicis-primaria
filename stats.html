@@ -8,64 +8,76 @@
 <style>
 :root{
   --cl-mates:#1d4ed8;--cl-llengua:#059669;--cl-angles:#7c3aed;--cl-castella:#d97706;
-  --bar-ok:#16a34a;--bar-ko:#ef4444
+  --bar-ok:#16a34a;--bar-ko:#ef4444;--bar-sel:#f59e0b
 }
 @media(prefers-color-scheme:dark){:root{
   --cl-mates:#60a5fa;--cl-llengua:#34d399;--cl-angles:#a78bfa;--cl-castella:#f59e0b;
-  --bar-ok:#4ade80;--bar-ko:#f87171
+  --bar-ok:#4ade80;--bar-ko:#f87171;--bar-sel:#fbbf24
 }}
 html[data-theme="dark"]{
   --cl-mates:#60a5fa;--cl-llengua:#34d399;--cl-angles:#a78bfa;--cl-castella:#f59e0b;
-  --bar-ok:#4ade80;--bar-ko:#f87171
+  --bar-ok:#4ade80;--bar-ko:#f87171;--bar-sel:#fbbf24
 }
 html[data-theme="light"]{
   --cl-mates:#1d4ed8;--cl-llengua:#059669;--cl-angles:#7c3aed;--cl-castella:#d97706;
-  --bar-ok:#16a34a;--bar-ko:#ef4444
+  --bar-ok:#16a34a;--bar-ko:#ef4444;--bar-sel:#f59e0b
 }
 
 /* ── Summary ── */
 .sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-sm)}
+.sum-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-sm)}
 .sum-cell{background:var(--bg-hi);border-radius:var(--r);padding:var(--sp-md) var(--sp-sm);text-align:center}
 .sum-n{font-size:var(--fxl);font-weight:800;color:var(--a);line-height:1.1}
 .sum-lbl{font-size:var(--fxs);color:var(--m);margin-top:4px}
+.sum-cell.ko .sum-n{color:var(--bar-ko)}
+.sum-cell.acc .sum-n{color:var(--cl-angles)}
+.sum-day-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-sm)}
+.sum-day-ttl{font-size:.83rem;font-weight:700;color:var(--t)}
+.sum-day-cls{border:none;background:none;cursor:pointer;font-size:.8rem;color:var(--m);padding:3px 9px;border-radius:6px;font-family:inherit;transition:background .12s;border:1px solid var(--b)}
+.sum-day-cls:hover{background:var(--bg);color:var(--t)}
 
-/* ── 30-day chart ── */
+/* ── Chart ── */
 .chart-wrap{overflow-x:auto;padding-bottom:2px;margin-top:var(--sp-md)}
 .chart{display:flex;align-items:stretch;gap:3px;height:110px;min-width:min-content}
-.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:14px;max-width:28px;cursor:default}
+.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:14px;max-width:28px;cursor:pointer}
 .bar-sp{flex:1;min-height:0}
-.bar-wrap{width:100%;border-radius:3px 3px 0 0;overflow:hidden;display:flex;flex-direction:column;opacity:.8;transition:opacity .1s}
+.bar-wrap{width:100%;border-radius:3px 3px 0 0;overflow:hidden;display:flex;flex-direction:column;opacity:.75;transition:opacity .1s}
 .bar-col:hover .bar-wrap{opacity:1}
 .bar-wrap.today{opacity:1;outline:2px solid var(--a);outline-offset:1px}
+.bar-col.sel .bar-wrap{opacity:1;outline:2px solid var(--bar-sel);outline-offset:1px}
+.bar-col.sel .bar-zero{background:var(--bar-sel);opacity:.8}
 .bar-ok-seg{width:100%;background:var(--bar-ok)}
 .bar-ko-seg{width:100%;background:var(--bar-ko)}
 .bar-zero{width:100%;height:2px;background:var(--b);opacity:.6;border-radius:2px}
 .bar-lbl{font-size:.48rem;color:var(--m);text-align:center;line-height:1;height:14px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.bar-col.sel .bar-lbl{color:var(--bar-sel);font-weight:700}
 .legend{display:flex;gap:var(--sp-md);font-size:var(--fxs);color:var(--m);margin-top:var(--sp-sm);align-items:center}
 .leg-dot{width:9px;height:9px;border-radius:2px;display:inline-block;flex-shrink:0}
 .leg-ok{background:var(--bar-ok)}
 .leg-ko{background:var(--bar-ko)}
 
-/* ── Per-subject cards ── */
+/* ── Per-subject ── */
 .subj-card{border-radius:var(--r);overflow:hidden;border:1px solid var(--b);background:var(--s);margin-bottom:var(--sp-sm);box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .subj-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:.84rem;font-weight:800;cursor:pointer;user-select:none;gap:8px;background:none;border:none;width:100%;text-align:left;font-family:inherit;border-bottom:1px solid var(--b)}
 .subj-hdr:hover{opacity:.85}
-.subj-hdr-left{display:flex;align-items:center;gap:8px}
-.subj-total{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(0,0,0,.06)}
-.subj-chevron{font-size:.55rem;opacity:.4;transition:transform .18s;flex-shrink:0;display:inline-block}
+.subj-totals{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.sbadge{font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:100px;white-space:nowrap}
+.subj-chevron{font-size:.55rem;opacity:.4;transition:transform .18s;display:inline-block;margin-left:2px}
 .subj-card.collapsed .subj-chevron{transform:rotate(-90deg)}
 .subj-card.collapsed .subj-body{display:none}
 .subj-body{padding:4px 0 6px}
 
 /* ── Exercise rows ── */
-.ex-row{display:flex;align-items:center;gap:8px;padding:5px 14px;transition:background .1s}
+.ex-row{display:flex;align-items:center;gap:7px;padding:5px 14px;transition:background .1s}
 .ex-row:hover{background:var(--bg)}
-.ex-row.zero{opacity:.35}
+.ex-row.zero{opacity:.3}
 .ex-icon{font-size:.85rem;min-width:18px;text-align:center;flex-shrink:0;line-height:1}
-.ex-name{font-size:var(--fs);color:var(--t);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
-.ex-bar-wrap{width:64px;height:5px;background:var(--b);border-radius:3px;overflow:hidden;flex-shrink:0}
-.ex-bar-fill{height:100%;border-radius:3px;transition:width .5s .1s}
-.ex-count{font-size:.8rem;font-weight:700;min-width:26px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+.ex-name{font-size:var(--fs);color:var(--t);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;min-width:0}
+.ex-acc{width:44px;height:5px;border-radius:3px;flex-shrink:0}
+.ex-n{font-size:.76rem;font-weight:700;min-width:24px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+.ex-ok-n{color:var(--bar-ok)}
+.ex-ko-n{color:var(--bar-ko)}
+.ex-row.zero .ex-n{color:var(--b)}
 </style>
 </head>
 <body>
@@ -74,11 +86,12 @@ html[data-theme="light"]{
     <div><h1>📊 Estadístiques</h1><div class="muted">Progrés complet</div></div>
   </div>
   <div id="gam-bar"></div>
+  <div class="card" id="summary-card"></div>
   <div class="card">
-    <div class="sum-grid" id="summary"></div>
-  </div>
-  <div class="card">
-    <div style="font-weight:700;color:var(--t);font-size:var(--fm)">Últims 30 dies</div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+      <span style="font-weight:700;color:var(--t);font-size:var(--fm)">Últims 30 dies</span>
+      <span style="font-size:var(--fxs);color:var(--m)">toca un dia per filtrar</span>
+    </div>
     <div class="chart-wrap"><div class="chart" id="chart"></div></div>
     <div class="legend">
       <span class="leg-dot leg-ok"></span>Encerts
@@ -137,55 +150,81 @@ const SUBJECTS=[
   ]},
 ];
 
-function eOk(key){try{const d=JSON.parse(localStorage.getItem(key));return d&&d.ok?d.ok:0;}catch{return 0;}}
+const DAY=['Dg','Dl','Dm','Dc','Dj','Dv','Ds'];
+const MON=['gen','feb','mar','abr','mai','jun','jul','ago','set','oct','nov','des'];
+function fmtD(d){const dt=new Date(d+'T12:00:00');return `${DAY[dt.getDay()]} ${dt.getDate()} ${MON[dt.getMonth()]} ${dt.getFullYear()}`;}
+
+let selDay=null;
+function selectDay(d){selDay=selDay===d?null:d;render();}
+
+function eGet(k,f){try{const d=JSON.parse(localStorage.getItem(k));return d&&d[f]?d[f]:0;}catch{return 0;}}
 
 function render(){
   const today=new Date().toISOString().slice(0,10);
   const hist=JSON.parse(localStorage.getItem('ex_hist_v1')||'[]');
   const gam=JSON.parse(localStorage.getItem('ex_gam_v1')||'{}');
-
   const byDay={};
   hist.forEach(h=>{byDay[h.d]=h;});
   if(gam.today===today)byDay[today]={d:today,ok:gam.todayOk||0,ko:gam.todayKo||0};
 
-  // Summary
-  const wd=new Date();wd.setDate(wd.getDate()-((wd.getDay()+6)%7));
-  const ws=wd.toISOString().slice(0,10);
-  const mon=today.slice(0,7);
-  let wOk=0,mOk=0,best=0;
-  Object.values(byDay).forEach(h=>{
-    if(h.d>=ws)wOk+=h.ok;
-    if(h.d.startsWith(mon))mOk+=h.ok;
-    if(h.ok>best)best=h.ok;
-  });
-  const todayOk=byDay[today]?.ok||0;
+  /* ── Summary ── */
+  if(selDay){
+    const e=byDay[selDay]||{ok:0,ko:0};
+    const tot=e.ok+e.ko;
+    const acc=tot>0?Math.round(e.ok/tot*100):'—';
+    document.getElementById('summary-card').innerHTML=
+      `<div class="sum-day-row">
+        <span class="sum-day-ttl">📅 ${fmtD(selDay)}</span>
+        <button class="sum-day-cls" onclick="selectDay('${selDay}')">✕ Tots els dies</button>
+      </div>
+      <div class="sum-grid-3">
+        <div class="sum-cell"><div class="sum-n">${e.ok}</div><div class="sum-lbl">✅ Encerts</div></div>
+        <div class="sum-cell ko"><div class="sum-n">${e.ko}</div><div class="sum-lbl">❌ Errors</div></div>
+        <div class="sum-cell acc"><div class="sum-n">${acc}${acc!=='—'?'%':''}</div><div class="sum-lbl">🎯 Precisió</div></div>
+      </div>`;
+  } else {
+    const wd=new Date();wd.setDate(wd.getDate()-((wd.getDay()+6)%7));
+    const ws=wd.toISOString().slice(0,10);
+    const mon=today.slice(0,7);
+    let wOk=0,mOk=0,best=0;
+    Object.values(byDay).forEach(h=>{
+      if(h.d>=ws)wOk+=h.ok;
+      if(h.d.startsWith(mon))mOk+=h.ok;
+      if(h.ok>best)best=h.ok;
+    });
+    const todayOk=byDay[today]?.ok||0;
+    document.getElementById('summary-card').innerHTML=
+      `<div class="sum-grid">
+        <div class="sum-cell"><div class="sum-n">${todayOk}</div><div class="sum-lbl">📅 Avui</div></div>
+        <div class="sum-cell"><div class="sum-n">${wOk}</div><div class="sum-lbl">📆 Setmana</div></div>
+        <div class="sum-cell"><div class="sum-n">${mOk}</div><div class="sum-lbl">🗓 Mes</div></div>
+        <div class="sum-cell"><div class="sum-n">${best}</div><div class="sum-lbl">🏆 Millor dia</div></div>
+      </div>`;
+  }
 
-  document.getElementById('summary').innerHTML=
-    `<div class="sum-cell"><div class="sum-n">${todayOk}</div><div class="sum-lbl">📅 Avui</div></div>`+
-    `<div class="sum-cell"><div class="sum-n">${wOk}</div><div class="sum-lbl">📆 Setmana</div></div>`+
-    `<div class="sum-cell"><div class="sum-n">${mOk}</div><div class="sum-lbl">🗓 Mes</div></div>`+
-    `<div class="sum-cell"><div class="sum-n">${best}</div><div class="sum-lbl">🏆 Millor dia</div></div>`;
-
-  // 30-day chart
+  /* ── Chart ── */
   const days=[];
   for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
-  const maxTotal=Math.max(1,...days.map(d=>(byDay[d]?.ok||0)+(byDay[d]?.ko||0)));
+  const maxT=Math.max(1,...days.map(d=>(byDay[d]?.ok||0)+(byDay[d]?.ko||0)));
   const H=90;
-  const MONS=['gen','feb','mar','abr','mai','jun','jul','ago','set','oct','nov','des'];
   document.getElementById('chart').innerHTML=days.map(d=>{
     const e=byDay[d]||{ok:0,ko:0};
-    const total=e.ok+e.ko;
+    const tot=e.ok+e.ko;
     const dt=new Date(d+'T12:00:00');
-    const dn=dt.getDate(),mn=MONS[dt.getMonth()];
+    const dn=dt.getDate(),mn=MON[dt.getMonth()];
     const lbl=dn===1?`${dn}<br>${mn}`:`${dn}`;
-    const tip=`${d}: ${e.ok} encerts · ${e.ko} errors`;
-    if(total===0)return `<div class="bar-col" title="${tip}"><div class="bar-sp"></div><div class="bar-zero"></div><div class="bar-lbl">${lbl}</div></div>`;
-    const totalH=Math.max(5,Math.round(total/maxTotal*H));
-    const okH=Math.round(e.ok/total*totalH);
+    const tip=`${fmtD(d)}: ${e.ok} encerts · ${e.ko} errors`;
+    const isSel=d===selDay;
+    const isToday=d===today;
+    const colCls=`bar-col${isSel?' sel':''}`;
+    if(tot===0)return `<div class="${colCls}" title="${tip}" onclick="selectDay('${d}')"><div class="bar-sp"></div><div class="bar-zero"></div><div class="bar-lbl">${lbl}</div></div>`;
+    const totalH=Math.max(5,Math.round(tot/maxT*H));
+    const okH=Math.round(e.ok/tot*totalH);
     const koH=totalH-okH;
-    return `<div class="bar-col" title="${tip}">
+    const wrapCls=`bar-wrap${isToday?' today':''}`;
+    return `<div class="${colCls}" title="${tip}" onclick="selectDay('${d}')">
       <div class="bar-sp"></div>
-      <div class="bar-wrap${d===today?' today':''}">
+      <div class="${wrapCls}">
         ${koH>0?`<div class="bar-ko-seg" style="height:${koH}px"></div>`:''}
         ${okH>0?`<div class="bar-ok-seg" style="height:${okH}px"></div>`:''}
       </div>
@@ -193,32 +232,37 @@ function render(){
     </div>`;
   }).join('');
 
-  // Per-subject breakdown
+  /* ── Per-subject ── */
   const saved=JSON.parse(localStorage.getItem('ex_stats_col')||'{}');
   document.getElementById('by-subject').innerHTML=SUBJECTS.map(s=>{
-    const counts=s.ex.map(e=>eOk(e.k));
-    const total=counts.reduce((a,b)=>a+b,0);
-    const maxC=Math.max(1,...counts);
+    const cOk=s.ex.map(e=>eGet(e.k,'ok'));
+    const cKo=s.ex.map(e=>eGet(e.k,'ko'));
+    const totOk=cOk.reduce((a,b)=>a+b,0);
+    const totKo=cKo.reduce((a,b)=>a+b,0);
     const isCol=saved[s.id]??false;
 
     const rows=s.ex.map((e,i)=>{
-      const c=counts[i];
-      const pct=Math.round(c/maxC*100);
-      return `<div class="ex-row${c===0?' zero':''}">
+      const ok=cOk[i],ko=cKo[i],tot=ok+ko;
+      const acc=tot>0?Math.round(ok/tot*100):0;
+      const bar=tot>0
+        ?`linear-gradient(to right,var(--bar-ok) ${acc}%,var(--bar-ko) ${acc}%)`
+        :'var(--b)';
+      return `<div class="ex-row${tot===0?' zero':''}">
         <span class="ex-icon">${e.i}</span>
-        <span class="ex-name">${e.n}</span>
-        <div class="ex-bar-wrap"><div class="ex-bar-fill" style="width:${c?pct:0}%;background:${s.color}"></div></div>
-        <span class="ex-count" style="color:${c?s.color:'var(--m)'}">${c||'—'}</span>
+        <span class="ex-name" title="${e.n}">${e.n}</span>
+        <div class="ex-acc" style="background:${bar}" title="${ok}✅ · ${ko}❌${tot?' · '+acc+'%':''}"></div>
+        <span class="ex-n ex-ok-n">${ok||'—'}</span>
+        <span class="ex-n ex-ko-n" style="${ko===0?'color:var(--b)':''}">${ko||'—'}</span>
       </div>`;
     }).join('');
 
+    const okB=totOk>0?`<span class="sbadge" style="color:var(--bar-ok);background:color-mix(in srgb,var(--bar-ok) 14%,transparent)">${totOk}✅</span>`:'' ;
+    const koB=totKo>0?`<span class="sbadge" style="color:var(--bar-ko);background:color-mix(in srgb,var(--bar-ko) 14%,transparent)">${totKo}❌</span>`:'';
+
     return `<div class="subj-card${isCol?' collapsed':''}" data-subj="${s.id}">
       <button class="subj-hdr" style="color:${s.color}" onclick="toggleSubj(this)">
-        <span class="subj-hdr-left">${s.label}</span>
-        <span style="display:flex;align-items:center;gap:6px">
-          <span class="subj-total" style="color:${s.color};background:color-mix(in srgb,${s.color} 12%,transparent)">${total} ✅</span>
-          <span class="subj-chevron">▾</span>
-        </span>
+        <span>${s.label}</span>
+        <span class="subj-totals">${okB}${koB}<span class="subj-chevron">▾</span></span>
       </button>
       <div class="subj-body">${rows}</div>
     </div>`;

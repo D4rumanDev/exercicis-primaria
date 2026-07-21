@@ -85,7 +85,7 @@ function gCorrect(xp=1,typeOrFn=null){
   newA.forEach(id=>{const a=GAM_ACHS.find(x=>x.id===id);if(a)gNotif(a.s+' '+a.n+'!');});
   boom();
 }
-function gWrong(){const g=gLoad();g.ko++;g.todayKo=(g.todayKo||0)+1;g.streak=0;gSave(g);gRender();}
+function gWrong(){const g=gLoad();g.ko++;g.todayKo=(g.todayKo||0)+1;g.streak=0;gSave(g);gRender();const e=eLoad();e.ko=(e.ko||0)+1;eSave(e);}
 function boom(){
   const c=['#1d4ed8','#fbbf24','#16a34a','#dc2626','#7c3aed'];
   const vh=window.innerHeight;
