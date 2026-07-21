@@ -277,6 +277,13 @@ function toggleSubj(btn){
   localStorage.setItem('ex_stats_col',JSON.stringify(saved));
 }
 
+function gResetExtra(){
+  const keep=new Set(['ex_theme','ex_stats_col']);
+  Object.keys(localStorage).filter(k=>!keep.has(k)).forEach(k=>localStorage.removeItem(k));
+  selDay=null;
+  render();
+}
+
 render();
 gRender();
 </script>

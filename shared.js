@@ -57,6 +57,7 @@ function gToggleAchs(){gAchsVisible=!gAchsVisible;if(gAchsVisible)gStatsVisible=
 function gReset(){
   if(!confirm('Vols reiniciar el progrés?'))return;
   localStorage.removeItem(GAM);
+  localStorage.removeItem('ex_hist_v1');
   const k=_eKey();if(k)localStorage.removeItem(k);
   if(typeof gResetExtra==='function')gResetExtra();
   gRender();
